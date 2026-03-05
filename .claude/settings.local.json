@@ -6,7 +6,9 @@
       "Bash(docker compose:*)",
       "Bash(psql:*)",
       "Bash(curl:*)",
-      "Bash(echo === Create expense ===:*)"
+      "Bash(echo === Create expense ===:*)",
+      "Bash(rm:*)",
+      "Bash(cp:*)"
     ]
   }
 }

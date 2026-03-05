@@ -1,0 +1,37 @@
+import { api } from "./client"
+
+export interface Expense {
+  id: string
+  amount: number
+  date: string
+  description: string | null
+  mileage: number | null
+  vehicleId: string
+  categoryId: string
+  createdAt: string
+  updatedAt: string
+  category: { id: string; name: string; slug: string }
+  vehicle: { id: string; brand: string; model: string; year: number }
+}
+
+interface CreateExpensePayload {
+  amount: number
+  date: string
+  description?: string
+  mileage?: number
+  vehicleId: string
+  categoryId: string
+}
+
+export const expensesApi = {
+  getAll: (vehicleId?: string) =>
+    api
+      .get<Expense[]>("/expenses", { params: vehicleId ? { vehicleId } : {} })
+      .then((r) => r.data),
+  getOne: (id: string) => api.get<Expense>(`/expenses/${id}`).then((r) => r.data),
+  create: (data: CreateExpensePayload) =>
+    api.post<Expense>("/expenses", data).then((r) => r.data),
+  update: (id: string, data: Partial<CreateExpensePayload>) =>
+    api.put<Expense>(`/expenses/${id}`, data).then((r) => r.data),
+  delete: (id: string) => api.delete(`/expenses/${id}`),
+}
