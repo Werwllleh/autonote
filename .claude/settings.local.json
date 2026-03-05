@@ -2,7 +2,11 @@
   "permissions": {
     "allow": [
       "Bash(npm:*)",
-      "Bash(npx:*)"
+      "Bash(npx:*)",
+      "Bash(docker compose:*)",
+      "Bash(psql:*)",
+      "Bash(curl:*)",
+      "Bash(echo === Create expense ===:*)"
     ]
   }
 }
