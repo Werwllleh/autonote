@@ -30,21 +30,21 @@ export function CategoryPieChart({ data }: Props) {
 
   if (chartData.length === 0) {
     return (
-      <div className="flex h-[300px] items-center justify-center text-muted-foreground">
+      <div className="flex h-[250px] items-center justify-center text-muted-foreground">
         Нет данных
       </div>
     )
   }
 
   return (
-    <ResponsiveContainer width="100%" height={300}>
+    <ResponsiveContainer width="100%" height={250}>
       <PieChart>
         <Pie
           data={chartData}
           cx="50%"
           cy="50%"
-          innerRadius={60}
-          outerRadius={100}
+          innerRadius={50}
+          outerRadius={80}
           paddingAngle={2}
           dataKey="value"
         >
@@ -52,8 +52,16 @@ export function CategoryPieChart({ data }: Props) {
             <Cell key={i} fill={COLORS[i % COLORS.length]} />
           ))}
         </Pie>
-        <Tooltip formatter={(value: number) => formatAmount(value)} />
-        <Legend />
+        <Tooltip
+          formatter={(value: number) => formatAmount(value)}
+          contentStyle={{
+            backgroundColor: "hsl(var(--card))",
+            border: "1px solid hsl(var(--border))",
+            borderRadius: "0.5rem",
+            color: "hsl(var(--card-foreground))",
+          }}
+        />
+        <Legend wrapperStyle={{ fontSize: "0.75rem" }} />
       </PieChart>
     </ResponsiveContainer>
   )

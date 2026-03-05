@@ -158,13 +158,16 @@ export function VehiclePage() {
           <ArrowLeft className="h-4 w-4" />
           Назад
         </Link>
-        <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm" onClick={handleExportCsv}>
+        <div className="flex items-center gap-1 sm:gap-2">
+          <Button variant="outline" size="sm" onClick={handleExportCsv} className="hidden sm:flex">
             <Download className="mr-2 h-4 w-4" />
             CSV
           </Button>
+          <Button variant="outline" size="icon" onClick={handleExportCsv} className="sm:hidden h-8 w-8">
+            <Download className="h-4 w-4" />
+          </Button>
           <AddExpenseDialog vehicleId={vehicle.id} />
-          <Button variant="outline" size="icon" onClick={handleDeleteVehicle}>
+          <Button variant="outline" size="icon" onClick={handleDeleteVehicle} className="h-8 w-8 sm:h-9 sm:w-9">
             <Trash2 className="h-4 w-4 text-destructive" />
           </Button>
         </div>
@@ -190,7 +193,7 @@ export function VehiclePage() {
       </div>
 
       {/* Summary cards */}
-      <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+      <div className="grid grid-cols-2 gap-3 sm:gap-4 sm:grid-cols-4">
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">
@@ -266,8 +269,8 @@ export function VehiclePage() {
       <Separator />
 
       {/* Expense list toolbar */}
-      <div className="flex flex-wrap items-center gap-3">
-        <div className="relative flex-1 min-w-[180px] max-w-xs">
+      <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+        <div className="relative w-full sm:w-auto sm:flex-1 sm:min-w-[180px] sm:max-w-xs">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input
             placeholder="Поиск..."
@@ -277,7 +280,7 @@ export function VehiclePage() {
           />
         </div>
         <Select value={catFilter} onValueChange={setCatFilter}>
-          <SelectTrigger className="w-[180px]">
+          <SelectTrigger className="w-[calc(50%-0.25rem)] sm:w-[180px]">
             <SelectValue placeholder="Категория" />
           </SelectTrigger>
           <SelectContent>
@@ -297,7 +300,7 @@ export function VehiclePage() {
             setSortDir(d)
           }}
         >
-          <SelectTrigger className="w-[200px]">
+          <SelectTrigger className="w-[calc(50%-0.25rem)] sm:w-[200px]">
             <ArrowUpDown className="mr-2 h-4 w-4" />
             <SelectValue />
           </SelectTrigger>
@@ -325,7 +328,7 @@ export function VehiclePage() {
           {filtered.map((expense) => (
             <div
               key={expense.id}
-              className="flex items-center gap-4 rounded-lg border px-4 py-3"
+              className="flex items-center gap-3 sm:gap-4 rounded-lg border px-3 sm:px-4 py-3"
             >
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2">
@@ -349,8 +352,8 @@ export function VehiclePage() {
                   )}
                 </div>
               </div>
-              <div className="flex items-center gap-3">
-                <span className="font-semibold">
+              <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+                <span className="font-semibold text-sm sm:text-base">
                   {formatAmount(expense.amount)}
                 </span>
                 <Button

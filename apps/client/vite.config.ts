@@ -16,6 +16,7 @@ export default defineConfig({
         manualChunks: {
           recharts: ["recharts"],
           vendor: ["react", "react-dom", "react-router-dom"],
+          radix: ["@radix-ui/react-dialog", "@radix-ui/react-dropdown-menu", "@radix-ui/react-select", "@radix-ui/react-tabs", "@radix-ui/react-separator", "@radix-ui/react-avatar", "@radix-ui/react-label", "@radix-ui/react-slot"],
         },
       },
     },

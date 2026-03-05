@@ -194,8 +194,8 @@ export function DashboardPage() {
       )}
 
       {/* Toolbar */}
-      <div className="flex flex-wrap items-center gap-3">
-        <div className="relative flex-1 min-w-[200px] max-w-sm">
+      <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+        <div className="relative w-full sm:w-auto sm:flex-1 sm:min-w-[200px] sm:max-w-sm">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input
             placeholder="Поиск по названию..."
@@ -206,7 +206,7 @@ export function DashboardPage() {
         </div>
 
         <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-          <SelectTrigger className="w-[180px]">
+          <SelectTrigger className="w-[calc(50%-0.25rem)] sm:w-[180px]">
             <SelectValue placeholder="Категория" />
           </SelectTrigger>
           <SelectContent>
@@ -220,7 +220,7 @@ export function DashboardPage() {
         </Select>
 
         <Select value={sortOrder} onValueChange={(v) => setSortOrder(v as SortOrder)}>
-          <SelectTrigger className="w-[200px]">
+          <SelectTrigger className="w-[calc(50%-0.25rem)] sm:w-[200px]">
             <ArrowUpDown className="mr-2 h-4 w-4" />
             <SelectValue />
           </SelectTrigger>

@@ -62,9 +62,10 @@ export function AddExpenseDialog({ vehicleId }: { vehicleId: string }) {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button>
-          <Plus className="mr-2 h-4 w-4" />
-          Добавить расход
+        <Button size="sm">
+          <Plus className="mr-1 sm:mr-2 h-4 w-4" />
+          <span className="hidden sm:inline">Добавить расход</span>
+          <span className="sm:hidden">Расход</span>
         </Button>
       </DialogTrigger>
       <DialogContent>

@@ -1,5 +1,6 @@
 import { Outlet } from "react-router-dom"
 import { useMe, useLogout } from "@/hooks/use-auth"
+import { ThemeToggle } from "@/components/theme-toggle"
 import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
@@ -20,30 +21,33 @@ export function Layout() {
         <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-4">
           <a href="/" className="flex items-center gap-2 font-semibold">
             <Car className="h-5 w-5" />
-            AutoNote
+            <span className="hidden sm:inline">AutoNote</span>
           </a>
-          {user && (
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="relative h-8 w-8 rounded-full">
-                  <Avatar className="h-8 w-8">
-                    <AvatarFallback className="text-xs">
-                      {user.email[0].toUpperCase()}
-                    </AvatarFallback>
-                  </Avatar>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem className="text-muted-foreground text-xs" disabled>
-                  {user.email}
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={logout}>
-                  <LogOut className="mr-2 h-4 w-4" />
-                  Выйти
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          )}
+          <div className="flex items-center gap-1">
+            <ThemeToggle />
+            {user && (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" className="relative h-8 w-8 rounded-full">
+                    <Avatar className="h-8 w-8">
+                      <AvatarFallback className="text-xs">
+                        {user.email[0].toUpperCase()}
+                      </AvatarFallback>
+                    </Avatar>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem className="text-muted-foreground text-xs" disabled>
+                    {user.email}
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={logout}>
+                    <LogOut className="mr-2 h-4 w-4" />
+                    Выйти
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
+          </div>
         </div>
       </header>
       <main className="mx-auto max-w-6xl px-4 py-6">
