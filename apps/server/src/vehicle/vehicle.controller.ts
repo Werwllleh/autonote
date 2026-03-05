@@ -6,44 +6,55 @@ import {
   Delete,
   Param,
   Body,
+  UseGuards,
   ParseUUIDPipe,
 } from '@nestjs/common';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { VehicleService } from './vehicle.service';
 import { CreateVehicleDto } from './dto/create-vehicle.dto';
 import { UpdateVehicleDto } from './dto/update-vehicle.dto';
 
-// TODO: replace hardcoded userId with auth user after Stage 2
-const TEMP_USER_ID = '00000000-0000-0000-0000-000000000000';
-
+@UseGuards(JwtAuthGuard)
 @Controller('vehicles')
 export class VehicleController {
   constructor(private readonly vehicleService: VehicleService) {}
 
   @Get()
-  findAll() {
-    return this.vehicleService.findAll();
+  findAll(@CurrentUser('id') userId: string) {
+    return this.vehicleService.findAll(userId);
   }
 
   @Get(':id')
-  findOne(@Param('id', ParseUUIDPipe) id: string) {
-    return this.vehicleService.findOne(id);
+  findOne(
+    @Param('id', ParseUUIDPipe) id: string,
+    @CurrentUser('id') userId: string,
+  ) {
+    return this.vehicleService.findOne(id, userId);
   }
 
   @Post()
-  create(@Body() dto: CreateVehicleDto) {
-    return this.vehicleService.create(dto, TEMP_USER_ID);
+  create(
+    @Body() dto: CreateVehicleDto,
+    @CurrentUser('id') userId: string,
+  ) {
+    return this.vehicleService.create(dto, userId);
   }
 
   @Put(':id')
   update(
     @Param('id', ParseUUIDPipe) id: string,
     @Body() dto: UpdateVehicleDto,
+    @CurrentUser('id') userId: string,
   ) {
-    return this.vehicleService.update(id, dto);
+    return this.vehicleService.update(id, dto, userId);
   }
 
   @Delete(':id')
-  remove(@Param('id', ParseUUIDPipe) id: string) {
-    return this.vehicleService.remove(id);
+  remove(
+    @Param('id', ParseUUIDPipe) id: string,
+    @CurrentUser('id') userId: string,
+  ) {
+    return this.vehicleService.remove(id, userId);
   }
 }

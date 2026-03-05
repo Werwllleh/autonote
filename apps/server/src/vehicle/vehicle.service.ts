@@ -7,14 +7,17 @@ import { UpdateVehicleDto } from './dto/update-vehicle.dto';
 export class VehicleService {
   constructor(private prisma: PrismaService) {}
 
-  findAll() {
+  findAll(userId: string) {
     return this.prisma.vehicle.findMany({
+      where: { userId },
       orderBy: { createdAt: 'desc' },
     });
   }
 
-  async findOne(id: string) {
-    const vehicle = await this.prisma.vehicle.findUnique({ where: { id } });
+  async findOne(id: string, userId: string) {
+    const vehicle = await this.prisma.vehicle.findFirst({
+      where: { id, userId },
+    });
     if (!vehicle) throw new NotFoundException('Vehicle not found');
     return vehicle;
   }
@@ -25,13 +28,13 @@ export class VehicleService {
     });
   }
 
-  async update(id: string, dto: UpdateVehicleDto) {
-    await this.findOne(id);
+  async update(id: string, dto: UpdateVehicleDto, userId: string) {
+    await this.findOne(id, userId);
     return this.prisma.vehicle.update({ where: { id }, data: dto });
   }
 
-  async remove(id: string) {
-    await this.findOne(id);
+  async remove(id: string, userId: string) {
+    await this.findOne(id, userId);
     return this.prisma.vehicle.delete({ where: { id } });
   }
 }

@@ -7,24 +7,33 @@ import { UpdateExpenseDto } from './dto/update-expense.dto';
 export class ExpenseService {
   constructor(private prisma: PrismaService) {}
 
-  findAll(vehicleId?: string) {
+  findAll(userId: string, vehicleId?: string) {
     return this.prisma.expense.findMany({
-      where: vehicleId ? { vehicleId } : undefined,
+      where: {
+        vehicle: { userId },
+        ...(vehicleId && { vehicleId }),
+      },
       include: { category: true, vehicle: true },
       orderBy: { date: 'desc' },
     });
   }
 
-  async findOne(id: string) {
-    const expense = await this.prisma.expense.findUnique({
-      where: { id },
+  async findOne(id: string, userId: string) {
+    const expense = await this.prisma.expense.findFirst({
+      where: { id, vehicle: { userId } },
       include: { category: true, vehicle: true },
     });
     if (!expense) throw new NotFoundException('Expense not found');
     return expense;
   }
 
-  create(dto: CreateExpenseDto) {
+  async create(dto: CreateExpenseDto, userId: string) {
+    // Verify vehicle belongs to user
+    const vehicle = await this.prisma.vehicle.findFirst({
+      where: { id: dto.vehicleId, userId },
+    });
+    if (!vehicle) throw new NotFoundException('Vehicle not found');
+
     return this.prisma.expense.create({
       data: {
         amount: dto.amount,
@@ -38,8 +47,8 @@ export class ExpenseService {
     });
   }
 
-  async update(id: string, dto: UpdateExpenseDto) {
-    await this.findOne(id);
+  async update(id: string, dto: UpdateExpenseDto, userId: string) {
+    await this.findOne(id, userId);
     return this.prisma.expense.update({
       where: { id },
       data: {
@@ -50,8 +59,8 @@ export class ExpenseService {
     });
   }
 
-  async remove(id: string) {
-    await this.findOne(id);
+  async remove(id: string, userId: string) {
+    await this.findOne(id, userId);
     return this.prisma.expense.delete({ where: { id } });
   }
 }
