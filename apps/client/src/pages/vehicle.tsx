@@ -4,7 +4,11 @@ import { useQuery } from "@tanstack/react-query"
 import { vehiclesApi } from "@/api/vehicles"
 import { useExpenses, useDeleteExpense } from "@/hooks/use-expenses"
 import { useDeleteVehicle } from "@/hooks/use-vehicles"
+import { useVehicleStats } from "@/hooks/use-stats"
+import { useAuthStore } from "@/lib/auth-store"
 import { AddExpenseDialog } from "@/components/add-expense-dialog"
+import { CategoryPieChart } from "@/components/charts/category-pie-chart"
+import { MonthlyLineChart } from "@/components/charts/monthly-line-chart"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -16,7 +20,18 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { ArrowLeft, Gauge, Trash2, Calendar, Car } from "lucide-react"
+import { Input } from "@/components/ui/input"
+import {
+  ArrowLeft,
+  Gauge,
+  Trash2,
+  Calendar,
+  Car,
+  Download,
+  Fuel,
+  Search,
+  ArrowUpDown,
+} from "lucide-react"
 
 function formatAmount(amount: number) {
   return amount.toLocaleString("ru-RU", {
@@ -34,10 +49,17 @@ function formatDate(dateStr: string) {
   })
 }
 
+type SortField = "date" | "amount"
+type SortDir = "asc" | "desc"
+
 export function VehiclePage() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
   const [catFilter, setCatFilter] = useState("all")
+  const [search, setSearch] = useState("")
+  const [sortField, setSortField] = useState<SortField>("date")
+  const [sortDir, setSortDir] = useState<SortDir>("desc")
+  const token = useAuthStore((s) => s.accessToken)
 
   const { data: vehicle, isLoading: vehicleLoading } = useQuery({
     queryKey: ["vehicles", id],
@@ -46,6 +68,7 @@ export function VehiclePage() {
   })
 
   const { data: expenses = [], isLoading: expensesLoading } = useExpenses(id)
+  const { data: stats } = useVehicleStats(id!)
   const deleteVehicle = useDeleteVehicle()
   const deleteExpense = useDeleteExpense()
 
@@ -58,15 +81,54 @@ export function VehiclePage() {
   }, [expenses])
 
   const filtered = useMemo(() => {
-    if (catFilter === "all") return expenses
-    return expenses.filter((e) => e.category.slug === catFilter)
-  }, [expenses, catFilter])
+    let list = expenses
+
+    if (catFilter !== "all") {
+      list = list.filter((e) => e.category.slug === catFilter)
+    }
+
+    if (search) {
+      const q = search.toLowerCase()
+      list = list.filter(
+        (e) =>
+          e.description?.toLowerCase().includes(q) ||
+          e.category.name.toLowerCase().includes(q),
+      )
+    }
+
+    list = [...list].sort((a, b) => {
+      if (sortField === "amount") {
+        return sortDir === "desc" ? b.amount - a.amount : a.amount - b.amount
+      }
+      const da = new Date(a.date).getTime()
+      const db = new Date(b.date).getTime()
+      return sortDir === "desc" ? db - da : da - db
+    })
+
+    return list
+  }, [expenses, catFilter, search, sortField, sortDir])
 
   const totalFiltered = filtered.reduce((sum, e) => sum + e.amount, 0)
 
   const handleDeleteVehicle = () => {
     if (!confirm("Удалить автомобиль и все его расходы?")) return
     deleteVehicle.mutate(id!, { onSuccess: () => navigate("/") })
+  }
+
+  const handleExportCsv = () => {
+    const url = `/api/expenses/export/csv?vehicleId=${id}`
+    const a = document.createElement("a")
+    a.href = url
+    a.download = "expenses.csv"
+    // Add auth header via fetch
+    fetch(url, { headers: { Authorization: `Bearer ${token}` } })
+      .then((r) => r.blob())
+      .then((blob) => {
+        const url = URL.createObjectURL(blob)
+        a.href = url
+        a.click()
+        URL.revokeObjectURL(url)
+      })
   }
 
   if (isLoading) {
@@ -97,6 +159,10 @@ export function VehiclePage() {
           Назад
         </Link>
         <div className="flex items-center gap-2">
+          <Button variant="outline" size="sm" onClick={handleExportCsv}>
+            <Download className="mr-2 h-4 w-4" />
+            CSV
+          </Button>
           <AddExpenseDialog vehicleId={vehicle.id} />
           <Button variant="outline" size="icon" onClick={handleDeleteVehicle}>
             <Trash2 className="h-4 w-4 text-destructive" />
@@ -132,7 +198,7 @@ export function VehiclePage() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-2xl font-bold">{formatAmount(totalFiltered)}</p>
+            <p className="text-2xl font-bold">{formatAmount(stats?.total ?? 0)}</p>
           </CardContent>
         </Card>
         <Card>
@@ -142,15 +208,76 @@ export function VehiclePage() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-2xl font-bold">{filtered.length}</p>
+            <p className="text-2xl font-bold">{stats?.count ?? 0}</p>
           </CardContent>
         </Card>
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">
+              Категорий
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-2xl font-bold">
+              {Object.keys(stats?.byCategory ?? {}).length}
+            </p>
+          </CardContent>
+        </Card>
+        {stats?.avgFuelCostPer100km !== null &&
+          stats?.avgFuelCostPer100km !== undefined && (
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-1">
+                  <Fuel className="h-3 w-3" />
+                  Топливо / 100 км
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-2xl font-bold">
+                  {formatAmount(stats.avgFuelCostPer100km)}
+                </p>
+              </CardContent>
+            </Card>
+          )}
       </div>
 
-      {/* Filter */}
-      <div className="flex items-center gap-3">
+      {/* Charts */}
+      {stats && Object.keys(stats.byCategory).length > 0 && (
+        <div className="grid gap-4 md:grid-cols-2">
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-base">По категориям</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <CategoryPieChart data={stats.byCategory} />
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-base">Динамика расходов</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <MonthlyLineChart data={stats.byMonth} />
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
+      <Separator />
+
+      {/* Expense list toolbar */}
+      <div className="flex flex-wrap items-center gap-3">
+        <div className="relative flex-1 min-w-[180px] max-w-xs">
+          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          <Input
+            placeholder="Поиск..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="pl-9"
+          />
+        </div>
         <Select value={catFilter} onValueChange={setCatFilter}>
-          <SelectTrigger className="w-[200px]">
+          <SelectTrigger className="w-[180px]">
             <SelectValue placeholder="Категория" />
           </SelectTrigger>
           <SelectContent>
@@ -162,9 +289,31 @@ export function VehiclePage() {
             ))}
           </SelectContent>
         </Select>
+        <Select
+          value={`${sortField}-${sortDir}`}
+          onValueChange={(v) => {
+            const [f, d] = v.split("-") as [SortField, SortDir]
+            setSortField(f)
+            setSortDir(d)
+          }}
+        >
+          <SelectTrigger className="w-[200px]">
+            <ArrowUpDown className="mr-2 h-4 w-4" />
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="date-desc">Дата: новые</SelectItem>
+            <SelectItem value="date-asc">Дата: старые</SelectItem>
+            <SelectItem value="amount-desc">Сумма: больше</SelectItem>
+            <SelectItem value="amount-asc">Сумма: меньше</SelectItem>
+          </SelectContent>
+        </Select>
+        {catFilter !== "all" && (
+          <p className="text-sm text-muted-foreground">
+            Итого: {formatAmount(totalFiltered)}
+          </p>
+        )}
       </div>
-
-      <Separator />
 
       {/* Expense list */}
       {filtered.length === 0 ? (

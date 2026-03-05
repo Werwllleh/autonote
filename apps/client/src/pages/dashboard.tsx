@@ -2,10 +2,13 @@ import { useState, useMemo } from "react"
 import { useVehicles } from "@/hooks/use-vehicles"
 import { useExpenses } from "@/hooks/use-expenses"
 import { useCategories } from "@/hooks/use-categories"
+import { useOverallStats } from "@/hooks/use-stats"
 import { VehicleCard } from "@/components/vehicle-card"
 import { AddVehicleDialog } from "@/components/add-vehicle-dialog"
+import { CategoryPieChart } from "@/components/charts/category-pie-chart"
+import { MonthlyLineChart } from "@/components/charts/monthly-line-chart"
 import { Input } from "@/components/ui/input"
-import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import {
   Select,
   SelectContent,
@@ -14,10 +17,19 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Search, LayoutGrid, List, ArrowUpDown } from "lucide-react"
+import { Separator } from "@/components/ui/separator"
+import { Search, LayoutGrid, List, ArrowUpDown, Car, Receipt } from "lucide-react"
 
 type ViewMode = "grid" | "list"
 type SortOrder = "desc" | "asc" | "name"
+
+function formatAmount(amount: number) {
+  return amount.toLocaleString("ru-RU", {
+    style: "currency",
+    currency: "RUB",
+    maximumFractionDigits: 0,
+  })
+}
 
 export function DashboardPage() {
   const [search, setSearch] = useState("")
@@ -28,6 +40,7 @@ export function DashboardPage() {
   const { data: vehicles = [], isLoading: vehiclesLoading } = useVehicles()
   const { data: expenses = [], isLoading: expensesLoading } = useExpenses()
   const { data: categories = [] } = useCategories()
+  const { data: stats } = useOverallStats()
 
   const isLoading = vehiclesLoading || expensesLoading
 
@@ -59,7 +72,6 @@ export function DashboardPage() {
   const filtered = useMemo(() => {
     let list = vehicles
 
-    // search
     if (search) {
       const q = search.toLowerCase()
       list = list.filter(
@@ -69,7 +81,6 @@ export function DashboardPage() {
       )
     }
 
-    // category filter: only show vehicles that have expenses in this category
     if (categoryFilter !== "all") {
       const catName = categories.find((c) => c.slug === categoryFilter)?.name
       if (catName) {
@@ -80,7 +91,6 @@ export function DashboardPage() {
       }
     }
 
-    // sort
     list = [...list].sort((a, b) => {
       if (sortOrder === "name") {
         return `${a.brand} ${a.model}`.localeCompare(`${b.brand} ${b.model}`)
@@ -94,11 +104,11 @@ export function DashboardPage() {
   }, [vehicles, search, categoryFilter, sortOrder, vehicleStats, categories])
 
   const getTopCategory = (vehicleId: string) => {
-    const stats = vehicleStats.get(vehicleId)
-    if (!stats || stats.byCat.size === 0) return undefined
+    const s = vehicleStats.get(vehicleId)
+    if (!s || s.byCat.size === 0) return undefined
     let max = 0
     let top = ""
-    stats.byCat.forEach((amount, name) => {
+    s.byCat.forEach((amount, name) => {
       if (amount > max) {
         max = amount
         top = name
@@ -114,6 +124,74 @@ export function DashboardPage() {
         <h1 className="text-2xl font-bold">Мои автомобили</h1>
         <AddVehicleDialog />
       </div>
+
+      {/* Overall stats */}
+      {stats && stats.count > 0 && (
+        <>
+          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-1">
+                  <Receipt className="h-3 w-3" />
+                  Всего расходов
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-2xl font-bold">{formatAmount(stats.total)}</p>
+                <p className="text-xs text-muted-foreground">{stats.count} записей</p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-1">
+                  <Car className="h-3 w-3" />
+                  Автомобилей
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-2xl font-bold">{vehicles.length}</p>
+              </CardContent>
+            </Card>
+            <Card className="col-span-2 sm:col-span-1">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm font-medium text-muted-foreground">
+                  Среднее / месяц
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-2xl font-bold">
+                  {formatAmount(
+                    Object.keys(stats.byMonth).length > 0
+                      ? stats.total / Object.keys(stats.byMonth).length
+                      : 0,
+                  )}
+                </p>
+              </CardContent>
+            </Card>
+          </div>
+
+          <div className="grid gap-4 md:grid-cols-2">
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-base">По категориям</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <CategoryPieChart data={stats.byCategory} />
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-base">Динамика расходов</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <MonthlyLineChart data={stats.byMonth} />
+              </CardContent>
+            </Card>
+          </div>
+
+          <Separator />
+        </>
+      )}
 
       {/* Toolbar */}
       <div className="flex flex-wrap items-center gap-3">
