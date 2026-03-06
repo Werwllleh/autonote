@@ -6,6 +6,9 @@ export interface Expense {
   date: string
   description: string | null
   mileage: number | null
+  liters: number | null
+  pricePerLiter: number | null
+  bonuses: number | null
   vehicleId: string
   categoryId: string
   createdAt: string
@@ -21,6 +24,9 @@ interface CreateExpensePayload {
   mileage?: number
   vehicleId: string
   categoryId: string
+  liters?: number
+  pricePerLiter?: number
+  bonuses?: number
 }
 
 export const expensesApi = {
@@ -31,7 +37,7 @@ export const expensesApi = {
   getOne: (id: string) => api.get<Expense>(`/expenses/${id}`).then((r) => r.data),
   create: (data: CreateExpensePayload) =>
     api.post<Expense>("/expenses", data).then((r) => r.data),
-  update: (id: string, data: Partial<CreateExpensePayload>) =>
+  update: (id: string, data: Record<string, unknown>) =>
     api.put<Expense>(`/expenses/${id}`, data).then((r) => r.data),
   delete: (id: string) => api.delete(`/expenses/${id}`),
 }

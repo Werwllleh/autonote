@@ -55,6 +55,10 @@ model Expense {
   description String?
   mileage     Int?
 
+  liters       Float? @map("liters")
+  pricePerLiter Float? @map("price_per_liter")
+  bonuses      Float? @map("bonuses")
+
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 

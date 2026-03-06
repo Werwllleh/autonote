@@ -6,7 +6,7 @@ import { useExpenses, useDeleteExpense } from "@/hooks/use-expenses"
 import { useDeleteVehicle } from "@/hooks/use-vehicles"
 import { useVehicleStats } from "@/hooks/use-stats"
 import { useAuthStore } from "@/lib/auth-store"
-import { AddExpenseDialog } from "@/components/add-expense-dialog"
+import { ExpenseDialog } from "@/components/expense-dialog"
 import { CategoryPieChart } from "@/components/charts/category-pie-chart"
 import { MonthlyLineChart } from "@/components/charts/monthly-line-chart"
 import { Badge } from "@/components/ui/badge"
@@ -29,6 +29,7 @@ import {
   Car,
   Download,
   Fuel,
+  Pencil,
   Search,
   ArrowUpDown,
 } from "lucide-react"
@@ -166,7 +167,7 @@ export function VehiclePage() {
           <Button variant="outline" size="icon" onClick={handleExportCsv} className="sm:hidden h-8 w-8">
             <Download className="h-4 w-4" />
           </Button>
-          <AddExpenseDialog vehicleId={vehicle.id} />
+          <ExpenseDialog vehicleId={vehicle.id} />
           <Button variant="outline" size="icon" onClick={handleDeleteVehicle} className="h-8 w-8 sm:h-9 sm:w-9">
             <Trash2 className="h-4 w-4 text-destructive" />
           </Button>
@@ -339,7 +340,7 @@ export function VehiclePage() {
                     </span>
                   )}
                 </div>
-                <div className="mt-1 flex items-center gap-3 text-xs text-muted-foreground">
+                <div className="mt-1 flex items-center gap-3 text-xs text-muted-foreground flex-wrap">
                   <span className="flex items-center gap-1">
                     <Calendar className="h-3 w-3" />
                     {formatDate(expense.date)}
@@ -350,12 +351,28 @@ export function VehiclePage() {
                       {expense.mileage.toLocaleString("ru-RU")} км
                     </span>
                   )}
+                  {expense.liters && expense.pricePerLiter && (
+                    <span className="flex items-center gap-1">
+                      <Fuel className="h-3 w-3" />
+                      {expense.liters} л × {expense.pricePerLiter} руб.
+                      {expense.bonuses ? ` (−${expense.bonuses} бонусы)` : ""}
+                    </span>
+                  )}
                 </div>
               </div>
-              <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+              <div className="flex items-center gap-1 sm:gap-2 shrink-0">
                 <span className="font-semibold text-sm sm:text-base">
                   {formatAmount(expense.amount)}
                 </span>
+                <ExpenseDialog
+                  vehicleId={vehicle.id}
+                  expense={expense}
+                  trigger={
+                    <Button variant="ghost" size="icon" className="h-8 w-8">
+                      <Pencil className="h-4 w-4 text-muted-foreground" />
+                    </Button>
+                  }
+                />
                 <Button
                   variant="ghost"
                   size="icon"

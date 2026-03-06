@@ -6,6 +6,7 @@ import {
   IsInt,
   IsUUID,
   Min,
+  ValidateIf,
 } from 'class-validator';
 
 export class UpdateExpenseDto {
@@ -34,4 +35,22 @@ export class UpdateExpenseDto {
   @IsOptional()
   @IsUUID()
   categoryId?: string;
+
+  @IsOptional()
+  @ValidateIf((_, value) => value !== null)
+  @IsNumber()
+  @Min(0)
+  liters?: number | null;
+
+  @IsOptional()
+  @ValidateIf((_, value) => value !== null)
+  @IsNumber()
+  @Min(0)
+  pricePerLiter?: number | null;
+
+  @IsOptional()
+  @ValidateIf((_, value) => value !== null)
+  @IsNumber()
+  @Min(0)
+  bonuses?: number | null;
 }

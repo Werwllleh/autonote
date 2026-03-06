@@ -20,6 +20,9 @@ export interface Expense {
   date: string
   description: string | null
   mileage: number | null
+  liters: number | null
+  pricePerLiter: number | null
+  bonuses: number | null
   vehicleId: string
   categoryId: string
   createdAt: string

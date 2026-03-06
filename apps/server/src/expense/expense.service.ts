@@ -42,6 +42,9 @@ export class ExpenseService {
         mileage: dto.mileage,
         vehicleId: dto.vehicleId,
         categoryId: dto.categoryId,
+        liters: dto.liters,
+        pricePerLiter: dto.pricePerLiter,
+        bonuses: dto.bonuses,
       },
       include: { category: true, vehicle: true },
     });

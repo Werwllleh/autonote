@@ -30,4 +30,19 @@ export class CreateExpenseDto {
 
   @IsUUID()
   categoryId: string;
+
+  @IsOptional()
+  @IsNumber()
+  @Min(0)
+  liters?: number;
+
+  @IsOptional()
+  @IsNumber()
+  @Min(0)
+  pricePerLiter?: number;
+
+  @IsOptional()
+  @IsNumber()
+  @Min(0)
+  bonuses?: number;
 }

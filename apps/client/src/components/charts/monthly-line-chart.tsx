@@ -69,7 +69,7 @@ export function MonthlyLineChart({ data }: Props) {
           tickLine={false}
         />
         <Tooltip
-          formatter={(value: number) => formatAmount(value)}
+          formatter={(value) => formatAmount(value as number)}
           contentStyle={{
             backgroundColor: "hsl(var(--card))",
             border: "1px solid hsl(var(--border))",

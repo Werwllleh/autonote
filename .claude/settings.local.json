@@ -8,7 +8,10 @@
       "Bash(curl:*)",
       "Bash(echo === Create expense ===:*)",
       "Bash(rm:*)",
-      "Bash(cp:*)"
+      "Bash(cp:*)",
+      "Bash(chmod +x:*)",
+      "Bash(sudo cp:*)",
+      "Bash(npm run:*)"
     ]
   }
 }
