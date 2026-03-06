@@ -11,7 +11,12 @@
       "Bash(cp:*)",
       "Bash(chmod +x:*)",
       "Bash(sudo cp:*)",
-      "Bash(npm run:*)"
+      "Bash(npm run:*)",
+      "Bash(grep:*)",
+      "Bash(sudo:*)",
+      "Read(//etc/nginx/sites-available/**)",
+      "Read(//etc/nginx/sites-enabled/**)",
+      "Bash(nginx -T)"
     ]
   }
 }

@@ -1,4 +1,4 @@
-import { Outlet } from "react-router-dom"
+import { Outlet, useNavigate } from "react-router-dom"
 import { useMe, useLogout } from "@/hooks/use-auth"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { Button } from "@/components/ui/button"
@@ -8,12 +8,17 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { Avatar, AvatarFallback } from "@/components/ui/avatar"
-import { Car, LogOut } from "lucide-react"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Car, LogOut, User } from "lucide-react"
 
 export function Layout() {
   const { data: user } = useMe()
   const logout = useLogout()
+  const navigate = useNavigate()
+
+  const avatarUrl = user?.avatar
+    ? `${window.location.origin}/api${user.avatar}`
+    : undefined
 
   return (
     <div className="min-h-screen bg-background">
@@ -30,6 +35,7 @@ export function Layout() {
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" className="relative h-8 w-8 rounded-full">
                     <Avatar className="h-8 w-8">
+                      <AvatarImage src={avatarUrl} />
                       <AvatarFallback className="text-xs">
                         {user.email[0].toUpperCase()}
                       </AvatarFallback>
@@ -39,6 +45,10 @@ export function Layout() {
                 <DropdownMenuContent align="end">
                   <DropdownMenuItem className="text-muted-foreground text-xs" disabled>
                     {user.email}
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => navigate("/profile")}>
+                    <User className="mr-2 h-4 w-4" />
+                    Личный кабинет
                   </DropdownMenuItem>
                   <DropdownMenuItem onClick={logout}>
                     <LogOut className="mr-2 h-4 w-4" />

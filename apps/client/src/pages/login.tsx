@@ -1,6 +1,7 @@
-import { useState, type FormEvent } from "react"
-import { Link } from "react-router-dom"
+import { useState, useEffect, type FormEvent } from "react"
+import { Link, useNavigate } from "react-router-dom"
 import { useLogin } from "@/hooks/use-auth"
+import { useAuthStore } from "@/lib/auth-store"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -11,6 +12,12 @@ export function LoginPage() {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const login = useLogin()
+  const navigate = useNavigate()
+  const accessToken = useAuthStore((s) => s.accessToken)
+
+  useEffect(() => {
+    if (accessToken) navigate("/", { replace: true })
+  }, [accessToken, navigate])
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault()

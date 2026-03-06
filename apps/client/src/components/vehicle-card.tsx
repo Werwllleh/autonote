@@ -24,8 +24,12 @@ export function VehicleCard({ vehicle, totalExpenses, topCategory, view }: Props
     return (
       <Link to={`/vehicles/${vehicle.id}`}>
         <div className="flex items-center gap-4 rounded-lg border px-4 py-3 transition-colors hover:bg-accent">
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-muted">
-            <Car className="h-5 w-5 text-muted-foreground" />
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-muted overflow-hidden">
+            {vehicle.photo ? (
+              <img src={`/api${vehicle.photo}`} alt="" className="h-full w-full object-cover" />
+            ) : (
+              <Car className="h-5 w-5 text-muted-foreground" />
+            )}
           </div>
           <div className="flex-1 min-w-0">
             <p className="font-medium truncate">
@@ -55,8 +59,12 @@ export function VehicleCard({ vehicle, totalExpenses, topCategory, view }: Props
       <Card className="transition-colors hover:bg-accent/50 h-full">
         <CardHeader className="pb-3">
           <div className="flex items-start justify-between">
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-muted">
-              <Car className="h-5 w-5 text-muted-foreground" />
+            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-muted overflow-hidden">
+              {vehicle.photo ? (
+                <img src={`/api${vehicle.photo}`} alt="" className="h-full w-full object-cover" />
+              ) : (
+                <Car className="h-5 w-5 text-muted-foreground" />
+              )}
             </div>
             {topCategory && (
               <Badge variant="secondary" className="text-xs">{topCategory}</Badge>

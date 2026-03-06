@@ -12,6 +12,7 @@ model User {
   email     String   @unique
   password  String
   name      String?
+  avatar    String?
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
@@ -26,6 +27,7 @@ model Vehicle {
   model   String
   year    Int
   mileage Int    @default(0)
+  photo   String?
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
@@ -58,6 +60,9 @@ model Expense {
   liters       Float? @map("liters")
   pricePerLiter Float? @map("price_per_liter")
   bonuses      Float? @map("bonuses")
+
+  parts        Json?  @map("parts")
+  laborCost    Float? @map("labor_cost")
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")

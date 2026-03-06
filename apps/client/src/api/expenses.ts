@@ -1,5 +1,12 @@
 import { api } from "./client"
 
+export interface Part {
+  article?: string
+  name: string
+  quantity: number
+  price: number
+}
+
 export interface Expense {
   id: string
   amount: number
@@ -9,6 +16,8 @@ export interface Expense {
   liters: number | null
   pricePerLiter: number | null
   bonuses: number | null
+  parts: Part[] | null
+  laborCost: number | null
   vehicleId: string
   categoryId: string
   createdAt: string
@@ -27,6 +36,8 @@ interface CreateExpensePayload {
   liters?: number
   pricePerLiter?: number
   bonuses?: number
+  parts?: Part[]
+  laborCost?: number
 }
 
 export const expensesApi = {

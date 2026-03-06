@@ -1,8 +1,8 @@
 import { Module } from '@nestjs/common';
 import { MulterModule } from '@nestjs/platform-express';
 import { memoryStorage } from 'multer';
-import { VehicleController } from './vehicle.controller';
-import { VehicleService } from './vehicle.service';
+import { UserController } from './user.controller';
+import { UserService } from './user.service';
 import { UploadModule } from '../upload/upload.module';
 
 @Module({
@@ -10,7 +10,7 @@ import { UploadModule } from '../upload/upload.module';
     MulterModule.register({ storage: memoryStorage() }),
     UploadModule,
   ],
-  controllers: [VehicleController],
-  providers: [VehicleService],
+  controllers: [UserController],
+  providers: [UserService],
 })
-export class VehicleModule {}
+export class UserModule {}

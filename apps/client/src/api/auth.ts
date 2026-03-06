@@ -22,5 +22,5 @@ export const authApi = {
   login: (data: LoginPayload) =>
     api.post<AuthTokens>("/auth/login", data).then((r) => r.data),
   me: () =>
-    api.get<{ id: string; email: string }>("/auth/me").then((r) => r.data),
+    api.get<{ id: string; email: string; name: string | null; avatar: string | null }>("/auth/me").then((r) => r.data),
 }

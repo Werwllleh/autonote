@@ -5,8 +5,28 @@ import {
   IsOptional,
   IsInt,
   IsUUID,
+  IsArray,
+  ValidateNested,
   Min,
 } from 'class-validator';
+import { Type } from 'class-transformer';
+
+export class PartDto {
+  @IsOptional()
+  @IsString()
+  article?: string;
+
+  @IsString()
+  name: string;
+
+  @IsNumber()
+  @Min(1)
+  quantity: number;
+
+  @IsNumber()
+  @Min(0)
+  price: number;
+}
 
 export class CreateExpenseDto {
   @IsNumber()
@@ -45,4 +65,15 @@ export class CreateExpenseDto {
   @IsNumber()
   @Min(0)
   bonuses?: number;
+
+  @IsOptional()
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => PartDto)
+  parts?: PartDto[];
+
+  @IsOptional()
+  @IsNumber()
+  @Min(0)
+  laborCost?: number;
 }

@@ -81,6 +81,18 @@
       transition: opacity 0.15s;
     }
     .header-cta:hover { opacity: 0.85; }
+    .header-login {
+      padding: 0.5rem 1.25rem;
+      color: var(--text);
+      text-decoration: none;
+      font-size: 0.875rem;
+      font-weight: 500;
+      border: 1px solid var(--border);
+      border-radius: 0.5rem;
+      transition: border-color 0.15s;
+      cursor: pointer;
+    }
+    .header-login:hover { border-color: var(--text-secondary); }
 
     /* Hero */
     .hero {
@@ -190,7 +202,10 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-2-2.2-3.1C12.9 5.9 11.7 5 10.5 5H5.3C4 5 2.8 5.6 2 6.6L.8 8.3c-.5.7-.8 1.5-.8 2.4V16c0 .6.4 1 1 1h2"/><circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/></svg>
         AutoNote
       </a>
-      <a href="https://my.auto-notes.ru/register" class="header-cta">Начать бесплатно</a>
+      <div style="display:flex;align-items:center;gap:0.75rem;">
+        <a href="https://my.auto-notes.ru/login" class="header-login">Войти</a>
+        <a href="https://my.auto-notes.ru/register" class="header-cta">Начать бесплатно</a>
+      </div>
     </div>
   </header>
 

@@ -6,6 +6,7 @@ import { LoginPage } from "@/pages/login"
 import { RegisterPage } from "@/pages/register"
 import { DashboardPage } from "@/pages/dashboard"
 import { VehiclePage } from "@/pages/vehicle"
+import { ProfilePage } from "@/pages/profile"
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -32,6 +33,7 @@ function App() {
           >
             <Route path="/" element={<DashboardPage />} />
             <Route path="/vehicles/:id" element={<VehiclePage />} />
+            <Route path="/profile" element={<ProfilePage />} />
           </Route>
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>

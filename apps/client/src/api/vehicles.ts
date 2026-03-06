@@ -6,6 +6,7 @@ export interface Vehicle {
   model: string
   year: number
   mileage: number
+  photo: string | null
   createdAt: string
   updatedAt: string
 }
@@ -29,4 +30,11 @@ export const vehiclesApi = {
   update: (id: string, data: Partial<CreateVehiclePayload>) =>
     api.put<Vehicle>(`/vehicles/${id}`, data).then((r) => r.data),
   delete: (id: string) => api.delete(`/vehicles/${id}`),
+  uploadPhoto: (id: string, file: File) => {
+    const fd = new FormData()
+    fd.append("file", file)
+    return api.put<Vehicle>(`/vehicles/${id}/photo`, fd).then((r) => r.data)
+  },
+  removePhoto: (id: string) =>
+    api.delete<Vehicle>(`/vehicles/${id}/photo`).then((r) => r.data),
 }

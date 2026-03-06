@@ -1,6 +1,6 @@
-import { useMemo, useState } from "react"
+import { useMemo, useState, useRef } from "react"
 import { useParams, useNavigate, Link } from "react-router-dom"
-import { useQuery } from "@tanstack/react-query"
+import { useQuery, useQueryClient } from "@tanstack/react-query"
 import { vehiclesApi } from "@/api/vehicles"
 import { useExpenses, useDeleteExpense } from "@/hooks/use-expenses"
 import { useDeleteVehicle } from "@/hooks/use-vehicles"
@@ -32,6 +32,8 @@ import {
   Pencil,
   Search,
   ArrowUpDown,
+  Wrench,
+  Camera,
 } from "lucide-react"
 
 function formatAmount(amount: number) {
@@ -72,6 +74,8 @@ export function VehiclePage() {
   const { data: stats } = useVehicleStats(id!)
   const deleteVehicle = useDeleteVehicle()
   const deleteExpense = useDeleteExpense()
+  const qc = useQueryClient()
+  const photoRef = useRef<HTMLInputElement>(null)
 
   const isLoading = vehicleLoading || expensesLoading
 
@@ -176,8 +180,37 @@ export function VehiclePage() {
 
       {/* Vehicle info */}
       <div className="flex items-center gap-4">
-        <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-muted">
-          <Car className="h-6 w-6 text-muted-foreground" />
+        <div
+          className="relative group flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-muted overflow-hidden cursor-pointer"
+          onClick={() => photoRef.current?.click()}
+        >
+          {vehicle.photo ? (
+            <img
+              src={`/api${vehicle.photo}`}
+              alt=""
+              className="h-full w-full object-cover"
+            />
+          ) : (
+            <Car className="h-6 w-6 text-muted-foreground" />
+          )}
+          <div className="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity">
+            <Camera className="h-4 w-4 text-white" />
+          </div>
+          <input
+            ref={photoRef}
+            type="file"
+            accept="image/*"
+            className="hidden"
+            onChange={(e) => {
+              const file = e.target.files?.[0]
+              if (file && id) {
+                vehiclesApi.uploadPhoto(id, file).then(() => {
+                  qc.invalidateQueries({ queryKey: ["vehicles", id] })
+                })
+              }
+              e.target.value = ""
+            }}
+          />
         </div>
         <div>
           <h1 className="text-2xl font-bold">
@@ -356,6 +389,19 @@ export function VehiclePage() {
                       <Fuel className="h-3 w-3" />
                       {expense.liters} л × {expense.pricePerLiter} руб.
                       {expense.bonuses ? ` (−${expense.bonuses} бонусы)` : ""}
+                    </span>
+                  )}
+                  {expense.parts && expense.parts.length > 0 && (
+                    <span className="flex items-center gap-1">
+                      <Wrench className="h-3 w-3" />
+                      {expense.parts.length} запч.
+                      {expense.laborCost ? ` + работа ${formatAmount(expense.laborCost)}` : ""}
+                    </span>
+                  )}
+                  {!expense.parts?.length && expense.laborCost && (
+                    <span className="flex items-center gap-1">
+                      <Wrench className="h-3 w-3" />
+                      работа {formatAmount(expense.laborCost)}
                     </span>
                   )}
                 </div>

@@ -7,8 +7,14 @@ import {
   Param,
   Body,
   UseGuards,
+  UseInterceptors,
+  UploadedFile,
+  ParseFilePipe,
+  MaxFileSizeValidator,
+  FileTypeValidator,
   ParseUUIDPipe,
 } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { VehicleService } from './vehicle.service';
@@ -48,6 +54,32 @@ export class VehicleController {
     @CurrentUser('id') userId: string,
   ) {
     return this.vehicleService.update(id, dto, userId);
+  }
+
+  @Put(':id/photo')
+  @UseInterceptors(FileInterceptor('file', { storage: undefined }))
+  uploadPhoto(
+    @Param('id', ParseUUIDPipe) id: string,
+    @CurrentUser('id') userId: string,
+    @UploadedFile(
+      new ParseFilePipe({
+        validators: [
+          new MaxFileSizeValidator({ maxSize: 10 * 1024 * 1024 }),
+          new FileTypeValidator({ fileType: /^image\/(jpeg|png|webp|gif)$/ }),
+        ],
+      }),
+    )
+    file: Express.Multer.File,
+  ) {
+    return this.vehicleService.uploadPhoto(id, userId, file);
+  }
+
+  @Delete(':id/photo')
+  removePhoto(
+    @Param('id', ParseUUIDPipe) id: string,
+    @CurrentUser('id') userId: string,
+  ) {
+    return this.vehicleService.removePhoto(id, userId);
   }
 
   @Delete(':id')

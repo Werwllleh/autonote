@@ -30,6 +30,8 @@ interface UpdateExpensePayload {
   liters?: number | null
   pricePerLiter?: number | null
   bonuses?: number | null
+  parts?: { article?: string; name: string; quantity: number; price: number }[] | null
+  laborCost?: number | null
 }
 
 export function useUpdateExpense() {

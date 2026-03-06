@@ -1,4 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+import { Prisma } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateExpenseDto } from './dto/create-expense.dto';
 import { UpdateExpenseDto } from './dto/update-expense.dto';
@@ -45,6 +46,8 @@ export class ExpenseService {
         liters: dto.liters,
         pricePerLiter: dto.pricePerLiter,
         bonuses: dto.bonuses,
+        parts: dto.parts ? (dto.parts as unknown as Prisma.InputJsonValue) : undefined,
+        laborCost: dto.laborCost,
       },
       include: { category: true, vehicle: true },
     });
@@ -52,12 +55,29 @@ export class ExpenseService {
 
   async update(id: string, dto: UpdateExpenseDto, userId: string) {
     await this.findOne(id, userId);
+
+    const data: Prisma.ExpenseUncheckedUpdateInput = {
+      date: dto.date ? new Date(dto.date) : undefined,
+      amount: dto.amount,
+      description: dto.description,
+      mileage: dto.mileage,
+      vehicleId: dto.vehicleId,
+      categoryId: dto.categoryId,
+      liters: dto.liters,
+      pricePerLiter: dto.pricePerLiter,
+      bonuses: dto.bonuses,
+      laborCost: dto.laborCost,
+    };
+
+    if (dto.parts === null) {
+      data.parts = Prisma.DbNull;
+    } else if (dto.parts) {
+      data.parts = dto.parts as unknown as Prisma.InputJsonValue;
+    }
+
     return this.prisma.expense.update({
       where: { id },
-      data: {
-        ...dto,
-        date: dto.date ? new Date(dto.date) : undefined,
-      },
+      data,
       include: { category: true, vehicle: true },
     });
   }

@@ -44,6 +44,15 @@ export class AuthService {
     return this.generateTokens(user.id, user.email);
   }
 
+  async getMe(userId: string) {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+      select: { id: true, email: true, name: true, avatar: true },
+    });
+    if (!user) throw new UnauthorizedException();
+    return user;
+  }
+
   async refresh(userId: string) {
     const user = await this.prisma.user.findUnique({ where: { id: userId } });
     if (!user) throw new UnauthorizedException();
