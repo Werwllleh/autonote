@@ -299,7 +299,7 @@ export function ExpenseDialog({ vehicleId, expense, trigger }: ExpenseDialogProp
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>{trigger || defaultTrigger}</DialogTrigger>
-      <DialogContent className="max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-h-[90vh] overflow-y-auto overflow-x-hidden p-4 sm:p-6">
         <DialogHeader>
           <DialogTitle>{isEdit ? "Редактировать расход" : "Новый расход"}</DialogTitle>
         </DialogHeader>
@@ -423,7 +423,7 @@ export function ExpenseDialog({ vehicleId, expense, trigger }: ExpenseDialogProp
                           onChange={(e) => updatePart(i, "name", e.target.value)}
                         />
                       </div>
-                      <div className="grid grid-cols-3 gap-2">
+                      <div className="grid grid-cols-2 gap-2">
                         <div className="space-y-1">
                           <span className="text-xs text-muted-foreground">Кол-во</span>
                           <Input
@@ -445,13 +445,12 @@ export function ExpenseDialog({ vehicleId, expense, trigger }: ExpenseDialogProp
                             onChange={(e) => updatePart(i, "price", e.target.value)}
                           />
                         </div>
-                        <div className="space-y-1">
-                          <span className="text-xs text-muted-foreground">Сумма</span>
-                          <div className="flex items-center h-9 px-3 rounded-md bg-muted text-sm">
-                            {((Number(part.quantity) || 0) * (Number(part.price) || 0)).toFixed(2)}
-                          </div>
-                        </div>
                       </div>
+                      {(Number(part.quantity) || 0) > 0 && (Number(part.price) || 0) > 0 && (
+                        <div className="text-xs text-right text-muted-foreground">
+                          Сумма: <span className="font-medium text-foreground">{((Number(part.quantity) || 0) * (Number(part.price) || 0)).toFixed(2)} руб.</span>
+                        </div>
+                      )}
                     </div>
                   ))}
                 </div>
@@ -486,35 +485,40 @@ export function ExpenseDialog({ vehicleId, expense, trigger }: ExpenseDialogProp
                       const sp = stockParts.find((p) => p.id === item.partId)
                       if (!sp) return null
                       return (
-                        <div key={item.partId} className="flex items-center gap-2 rounded-md border border-dashed px-3 py-2">
-                          <div className="flex-1 min-w-0">
-                            <div className="text-sm font-medium truncate">{sp.name}</div>
-                            <div className="text-xs text-muted-foreground">
-                              {sp.article && `${sp.article} · `}{sp.price.toFixed(2)} руб./шт.
+                        <div key={item.partId} className="rounded-md border border-dashed px-3 py-2 space-y-1.5">
+                          <div className="flex items-center justify-between gap-2">
+                            <div className="min-w-0">
+                              <div className="text-sm font-medium truncate">{sp.name}</div>
+                              <div className="text-xs text-muted-foreground">
+                                {sp.article && `${sp.article} · `}{sp.price.toFixed(2)} руб./шт.
+                              </div>
                             </div>
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="icon"
+                              className="h-7 w-7 shrink-0"
+                              onClick={() => removeStockPart(item.partId)}
+                            >
+                              <Trash2 className="h-3 w-3" />
+                            </Button>
                           </div>
-                          <Input
-                            type="number"
-                            min={1}
-                            max={sp.quantity}
-                            value={item.quantity}
-                            onChange={(e) =>
-                              updateStockPartQty(item.partId, Math.min(Number(e.target.value) || 1, sp.quantity))
-                            }
-                            className="w-16 h-8 text-center"
-                          />
-                          <div className="text-sm font-medium w-20 text-right">
-                            {(sp.price * item.quantity).toFixed(2)}
+                          <div className="flex items-center gap-2">
+                            <Input
+                              type="number"
+                              min={1}
+                              max={sp.quantity}
+                              value={item.quantity}
+                              onChange={(e) =>
+                                updateStockPartQty(item.partId, Math.min(Number(e.target.value) || 1, sp.quantity))
+                              }
+                              className="w-16 h-8 text-center"
+                            />
+                            <span className="text-xs text-muted-foreground">шт.</span>
+                            <span className="ml-auto text-sm font-medium">
+                              {(sp.price * item.quantity).toFixed(2)} руб.
+                            </span>
                           </div>
-                          <Button
-                            type="button"
-                            variant="ghost"
-                            size="icon"
-                            className="h-7 w-7 shrink-0"
-                            onClick={() => removeStockPart(item.partId)}
-                          >
-                            <Trash2 className="h-3 w-3" />
-                          </Button>
                         </div>
                       )
                     })}
