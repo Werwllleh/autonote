@@ -11,6 +11,15 @@ import {
 } from 'class-validator';
 import { Type } from 'class-transformer';
 
+export class StockPartDto {
+  @IsUUID()
+  partId: string;
+
+  @IsInt()
+  @Min(1)
+  quantity: number;
+}
+
 export class PartDto {
   @IsOptional()
   @IsString()
@@ -76,4 +85,10 @@ export class CreateExpenseDto {
   @IsNumber()
   @Min(0)
   laborCost?: number;
+
+  @IsOptional()
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => StockPartDto)
+  stockParts?: StockPartDto[];
 }

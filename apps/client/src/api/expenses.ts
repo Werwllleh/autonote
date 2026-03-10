@@ -38,6 +38,7 @@ interface CreateExpensePayload {
   bonuses?: number
   parts?: Part[]
   laborCost?: number
+  stockParts?: { partId: string; quantity: number }[]
 }
 
 export const expensesApi = {

@@ -1,12 +1,16 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
+import { PartService } from '../part/part.service';
 import { CreateExpenseDto } from './dto/create-expense.dto';
 import { UpdateExpenseDto } from './dto/update-expense.dto';
 
 @Injectable()
 export class ExpenseService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private partService: PartService,
+  ) {}
 
   findAll(userId: string, vehicleId?: string) {
     return this.prisma.expense.findMany({
@@ -34,6 +38,11 @@ export class ExpenseService {
       where: { id: dto.vehicleId, userId },
     });
     if (!vehicle) throw new NotFoundException('Vehicle not found');
+
+    // Deduct stock parts if provided
+    if (dto.stockParts?.length) {
+      await this.partService.deductStock(dto.stockParts, userId);
+    }
 
     return this.prisma.expense.create({
       data: {

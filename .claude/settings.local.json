@@ -16,7 +16,9 @@
       "Bash(sudo:*)",
       "Read(//etc/nginx/sites-available/**)",
       "Read(//etc/nginx/sites-enabled/**)",
-      "Bash(nginx -T)"
+      "Bash(nginx -T)",
+      "Bash(cp -r /home/alex/apps/main/autonote/apps/client/dist/* /var/www/auto-notes.ru/client/ 2>&1)",
+      "Bash(cp -r /home/alex/apps/main/autonote/apps/client/dist/* /var/www/auto-notes.ru/client/)"
     ]
   }
 }

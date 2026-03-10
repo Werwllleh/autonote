@@ -1,6 +1,8 @@
 import { useState, useMemo, useEffect, type FormEvent, type ReactNode } from "react"
 import { useCreateExpense, useUpdateExpense } from "@/hooks/use-expenses"
 import { useCategories } from "@/hooks/use-categories"
+import { useParts } from "@/hooks/use-parts"
+import { useQueryClient } from "@tanstack/react-query"
 import type { Expense } from "@/api/expenses"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -19,7 +21,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog"
-import { Plus, Trash2 } from "lucide-react"
+import { Plus, Trash2, Package } from "lucide-react"
 
 interface PartRow {
   article: string
@@ -51,8 +53,12 @@ export function ExpenseDialog({ vehicleId, expense, trigger }: ExpenseDialogProp
   // Maintenance
   const [parts, setParts] = useState<PartRow[]>([])
   const [laborCost, setLaborCost] = useState("")
+  // Stock parts (picked from inventory)
+  const [stockItems, setStockItems] = useState<{ partId: string; quantity: number }[]>([])
 
   const { data: categories = [] } = useCategories()
+  const { data: stockParts = [] } = useParts(vehicleId)
+  const qc = useQueryClient()
   const create = useCreateExpense()
   const update = useUpdateExpense()
   const mutation = isEdit ? update : create
@@ -116,13 +122,40 @@ export function ExpenseDialog({ vehicleId, expense, trigger }: ExpenseDialogProp
     }, 0)
   }, [parts])
 
+  const stockPartsTotal = useMemo(() => {
+    return stockItems.reduce((sum, item) => {
+      const sp = stockParts.find((p) => p.id === item.partId)
+      return sp ? sum + sp.price * item.quantity : sum
+    }, 0)
+  }, [stockItems, stockParts])
+
   const laborCostNum = useMemo(() => {
     const v = parseFloat(laborCost)
     return !isNaN(v) && v > 0 ? v : 0
   }, [laborCost])
 
-  const maintenanceTotal = partsTotal + laborCostNum
+  const maintenanceTotal = partsTotal + stockPartsTotal + laborCostNum
   const hasParts = parts.some((p) => p.name && parseFloat(p.price) > 0)
+  const hasStockParts = stockItems.length > 0
+
+  // Stock parts helpers
+  const availableStockParts = useMemo(
+    () => stockParts.filter((p) => p.quantity > 0),
+    [stockParts],
+  )
+
+  const addStockPart = (partId: string) => {
+    if (stockItems.some((s) => s.partId === partId)) return
+    setStockItems([...stockItems, { partId, quantity: 1 }])
+  }
+
+  const removeStockPart = (partId: string) => {
+    setStockItems(stockItems.filter((s) => s.partId !== partId))
+  }
+
+  const updateStockPartQty = (partId: string, qty: number) => {
+    setStockItems(stockItems.map((s) => (s.partId === partId ? { ...s, quantity: qty } : s)))
+  }
 
   // Parts management
   const addPart = () => setParts([...parts, emptyPart()])
@@ -142,6 +175,7 @@ export function ExpenseDialog({ vehicleId, expense, trigger }: ExpenseDialogProp
     setBonuses("")
     setParts([])
     setLaborCost("")
+    setStockItems([])
   }
 
   const handleSubmit = (e: FormEvent) => {
@@ -159,6 +193,10 @@ export function ExpenseDialog({ vehicleId, expense, trigger }: ExpenseDialogProp
     const onSuccess = () => {
       setOpen(false)
       if (!isEdit) reset()
+      // Refresh stock after using parts
+      if (stockItems.length > 0) {
+        qc.invalidateQueries({ queryKey: ["parts", vehicleId] })
+      }
     }
 
     const base = {
@@ -193,6 +231,30 @@ export function ExpenseDialog({ vehicleId, expense, trigger }: ExpenseDialogProp
         { onSuccess },
       )
     } else {
+      // Combine manual parts + stock parts into single parts array
+      const manualParts = hasParts
+        ? parts
+            .filter((p) => p.name && parseFloat(p.price) > 0)
+            .map((p) => ({
+              article: p.article || undefined,
+              name: p.name,
+              quantity: Number(p.quantity) || 1,
+              price: Number(p.price),
+            }))
+        : []
+
+      const stockPartsMapped = stockItems.map((item) => {
+        const sp = stockParts.find((p) => p.id === item.partId)!
+        return {
+          article: sp.article || undefined,
+          name: sp.name,
+          quantity: item.quantity,
+          price: sp.price,
+        }
+      })
+
+      const allParts = [...manualParts, ...stockPartsMapped]
+
       create.mutate(
         {
           ...base,
@@ -202,17 +264,9 @@ export function ExpenseDialog({ vehicleId, expense, trigger }: ExpenseDialogProp
             bonuses: bonuses ? parseFloat(bonuses) : undefined,
           }),
           ...(isMaintenance && {
-            ...(hasParts && {
-              parts: parts
-                .filter((p) => p.name && parseFloat(p.price) > 0)
-                .map((p) => ({
-                  article: p.article || undefined,
-                  name: p.name,
-                  quantity: Number(p.quantity) || 1,
-                  price: Number(p.price),
-                })),
-            }),
+            ...(allParts.length > 0 && { parts: allParts }),
             ...(laborCostNum > 0 && { laborCost: laborCostNum }),
+            ...(stockItems.length > 0 && { stockParts: stockItems }),
           }),
         },
         { onSuccess },
@@ -240,7 +294,7 @@ export function ExpenseDialog({ vehicleId, expense, trigger }: ExpenseDialogProp
   )
 
   // Should show manual amount field for maintenance?
-  const showManualAmount = isMaintenance && !hasParts && laborCostNum === 0
+  const showManualAmount = isMaintenance && !hasParts && !hasStockParts && laborCostNum === 0
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -359,7 +413,8 @@ export function ExpenseDialog({ vehicleId, expense, trigger }: ExpenseDialogProp
                         <Input
                           placeholder="Артикул"
                           value={part.article}
-                          onChange={(e) => updatePart(i, "article", e.target.value)}
+                          onChange={(e) => updatePart(i, "article", e.target.value.toUpperCase())}
+                          className="uppercase"
                         />
                         <Input
                           required
@@ -400,6 +455,72 @@ export function ExpenseDialog({ vehicleId, expense, trigger }: ExpenseDialogProp
                     </div>
                   ))}
                 </div>
+                {/* Stock parts picker */}
+                {availableStockParts.length > 0 && (
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <Label className="flex items-center gap-1.5">
+                        <Package className="h-3.5 w-3.5" />
+                        Со склада
+                      </Label>
+                      <Select
+                        value=""
+                        onValueChange={(id) => addStockPart(id)}
+                      >
+                        <SelectTrigger className="w-auto h-8 text-xs gap-1">
+                          <Plus className="h-3 w-3" />
+                          <SelectValue placeholder="Выбрать" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {availableStockParts
+                            .filter((p) => !stockItems.some((s) => s.partId === p.id))
+                            .map((p) => (
+                              <SelectItem key={p.id} value={p.id}>
+                                {p.name} ({p.quantity} шт.)
+                              </SelectItem>
+                            ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    {stockItems.map((item) => {
+                      const sp = stockParts.find((p) => p.id === item.partId)
+                      if (!sp) return null
+                      return (
+                        <div key={item.partId} className="flex items-center gap-2 rounded-md border border-dashed px-3 py-2">
+                          <div className="flex-1 min-w-0">
+                            <div className="text-sm font-medium truncate">{sp.name}</div>
+                            <div className="text-xs text-muted-foreground">
+                              {sp.article && `${sp.article} · `}{sp.price.toFixed(2)} руб./шт.
+                            </div>
+                          </div>
+                          <Input
+                            type="number"
+                            min={1}
+                            max={sp.quantity}
+                            value={item.quantity}
+                            onChange={(e) =>
+                              updateStockPartQty(item.partId, Math.min(Number(e.target.value) || 1, sp.quantity))
+                            }
+                            className="w-16 h-8 text-center"
+                          />
+                          <div className="text-sm font-medium w-20 text-right">
+                            {(sp.price * item.quantity).toFixed(2)}
+                          </div>
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="icon"
+                            className="h-7 w-7 shrink-0"
+                            onClick={() => removeStockPart(item.partId)}
+                          >
+                            <Trash2 className="h-3 w-3" />
+                          </Button>
+                        </div>
+                      )
+                    })}
+                  </div>
+                )}
+
                 <div className="space-y-2">
                   <Label>Стоимость работы (руб.)</Label>
                   <Input
@@ -415,8 +536,14 @@ export function ExpenseDialog({ vehicleId, expense, trigger }: ExpenseDialogProp
                   <div className="rounded-md bg-muted px-3 py-2 text-sm space-y-1">
                     {partsTotal > 0 && (
                       <div className="flex justify-between">
-                        <span className="text-muted-foreground">Запчасти:</span>
+                        <span className="text-muted-foreground">Запчасти (ручные):</span>
                         <span>{partsTotal.toFixed(2)} руб.</span>
+                      </div>
+                    )}
+                    {stockPartsTotal > 0 && (
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">Запчасти (со склада):</span>
+                        <span>{stockPartsTotal.toFixed(2)} руб.</span>
                       </div>
                     )}
                     {laborCostNum > 0 && (
@@ -425,12 +552,12 @@ export function ExpenseDialog({ vehicleId, expense, trigger }: ExpenseDialogProp
                         <span>{laborCostNum.toFixed(2)} руб.</span>
                       </div>
                     )}
-                    {partsTotal > 0 && laborCostNum > 0 && (
+                    {(partsTotal + stockPartsTotal > 0 && laborCostNum > 0) || (partsTotal > 0 && stockPartsTotal > 0) ? (
                       <div className="flex justify-between font-semibold border-t pt-1">
                         <span>Итого:</span>
                         <span>{maintenanceTotal.toFixed(2)} руб.</span>
                       </div>
-                    )}
+                    ) : null}
                   </div>
                 )}
               </>

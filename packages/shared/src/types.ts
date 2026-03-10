@@ -14,6 +14,17 @@ export interface Category {
   slug: string
 }
 
+export interface InventoryPart {
+  id: string
+  name: string
+  article: string | null
+  quantity: number
+  price: number
+  vehicleId: string
+  createdAt: string
+  updatedAt: string
+}
+
 export interface Expense {
   id: string
   amount: number

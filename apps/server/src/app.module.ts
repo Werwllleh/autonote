@@ -10,6 +10,7 @@ import { CategoryModule } from './category/category.module';
 import { ExpenseModule } from './expense/expense.module';
 import { StatsModule } from './stats/stats.module';
 import { UploadModule } from './upload/upload.module';
+import { PartModule } from './part/part.module';
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { UploadModule } from './upload/upload.module';
     ExpenseModule,
     StatsModule,
     UploadModule,
+    PartModule,
   ],
 })
 export class AppModule {}

@@ -7,6 +7,7 @@ import { useDeleteVehicle } from "@/hooks/use-vehicles"
 import { useVehicleStats } from "@/hooks/use-stats"
 import { useAuthStore } from "@/lib/auth-store"
 import { ExpenseDialog } from "@/components/expense-dialog"
+import { PartsInventory } from "@/components/parts-inventory"
 import { CategoryPieChart } from "@/components/charts/category-pie-chart"
 import { MonthlyLineChart } from "@/components/charts/monthly-line-chart"
 import { Badge } from "@/components/ui/badge"
@@ -27,9 +28,12 @@ import {
   Trash2,
   Calendar,
   Car,
+  ChevronDown,
+  ChevronRight,
   Download,
   Fuel,
   Pencil,
+  Receipt,
   Search,
   ArrowUpDown,
   Wrench,
@@ -62,6 +66,7 @@ export function VehiclePage() {
   const [search, setSearch] = useState("")
   const [sortField, setSortField] = useState<SortField>("date")
   const [sortDir, setSortDir] = useState<SortDir>("desc")
+  const [expensesOpen, setExpensesOpen] = useState(false)
   const token = useAuthStore((s) => s.accessToken)
 
   const { data: vehicle, isLoading: vehicleLoading } = useQuery({
@@ -163,19 +168,9 @@ export function VehiclePage() {
           <ArrowLeft className="h-4 w-4" />
           Назад
         </Link>
-        <div className="flex items-center gap-1 sm:gap-2">
-          <Button variant="outline" size="sm" onClick={handleExportCsv} className="hidden sm:flex">
-            <Download className="mr-2 h-4 w-4" />
-            CSV
-          </Button>
-          <Button variant="outline" size="icon" onClick={handleExportCsv} className="sm:hidden h-8 w-8">
-            <Download className="h-4 w-4" />
-          </Button>
-          <ExpenseDialog vehicleId={vehicle.id} />
-          <Button variant="outline" size="icon" onClick={handleDeleteVehicle} className="h-8 w-8 sm:h-9 sm:w-9">
-            <Trash2 className="h-4 w-4 text-destructive" />
-          </Button>
-        </div>
+        <Button variant="outline" size="icon" onClick={handleDeleteVehicle} className="h-8 w-8 sm:h-9 sm:w-9">
+          <Trash2 className="h-4 w-4 text-destructive" />
+        </Button>
       </div>
 
       {/* Vehicle info */}
@@ -300,142 +295,186 @@ export function VehiclePage() {
         </div>
       )}
 
+      {/* Parts inventory */}
+      <PartsInventory vehicleId={vehicle.id} />
+
       <Separator />
 
-      {/* Expense list toolbar */}
-      <div className="flex flex-wrap items-center gap-2 sm:gap-3">
-        <div className="relative w-full sm:w-auto sm:flex-1 sm:min-w-[180px] sm:max-w-xs">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-          <Input
-            placeholder="Поиск..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="pl-9"
-          />
+      {/* Expenses collapsible section */}
+      <div className="space-y-3">
+        <div className="flex items-center justify-between">
+          <button
+            type="button"
+            className="flex items-center gap-2 hover:opacity-80 transition-opacity"
+            onClick={() => setExpensesOpen(!expensesOpen)}
+          >
+            {expensesOpen ? (
+              <ChevronDown className="h-4 w-4 text-muted-foreground" />
+            ) : (
+              <ChevronRight className="h-4 w-4 text-muted-foreground" />
+            )}
+            <Receipt className="h-5 w-5 text-muted-foreground" />
+            <h2 className="text-lg font-semibold">Расходы</h2>
+            {expenses.length > 0 && (
+              <Badge variant="secondary">{expenses.length}</Badge>
+            )}
+            {!expensesOpen && expenses.length > 0 && (
+              <span className="text-sm text-muted-foreground ml-1">
+                {formatAmount(stats?.total ?? 0)}
+              </span>
+            )}
+          </button>
+          <div className="flex items-center gap-1 sm:gap-2">
+            <Button variant="outline" size="sm" onClick={handleExportCsv} className="hidden sm:flex">
+              <Download className="mr-2 h-4 w-4" />
+              CSV
+            </Button>
+            <Button variant="outline" size="icon" onClick={handleExportCsv} className="sm:hidden h-8 w-8">
+              <Download className="h-4 w-4" />
+            </Button>
+            <ExpenseDialog vehicleId={vehicle.id} />
+          </div>
         </div>
-        <Select value={catFilter} onValueChange={setCatFilter}>
-          <SelectTrigger className="w-[calc(50%-0.25rem)] sm:w-[180px]">
-            <SelectValue placeholder="Категория" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">Все категории</SelectItem>
-            {categories.map((cat) => (
-              <SelectItem key={cat.slug} value={cat.slug}>
-                {cat.name}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-        <Select
-          value={`${sortField}-${sortDir}`}
-          onValueChange={(v) => {
-            const [f, d] = v.split("-") as [SortField, SortDir]
-            setSortField(f)
-            setSortDir(d)
-          }}
-        >
-          <SelectTrigger className="w-[calc(50%-0.25rem)] sm:w-[200px]">
-            <ArrowUpDown className="mr-2 h-4 w-4" />
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="date-desc">Дата: новые</SelectItem>
-            <SelectItem value="date-asc">Дата: старые</SelectItem>
-            <SelectItem value="amount-desc">Сумма: больше</SelectItem>
-            <SelectItem value="amount-asc">Сумма: меньше</SelectItem>
-          </SelectContent>
-        </Select>
-        {catFilter !== "all" && (
-          <p className="text-sm text-muted-foreground">
-            Итого: {formatAmount(totalFiltered)}
-          </p>
+
+        {expensesOpen && (
+          <>
+            {/* Expense list toolbar */}
+            <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+              <div className="relative w-full sm:w-auto sm:flex-1 sm:min-w-[180px] sm:max-w-xs">
+                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                <Input
+                  placeholder="Поиск..."
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  className="pl-9"
+                />
+              </div>
+              <Select value={catFilter} onValueChange={setCatFilter}>
+                <SelectTrigger className="w-[calc(50%-0.25rem)] sm:w-[180px]">
+                  <SelectValue placeholder="Категория" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Все категории</SelectItem>
+                  {categories.map((cat) => (
+                    <SelectItem key={cat.slug} value={cat.slug}>
+                      {cat.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <Select
+                value={`${sortField}-${sortDir}`}
+                onValueChange={(v) => {
+                  const [f, d] = v.split("-") as [SortField, SortDir]
+                  setSortField(f)
+                  setSortDir(d)
+                }}
+              >
+                <SelectTrigger className="w-[calc(50%-0.25rem)] sm:w-[200px]">
+                  <ArrowUpDown className="mr-2 h-4 w-4" />
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="date-desc">Дата: новые</SelectItem>
+                  <SelectItem value="date-asc">Дата: старые</SelectItem>
+                  <SelectItem value="amount-desc">Сумма: больше</SelectItem>
+                  <SelectItem value="amount-asc">Сумма: меньше</SelectItem>
+                </SelectContent>
+              </Select>
+              {catFilter !== "all" && (
+                <p className="text-sm text-muted-foreground">
+                  Итого: {formatAmount(totalFiltered)}
+                </p>
+              )}
+            </div>
+
+            {/* Expense list */}
+            {filtered.length === 0 ? (
+              <div className="py-12 text-center text-muted-foreground">
+                Нет расходов. Добавьте первый!
+              </div>
+            ) : (
+              <div className="space-y-2">
+                {filtered.map((expense) => (
+                  <div
+                    key={expense.id}
+                    className="flex items-center gap-3 sm:gap-4 rounded-lg border px-3 sm:px-4 py-3"
+                  >
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2">
+                        <Badge variant="secondary">{expense.category.name}</Badge>
+                        {expense.description && (
+                          <span className="text-sm text-muted-foreground truncate">
+                            {expense.description}
+                          </span>
+                        )}
+                      </div>
+                      <div className="mt-1 flex items-center gap-3 text-xs text-muted-foreground flex-wrap">
+                        <span className="flex items-center gap-1">
+                          <Calendar className="h-3 w-3" />
+                          {formatDate(expense.date)}
+                        </span>
+                        {expense.mileage && (
+                          <span className="flex items-center gap-1">
+                            <Gauge className="h-3 w-3" />
+                            {expense.mileage.toLocaleString("ru-RU")} км
+                          </span>
+                        )}
+                        {expense.liters && expense.pricePerLiter && (
+                          <span className="flex items-center gap-1">
+                            <Fuel className="h-3 w-3" />
+                            {expense.liters} л × {expense.pricePerLiter} руб.
+                            {expense.bonuses ? ` (−${expense.bonuses} бонусы)` : ""}
+                          </span>
+                        )}
+                        {expense.parts && expense.parts.length > 0 && (
+                          <span className="flex items-center gap-1">
+                            <Wrench className="h-3 w-3" />
+                            {expense.parts.length} запч.
+                            {expense.laborCost ? ` + работа ${formatAmount(expense.laborCost)}` : ""}
+                          </span>
+                        )}
+                        {!expense.parts?.length && expense.laborCost && (
+                          <span className="flex items-center gap-1">
+                            <Wrench className="h-3 w-3" />
+                            работа {formatAmount(expense.laborCost)}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-1 sm:gap-2 shrink-0">
+                      <span className="font-semibold text-sm sm:text-base">
+                        {formatAmount(expense.amount)}
+                      </span>
+                      <ExpenseDialog
+                        vehicleId={vehicle.id}
+                        expense={expense}
+                        trigger={
+                          <Button variant="ghost" size="icon" className="h-8 w-8">
+                            <Pencil className="h-4 w-4 text-muted-foreground" />
+                          </Button>
+                        }
+                      />
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8"
+                        onClick={() => {
+                          if (confirm("Удалить расход?")) {
+                            deleteExpense.mutate(expense.id)
+                          }
+                        }}
+                      >
+                        <Trash2 className="h-4 w-4 text-muted-foreground" />
+                      </Button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </>
         )}
       </div>
-
-      {/* Expense list */}
-      {filtered.length === 0 ? (
-        <div className="py-12 text-center text-muted-foreground">
-          Нет расходов. Добавьте первый!
-        </div>
-      ) : (
-        <div className="space-y-2">
-          {filtered.map((expense) => (
-            <div
-              key={expense.id}
-              className="flex items-center gap-3 sm:gap-4 rounded-lg border px-3 sm:px-4 py-3"
-            >
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2">
-                  <Badge variant="secondary">{expense.category.name}</Badge>
-                  {expense.description && (
-                    <span className="text-sm text-muted-foreground truncate">
-                      {expense.description}
-                    </span>
-                  )}
-                </div>
-                <div className="mt-1 flex items-center gap-3 text-xs text-muted-foreground flex-wrap">
-                  <span className="flex items-center gap-1">
-                    <Calendar className="h-3 w-3" />
-                    {formatDate(expense.date)}
-                  </span>
-                  {expense.mileage && (
-                    <span className="flex items-center gap-1">
-                      <Gauge className="h-3 w-3" />
-                      {expense.mileage.toLocaleString("ru-RU")} км
-                    </span>
-                  )}
-                  {expense.liters && expense.pricePerLiter && (
-                    <span className="flex items-center gap-1">
-                      <Fuel className="h-3 w-3" />
-                      {expense.liters} л × {expense.pricePerLiter} руб.
-                      {expense.bonuses ? ` (−${expense.bonuses} бонусы)` : ""}
-                    </span>
-                  )}
-                  {expense.parts && expense.parts.length > 0 && (
-                    <span className="flex items-center gap-1">
-                      <Wrench className="h-3 w-3" />
-                      {expense.parts.length} запч.
-                      {expense.laborCost ? ` + работа ${formatAmount(expense.laborCost)}` : ""}
-                    </span>
-                  )}
-                  {!expense.parts?.length && expense.laborCost && (
-                    <span className="flex items-center gap-1">
-                      <Wrench className="h-3 w-3" />
-                      работа {formatAmount(expense.laborCost)}
-                    </span>
-                  )}
-                </div>
-              </div>
-              <div className="flex items-center gap-1 sm:gap-2 shrink-0">
-                <span className="font-semibold text-sm sm:text-base">
-                  {formatAmount(expense.amount)}
-                </span>
-                <ExpenseDialog
-                  vehicleId={vehicle.id}
-                  expense={expense}
-                  trigger={
-                    <Button variant="ghost" size="icon" className="h-8 w-8">
-                      <Pencil className="h-4 w-4 text-muted-foreground" />
-                    </Button>
-                  }
-                />
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-8 w-8"
-                  onClick={() => {
-                    if (confirm("Удалить расход?")) {
-                      deleteExpense.mutate(expense.id)
-                    }
-                  }}
-                >
-                  <Trash2 className="h-4 w-4 text-muted-foreground" />
-                </Button>
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
     </div>
   )
 }
