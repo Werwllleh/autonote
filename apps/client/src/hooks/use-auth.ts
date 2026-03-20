@@ -23,7 +23,7 @@ export function useLogin() {
     onSuccess: (data) => {
       setTokens(data.accessToken, data.refreshToken)
       qc.invalidateQueries({ queryKey: ["auth"] })
-      navigate("/")
+      navigate("/dashboard")
     },
   })
 }
@@ -38,7 +38,7 @@ export function useRegister() {
     onSuccess: (data) => {
       setTokens(data.accessToken, data.refreshToken)
       qc.invalidateQueries({ queryKey: ["auth"] })
-      navigate("/")
+      navigate("/dashboard")
     },
   })
 }

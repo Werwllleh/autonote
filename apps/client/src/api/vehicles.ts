@@ -7,6 +7,12 @@ export interface Vehicle {
   year: number
   mileage: number
   photo: string | null
+  vin: string | null
+  licensePlate: string | null
+  registrationNumber: string | null
+  purchaseDate: string | null
+  purchasePrice: number | null
+  notes: string | null
   createdAt: string
   updatedAt: string
 }
@@ -22,12 +28,25 @@ interface CreateVehiclePayload {
   mileage?: number
 }
 
+interface UpdateVehiclePayload {
+  brand?: string
+  model?: string
+  year?: number
+  mileage?: number
+  vin?: string | null
+  licensePlate?: string | null
+  registrationNumber?: string | null
+  purchaseDate?: string | null
+  purchasePrice?: number | null
+  notes?: string | null
+}
+
 export const vehiclesApi = {
   getAll: () => api.get<Vehicle[]>("/vehicles").then((r) => r.data),
   getOne: (id: string) => api.get<Vehicle>(`/vehicles/${id}`).then((r) => r.data),
   create: (data: CreateVehiclePayload) =>
     api.post<Vehicle>("/vehicles", data).then((r) => r.data),
-  update: (id: string, data: Partial<CreateVehiclePayload>) =>
+  update: (id: string, data: UpdateVehiclePayload) =>
     api.put<Vehicle>(`/vehicles/${id}`, data).then((r) => r.data),
   delete: (id: string) => api.delete(`/vehicles/${id}`),
   uploadPhoto: (id: string, file: File) => {

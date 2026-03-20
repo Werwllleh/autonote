@@ -34,7 +34,16 @@ export class VehicleService {
 
   async update(id: string, dto: UpdateVehicleDto, userId: string) {
     await this.findOne(id, userId);
-    return this.prisma.vehicle.update({ where: { id }, data: dto });
+    const { purchaseDate, ...rest } = dto;
+    return this.prisma.vehicle.update({
+      where: { id },
+      data: {
+        ...rest,
+        ...(purchaseDate !== undefined && {
+          purchaseDate: purchaseDate ? new Date(purchaseDate) : null,
+        }),
+      },
+    });
   }
 
   async uploadPhoto(id: string, userId: string, file: Express.Multer.File) {

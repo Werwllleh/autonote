@@ -24,9 +24,9 @@ export function Layout() {
     <div className="min-h-screen bg-background">
       <header className="sticky top-0 z-50 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-4">
-          <a href="/" className="flex items-center gap-2 font-semibold">
+          <a href="/dashboard" className="flex items-center gap-2 font-semibold">
             <Car className="h-5 w-5" />
-            <span className="hidden sm:inline">AutoNote</span>
+            <span className="hidden sm:inline">AutoNotes</span>
           </a>
           <div className="flex items-center gap-1">
             <ThemeToggle />

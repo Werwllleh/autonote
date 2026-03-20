@@ -7,7 +7,10 @@ import { useDeleteVehicle } from "@/hooks/use-vehicles"
 import { useVehicleStats } from "@/hooks/use-stats"
 import { useAuthStore } from "@/lib/auth-store"
 import { ExpenseDialog } from "@/components/expense-dialog"
+import { ImportDialog } from "@/components/import-dialog"
+import { EditVehicleDialog } from "@/components/edit-vehicle-dialog"
 import { PartsInventory } from "@/components/parts-inventory"
+import { ServiceIntervals } from "@/components/service-intervals"
 import { CategoryPieChart } from "@/components/charts/category-pie-chart"
 import { MonthlyLineChart } from "@/components/charts/monthly-line-chart"
 import { Badge } from "@/components/ui/badge"
@@ -38,6 +41,11 @@ import {
   ArrowUpDown,
   Wrench,
   Camera,
+  TrendingUp,
+  ArrowUpRight,
+  ArrowDownRight,
+  Droplets,
+  Info,
 } from "lucide-react"
 
 function formatAmount(amount: number) {
@@ -56,6 +64,12 @@ function formatDate(dateStr: string) {
   })
 }
 
+function formatMonthHeader(key: string) {
+  const [y, m] = key.split("-")
+  const d = new Date(Number(y), Number(m) - 1)
+  return d.toLocaleDateString("ru-RU", { month: "long", year: "numeric" })
+}
+
 type SortField = "date" | "amount"
 type SortDir = "asc" | "desc"
 
@@ -67,6 +81,8 @@ export function VehiclePage() {
   const [sortField, setSortField] = useState<SortField>("date")
   const [sortDir, setSortDir] = useState<SortDir>("desc")
   const [expensesOpen, setExpensesOpen] = useState(false)
+  const [collapsedMonths, setCollapsedMonths] = useState<Set<string>>(new Set())
+  const [metaOpen, setMetaOpen] = useState(false)
   const token = useAuthStore((s) => s.accessToken)
 
   const { data: vehicle, isLoading: vehicleLoading } = useQuery({
@@ -118,26 +134,48 @@ export function VehiclePage() {
     return list
   }, [expenses, catFilter, search, sortField, sortDir])
 
+  // Group by month
+  const groupedByMonth = useMemo(() => {
+    const groups: { key: string; expenses: typeof filtered; total: number }[] = []
+    const map = new Map<string, typeof filtered>()
+    for (const e of filtered) {
+      const key = e.date.slice(0, 7)
+      if (!map.has(key)) map.set(key, [])
+      map.get(key)!.push(e)
+    }
+    for (const [key, exps] of map) {
+      groups.push({ key, expenses: exps, total: exps.reduce((s, e) => s + e.amount, 0) })
+    }
+    return groups
+  }, [filtered])
+
   const totalFiltered = filtered.reduce((sum, e) => sum + e.amount, 0)
+
+  const toggleMonth = (key: string) => {
+    setCollapsedMonths((prev) => {
+      const next = new Set(prev)
+      if (next.has(key)) next.delete(key)
+      else next.add(key)
+      return next
+    })
+  }
 
   const handleDeleteVehicle = () => {
     if (!confirm("Удалить автомобиль и все его расходы?")) return
-    deleteVehicle.mutate(id!, { onSuccess: () => navigate("/") })
+    deleteVehicle.mutate(id!, { onSuccess: () => navigate("/dashboard") })
   }
 
   const handleExportCsv = () => {
     const url = `/api/expenses/export/csv?vehicleId=${id}`
-    const a = document.createElement("a")
-    a.href = url
-    a.download = "expenses.csv"
-    // Add auth header via fetch
     fetch(url, { headers: { Authorization: `Bearer ${token}` } })
       .then((r) => r.blob())
       .then((blob) => {
-        const url = URL.createObjectURL(blob)
-        a.href = url
+        const u = URL.createObjectURL(blob)
+        const a = document.createElement("a")
+        a.href = u
+        a.download = "expenses.csv"
         a.click()
-        URL.revokeObjectURL(url)
+        URL.revokeObjectURL(u)
       })
   }
 
@@ -157,20 +195,30 @@ export function VehiclePage() {
     )
   }
 
+  const hasMeta = vehicle.vin || vehicle.licensePlate || vehicle.registrationNumber || vehicle.purchaseDate || vehicle.purchasePrice || vehicle.notes
+
+  // Period comparison
+  const monthChange = stats && stats.prevMonthTotal > 0
+    ? Math.round(((stats.currentMonthTotal - stats.prevMonthTotal) / stats.prevMonthTotal) * 100)
+    : null
+
   return (
     <div className="space-y-6">
       {/* Back + actions */}
       <div className="flex items-center justify-between">
         <Link
-          to="/"
+          to="/dashboard"
           className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
         >
           <ArrowLeft className="h-4 w-4" />
           Назад
         </Link>
-        <Button variant="outline" size="icon" onClick={handleDeleteVehicle} className="h-8 w-8 sm:h-9 sm:w-9">
-          <Trash2 className="h-4 w-4 text-destructive" />
-        </Button>
+        <div className="flex items-center gap-2">
+          <EditVehicleDialog vehicle={vehicle} />
+          <Button variant="outline" size="icon" onClick={handleDeleteVehicle} className="h-8 w-8 sm:h-9 sm:w-9">
+            <Trash2 className="h-4 w-4 text-destructive" />
+          </Button>
+        </div>
       </div>
 
       {/* Vehicle info */}
@@ -180,11 +228,7 @@ export function VehiclePage() {
           onClick={() => photoRef.current?.click()}
         >
           {vehicle.photo ? (
-            <img
-              src={`/api${vehicle.photo}`}
-              alt=""
-              className="h-full w-full object-cover"
-            />
+            <img src={`/api${vehicle.photo}`} alt="" className="h-full w-full object-cover" />
           ) : (
             <Car className="h-6 w-6 text-muted-foreground" />
           )}
@@ -217,9 +261,61 @@ export function VehiclePage() {
               <Gauge className="h-3 w-3" />
               {vehicle.mileage.toLocaleString("ru-RU")} км
             </span>
+            {vehicle.licensePlate && (
+              <span className="font-mono text-xs">{vehicle.licensePlate}</span>
+            )}
           </div>
         </div>
       </div>
+
+      {/* Vehicle metadata */}
+      {hasMeta && (
+        <div>
+          <button
+            type="button"
+            className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
+            onClick={() => setMetaOpen(!metaOpen)}
+          >
+            <Info className="h-3.5 w-3.5" />
+            <span>Информация об авто</span>
+            {metaOpen ? <ChevronDown className="h-3 w-3" /> : <ChevronRight className="h-3 w-3" />}
+          </button>
+          {metaOpen && (
+            <div className="mt-2 grid grid-cols-2 gap-x-6 gap-y-2 text-sm sm:grid-cols-3">
+              {vehicle.vin && (
+                <div>
+                  <span className="text-muted-foreground text-xs">VIN</span>
+                  <p className="font-mono text-xs">{vehicle.vin}</p>
+                </div>
+              )}
+              {vehicle.registrationNumber && (
+                <div>
+                  <span className="text-muted-foreground text-xs">СТС / ПТС</span>
+                  <p>{vehicle.registrationNumber}</p>
+                </div>
+              )}
+              {vehicle.purchaseDate && (
+                <div>
+                  <span className="text-muted-foreground text-xs">Дата покупки</span>
+                  <p>{formatDate(vehicle.purchaseDate)}</p>
+                </div>
+              )}
+              {vehicle.purchasePrice && (
+                <div>
+                  <span className="text-muted-foreground text-xs">Цена покупки</span>
+                  <p>{formatAmount(vehicle.purchasePrice)}</p>
+                </div>
+              )}
+              {vehicle.notes && (
+                <div className="col-span-2 sm:col-span-3">
+                  <span className="text-muted-foreground text-xs">Заметки</span>
+                  <p>{vehicle.notes}</p>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Summary cards */}
       <div className="grid grid-cols-2 gap-3 sm:gap-4 sm:grid-cols-4">
@@ -233,44 +329,75 @@ export function VehiclePage() {
             <p className="text-2xl font-bold">{formatAmount(stats?.total ?? 0)}</p>
           </CardContent>
         </Card>
+
+        {/* This month vs last */}
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">
-              Записей
+              В этом месяце
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-2xl font-bold">{stats?.count ?? 0}</p>
+            <p className="text-2xl font-bold">{formatAmount(stats?.currentMonthTotal ?? 0)}</p>
+            {monthChange !== null && (
+              <div className={`flex items-center gap-1 text-xs mt-1 ${monthChange > 0 ? "text-destructive" : "text-emerald-500"}`}>
+                {monthChange > 0 ? <ArrowUpRight className="h-3 w-3" /> : <ArrowDownRight className="h-3 w-3" />}
+                <span>{Math.abs(monthChange)}% к пред. месяцу</span>
+              </div>
+            )}
           </CardContent>
         </Card>
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Категорий
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-2xl font-bold">
-              {Object.keys(stats?.byCategory ?? {}).length}
-            </p>
-          </CardContent>
-        </Card>
-        {stats?.avgFuelCostPer100km !== null &&
-          stats?.avgFuelCostPer100km !== undefined && (
-            <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-1">
-                  <Fuel className="h-3 w-3" />
-                  Топливо / 100 км
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-2xl font-bold">
-                  {formatAmount(stats.avgFuelCostPer100km)}
+
+        {stats?.avgFuelCostPer100km != null && (
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-1">
+                <Fuel className="h-3 w-3" />
+                Топливо / 100 км
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-2xl font-bold">{formatAmount(stats.avgFuelCostPer100km)}</p>
+              {stats.avgLitersPer100km != null && (
+                <p className="text-xs text-muted-foreground mt-1 flex items-center gap-1">
+                  <Droplets className="h-3 w-3" />
+                  {stats.avgLitersPer100km} л / 100 км
                 </p>
-              </CardContent>
-            </Card>
-          )}
+              )}
+            </CardContent>
+          </Card>
+        )}
+
+        {stats?.costPerKm != null && (
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-1">
+                <Gauge className="h-3 w-3" />
+                Стоимость км
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-2xl font-bold">{stats.costPerKm.toFixed(1)} ₽</p>
+            </CardContent>
+          </Card>
+        )}
+
+        {stats?.yearlyForecast != null && stats.yearlyForecast > 0 && (
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-1">
+                <TrendingUp className="h-3 w-3" />
+                Прогноз / год
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-2xl font-bold">{formatAmount(stats.yearlyForecast)}</p>
+              <p className="text-xs text-muted-foreground mt-1">
+                ~{formatAmount(stats.monthlyAvg)} / мес.
+              </p>
+            </CardContent>
+          </Card>
+        )}
       </div>
 
       {/* Charts */}
@@ -294,6 +421,9 @@ export function VehiclePage() {
           </Card>
         </div>
       )}
+
+      {/* Service intervals */}
+      <ServiceIntervals vehicleId={vehicle.id} currentMileage={vehicle.mileage} />
 
       {/* Parts inventory */}
       <PartsInventory vehicleId={vehicle.id} />
@@ -325,6 +455,7 @@ export function VehiclePage() {
             )}
           </button>
           <div className="flex items-center gap-1 sm:gap-2">
+            <ImportDialog vehicleId={vehicle.id} />
             <Button variant="outline" size="sm" onClick={handleExportCsv} className="hidden sm:flex">
               <Download className="mr-2 h-4 w-4" />
               CSV
@@ -388,86 +519,111 @@ export function VehiclePage() {
               )}
             </div>
 
-            {/* Expense list */}
+            {/* Expense list grouped by month */}
             {filtered.length === 0 ? (
               <div className="py-12 text-center text-muted-foreground">
                 Нет расходов. Добавьте первый!
               </div>
             ) : (
-              <div className="space-y-2">
-                {filtered.map((expense) => (
-                  <div
-                    key={expense.id}
-                    className="flex items-center gap-3 sm:gap-4 rounded-lg border px-3 sm:px-4 py-3"
-                  >
-                    <div className="flex-1 min-w-0">
+              <div className="space-y-4">
+                {groupedByMonth.map((group) => (
+                  <div key={group.key}>
+                    <button
+                      type="button"
+                      className="flex w-full items-center justify-between rounded-lg bg-muted/50 px-3 py-2 text-sm hover:bg-muted transition-colors"
+                      onClick={() => toggleMonth(group.key)}
+                    >
                       <div className="flex items-center gap-2">
-                        <Badge variant="secondary">{expense.category.name}</Badge>
-                        {expense.description && (
-                          <span className="text-sm text-muted-foreground truncate">
-                            {expense.description}
-                          </span>
+                        {collapsedMonths.has(group.key) ? (
+                          <ChevronRight className="h-3.5 w-3.5 text-muted-foreground" />
+                        ) : (
+                          <ChevronDown className="h-3.5 w-3.5 text-muted-foreground" />
                         )}
+                        <span className="font-medium capitalize">{formatMonthHeader(group.key)}</span>
+                        <Badge variant="secondary" className="text-xs">{group.expenses.length}</Badge>
                       </div>
-                      <div className="mt-1 flex items-center gap-3 text-xs text-muted-foreground flex-wrap">
-                        <span className="flex items-center gap-1">
-                          <Calendar className="h-3 w-3" />
-                          {formatDate(expense.date)}
-                        </span>
-                        {expense.mileage && (
-                          <span className="flex items-center gap-1">
-                            <Gauge className="h-3 w-3" />
-                            {expense.mileage.toLocaleString("ru-RU")} км
-                          </span>
-                        )}
-                        {expense.liters && expense.pricePerLiter && (
-                          <span className="flex items-center gap-1">
-                            <Fuel className="h-3 w-3" />
-                            {expense.liters} л × {expense.pricePerLiter} руб.
-                            {expense.bonuses ? ` (−${expense.bonuses} бонусы)` : ""}
-                          </span>
-                        )}
-                        {expense.parts && expense.parts.length > 0 && (
-                          <span className="flex items-center gap-1">
-                            <Wrench className="h-3 w-3" />
-                            {expense.parts.length} запч.
-                            {expense.laborCost ? ` + работа ${formatAmount(expense.laborCost)}` : ""}
-                          </span>
-                        )}
-                        {!expense.parts?.length && expense.laborCost && (
-                          <span className="flex items-center gap-1">
-                            <Wrench className="h-3 w-3" />
-                            работа {formatAmount(expense.laborCost)}
-                          </span>
-                        )}
+                      <span className="font-semibold">{formatAmount(group.total)}</span>
+                    </button>
+
+                    {!collapsedMonths.has(group.key) && (
+                      <div className="mt-1 space-y-1.5">
+                        {group.expenses.map((expense) => (
+                          <div
+                            key={expense.id}
+                            className="flex items-center gap-3 sm:gap-4 rounded-lg border px-3 sm:px-4 py-3"
+                          >
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center gap-2">
+                                <Badge variant="secondary">{expense.category.name}</Badge>
+                                {expense.description && (
+                                  <span className="text-sm text-muted-foreground truncate">
+                                    {expense.description}
+                                  </span>
+                                )}
+                              </div>
+                              <div className="mt-1 flex items-center gap-3 text-xs text-muted-foreground flex-wrap">
+                                <span className="flex items-center gap-1">
+                                  <Calendar className="h-3 w-3" />
+                                  {formatDate(expense.date)}
+                                </span>
+                                {expense.mileage && (
+                                  <span className="flex items-center gap-1">
+                                    <Gauge className="h-3 w-3" />
+                                    {expense.mileage.toLocaleString("ru-RU")} км
+                                  </span>
+                                )}
+                                {expense.liters && expense.pricePerLiter && (
+                                  <span className="flex items-center gap-1">
+                                    <Fuel className="h-3 w-3" />
+                                    {expense.liters} л × {expense.pricePerLiter} руб.
+                                    {expense.bonuses ? ` (-${expense.bonuses} бонусы)` : ""}
+                                  </span>
+                                )}
+                                {expense.parts && expense.parts.length > 0 && (
+                                  <span className="flex items-center gap-1">
+                                    <Wrench className="h-3 w-3" />
+                                    {expense.parts.length} запч.
+                                    {expense.laborCost ? ` + работа ${formatAmount(expense.laborCost)}` : ""}
+                                  </span>
+                                )}
+                                {!expense.parts?.length && expense.laborCost && (
+                                  <span className="flex items-center gap-1">
+                                    <Wrench className="h-3 w-3" />
+                                    работа {formatAmount(expense.laborCost)}
+                                  </span>
+                                )}
+                              </div>
+                            </div>
+                            <div className="flex items-center gap-1 sm:gap-2 shrink-0">
+                              <span className="font-semibold text-sm sm:text-base">
+                                {formatAmount(expense.amount)}
+                              </span>
+                              <ExpenseDialog
+                                vehicleId={vehicle.id}
+                                expense={expense}
+                                trigger={
+                                  <Button variant="ghost" size="icon" className="h-8 w-8">
+                                    <Pencil className="h-4 w-4 text-muted-foreground" />
+                                  </Button>
+                                }
+                              />
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-8 w-8"
+                                onClick={() => {
+                                  if (confirm("Удалить расход?")) {
+                                    deleteExpense.mutate(expense.id)
+                                  }
+                                }}
+                              >
+                                <Trash2 className="h-4 w-4 text-muted-foreground" />
+                              </Button>
+                            </div>
+                          </div>
+                        ))}
                       </div>
-                    </div>
-                    <div className="flex items-center gap-1 sm:gap-2 shrink-0">
-                      <span className="font-semibold text-sm sm:text-base">
-                        {formatAmount(expense.amount)}
-                      </span>
-                      <ExpenseDialog
-                        vehicleId={vehicle.id}
-                        expense={expense}
-                        trigger={
-                          <Button variant="ghost" size="icon" className="h-8 w-8">
-                            <Pencil className="h-4 w-4 text-muted-foreground" />
-                          </Button>
-                        }
-                      />
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-8 w-8"
-                        onClick={() => {
-                          if (confirm("Удалить расход?")) {
-                            deleteExpense.mutate(expense.id)
-                          }
-                        }}
-                      >
-                        <Trash2 className="h-4 w-4 text-muted-foreground" />
-                      </Button>
-                    </div>
+                    )}
                   </div>
                 ))}
               </div>

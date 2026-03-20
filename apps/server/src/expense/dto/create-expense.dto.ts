@@ -91,4 +91,12 @@ export class CreateExpenseDto {
   @ValidateNested({ each: true })
   @Type(() => StockPartDto)
   stockParts?: StockPartDto[];
+
+  @IsOptional()
+  @IsDateString()
+  dateFrom?: string;
+
+  @IsOptional()
+  @IsDateString()
+  dateTo?: string;
 }

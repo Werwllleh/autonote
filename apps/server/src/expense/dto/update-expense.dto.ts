@@ -70,4 +70,14 @@ export class UpdateExpenseDto {
   @IsNumber()
   @Min(0)
   laborCost?: number | null;
+
+  @IsOptional()
+  @ValidateIf((_, value) => value !== null)
+  @IsDateString()
+  dateFrom?: string | null;
+
+  @IsOptional()
+  @ValidateIf((_, value) => value !== null)
+  @IsDateString()
+  dateTo?: string | null;
 }

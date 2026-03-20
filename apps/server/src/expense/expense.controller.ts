@@ -10,7 +10,11 @@ import {
   Res,
   UseGuards,
   ParseUUIDPipe,
+  UseInterceptors,
+  UploadedFile,
+  BadRequestException,
 } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import type { Response } from 'express';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
@@ -41,6 +45,59 @@ export class ExpenseController {
     res.setHeader('Content-Type', 'text/csv; charset=utf-8');
     res.setHeader('Content-Disposition', 'attachment; filename=expenses.csv');
     res.send(BOM + header + rows.join('\n'));
+  }
+
+  @Get('import/template')
+  downloadTemplate(@Res() res: Response) {
+    const BOM = '\uFEFF';
+    const header =
+      'Дата;Категория;Сумма;Описание;Пробег;Литры;Цена за литр\n';
+    const example = '15.03.2026;Топливо;3200;АИ-95 Лукойл;56340;42.5;75.3\n';
+    res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+    res.setHeader(
+      'Content-Disposition',
+      'attachment; filename=autonotes-template.csv',
+    );
+    res.send(BOM + header + example);
+  }
+
+  @Post('import')
+  @UseInterceptors(
+    FileInterceptor('file', {
+      limits: { fileSize: 5 * 1024 * 1024 }, // 5MB
+      fileFilter: (_req, file, cb) => {
+        const allowed = [
+          'text/csv',
+          'application/vnd.ms-excel',
+          'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+          'application/octet-stream',
+        ];
+        const extOk = /\.(csv|xlsx?|xls)$/i.test(file.originalname);
+        if (allowed.includes(file.mimetype) || extOk) {
+          cb(null, true);
+        } else {
+          cb(
+            new BadRequestException(
+              'Поддерживаются только CSV, XLS и XLSX файлы',
+            ),
+            false,
+          );
+        }
+      },
+    }),
+  )
+  async importFile(
+    @UploadedFile() file: Express.Multer.File,
+    @Query('vehicleId', ParseUUIDPipe) vehicleId: string,
+    @CurrentUser('id') userId: string,
+  ) {
+    if (!file) throw new BadRequestException('Файл не загружен');
+    return this.expenseService.importFromFile(
+      file.buffer,
+      file.originalname,
+      vehicleId,
+      userId,
+    );
   }
 
   @Get()

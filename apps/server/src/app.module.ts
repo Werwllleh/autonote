@@ -11,6 +11,7 @@ import { ExpenseModule } from './expense/expense.module';
 import { StatsModule } from './stats/stats.module';
 import { UploadModule } from './upload/upload.module';
 import { PartModule } from './part/part.module';
+import { ServiceIntervalModule } from './service-interval/service-interval.module';
 
 @Module({
   imports: [
@@ -29,6 +30,7 @@ import { PartModule } from './part/part.module';
     StatsModule,
     UploadModule,
     PartModule,
+    ServiceIntervalModule,
   ],
 })
 export class AppModule {}

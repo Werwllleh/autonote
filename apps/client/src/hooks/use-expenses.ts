@@ -32,6 +32,8 @@ interface UpdateExpensePayload {
   bonuses?: number | null
   parts?: { article?: string; name: string; quantity: number; price: number }[] | null
   laborCost?: number | null
+  dateFrom?: string | null
+  dateTo?: string | null
 }
 
 export function useUpdateExpense() {
@@ -50,6 +52,18 @@ export function useDeleteExpense() {
   const qc = useQueryClient()
   return useMutation({
     mutationFn: expensesApi.delete,
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["expenses"] })
+      qc.invalidateQueries({ queryKey: ["stats"] })
+    },
+  })
+}
+
+export function useImportExpenses() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: ({ file, vehicleId }: { file: File; vehicleId: string }) =>
+      expensesApi.importFile(file, vehicleId),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["expenses"] })
       qc.invalidateQueries({ queryKey: ["stats"] })

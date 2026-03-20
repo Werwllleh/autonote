@@ -53,6 +53,9 @@ export function ExpenseDialog({ vehicleId, expense, trigger }: ExpenseDialogProp
   // Maintenance
   const [parts, setParts] = useState<PartRow[]>([])
   const [laborCost, setLaborCost] = useState("")
+  // Insurance
+  const [dateFrom, setDateFrom] = useState("")
+  const [dateTo, setDateTo] = useState("")
   // Stock parts (picked from inventory)
   const [stockItems, setStockItems] = useState<{ partId: string; quantity: number }[]>([])
 
@@ -84,6 +87,8 @@ export function ExpenseDialog({ vehicleId, expense, trigger }: ExpenseDialogProp
           : [],
       )
       setLaborCost(expense.laborCost ? String(expense.laborCost) : "")
+      setDateFrom(expense.dateFrom?.slice(0, 10) || "")
+      setDateTo(expense.dateTo?.slice(0, 10) || "")
     }
     if (open && !expense) {
       reset()
@@ -96,6 +101,7 @@ export function ExpenseDialog({ vehicleId, expense, trigger }: ExpenseDialogProp
   )
   const isFuel = selectedCategory?.slug === "fuel"
   const isMaintenance = selectedCategory?.slug === "maintenance"
+  const isInsurance = selectedCategory?.slug === "insurance"
 
   // Fuel calculations
   const fuelTotal = useMemo(() => {
@@ -176,6 +182,8 @@ export function ExpenseDialog({ vehicleId, expense, trigger }: ExpenseDialogProp
     setParts([])
     setLaborCost("")
     setStockItems([])
+    setDateFrom("")
+    setDateTo("")
   }
 
   const handleSubmit = (e: FormEvent) => {
@@ -227,6 +235,8 @@ export function ExpenseDialog({ vehicleId, expense, trigger }: ExpenseDialogProp
                 }))
             : null,
           laborCost: isMaintenance && laborCostNum > 0 ? laborCostNum : null,
+          dateFrom: isInsurance && dateFrom ? dateFrom : null,
+          dateTo: isInsurance && dateTo ? dateTo : null,
         },
         { onSuccess },
       )
@@ -267,6 +277,10 @@ export function ExpenseDialog({ vehicleId, expense, trigger }: ExpenseDialogProp
             ...(allParts.length > 0 && { parts: allParts }),
             ...(laborCostNum > 0 && { laborCost: laborCostNum }),
             ...(stockItems.length > 0 && { stockParts: stockItems }),
+          }),
+          ...(isInsurance && {
+            ...(dateFrom && { dateFrom }),
+            ...(dateTo && { dateTo }),
           }),
         },
         { onSuccess },
@@ -567,6 +581,35 @@ export function ExpenseDialog({ vehicleId, expense, trigger }: ExpenseDialogProp
               </>
             )}
 
+            {/* === INSURANCE === */}
+            {isInsurance && (
+              <div className="space-y-3">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label>Начало полиса</Label>
+                    <Input
+                      type="date"
+                      value={dateFrom}
+                      onChange={(e) => setDateFrom(e.target.value)}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Окончание полиса</Label>
+                    <Input
+                      type="date"
+                      value={dateTo}
+                      onChange={(e) => setDateTo(e.target.value)}
+                    />
+                  </div>
+                </div>
+                {dateFrom && dateTo && (
+                  <p className="text-xs text-muted-foreground">
+                    Срок действия: {new Date(dateFrom).toLocaleDateString("ru-RU")} — {new Date(dateTo).toLocaleDateString("ru-RU")}
+                  </p>
+                )}
+              </div>
+            )}
+
             {/* === DEFAULT / MANUAL AMOUNT === */}
             {!isFuel && !isMaintenance && (
               <div className="grid grid-cols-2 gap-4">
@@ -631,7 +674,9 @@ export function ExpenseDialog({ vehicleId, expense, trigger }: ExpenseDialogProp
                     ? "АИ-95, Лукойл"
                     : isMaintenance
                       ? "Замена масла, фильтров"
-                      : "Описание расхода"
+                      : isInsurance
+                        ? "ОСАГО, КАСКО, Ингосстрах"
+                        : "Описание расхода"
                 }
               />
             </div>

@@ -2,11 +2,13 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom"
 import { Layout } from "@/components/layout"
 import { ProtectedRoute } from "@/components/protected-route"
+import { LandingPage } from "@/pages/landing"
 import { LoginPage } from "@/pages/login"
 import { RegisterPage } from "@/pages/register"
 import { DashboardPage } from "@/pages/dashboard"
 import { VehiclePage } from "@/pages/vehicle"
 import { ProfilePage } from "@/pages/profile"
+import { useTheme } from "@/hooks/use-theme"
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -18,10 +20,13 @@ const queryClient = new QueryClient({
 })
 
 function App() {
+  useTheme()
+
   return (
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
         <Routes>
+          <Route path="/" element={<LandingPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
           <Route
@@ -31,7 +36,7 @@ function App() {
               </ProtectedRoute>
             }
           >
-            <Route path="/" element={<DashboardPage />} />
+            <Route path="/dashboard" element={<DashboardPage />} />
             <Route path="/vehicles/:id" element={<VehiclePage />} />
             <Route path="/profile" element={<ProfilePage />} />
           </Route>

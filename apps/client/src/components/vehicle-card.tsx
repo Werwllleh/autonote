@@ -1,32 +1,24 @@
 import { Link } from "react-router-dom"
 import type { Vehicle } from "@/api/vehicles"
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Car, Gauge } from "lucide-react"
+import { Card } from "@/components/ui/card"
+import { Car } from "lucide-react"
 
 interface Props {
   vehicle: Vehicle
-  totalExpenses: number
-  topCategory?: string
+  costPerKm?: number | null
   view: "grid" | "list"
 }
 
-function formatMileage(km: number) {
-  return km.toLocaleString("ru-RU") + " км"
-}
+export function VehicleCard({ vehicle, costPerKm, view }: Props) {
+  const photo = vehicle.photo ? `/api${vehicle.photo}` : null
 
-function formatAmount(amount: number) {
-  return amount.toLocaleString("ru-RU", { style: "currency", currency: "RUB", maximumFractionDigits: 0 })
-}
-
-export function VehicleCard({ vehicle, totalExpenses, topCategory, view }: Props) {
   if (view === "list") {
     return (
       <Link to={`/vehicles/${vehicle.id}`}>
         <div className="flex items-center gap-4 rounded-lg border px-4 py-3 transition-colors hover:bg-accent">
           <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-muted overflow-hidden">
-            {vehicle.photo ? (
-              <img src={`/api${vehicle.photo}`} alt="" className="h-full w-full object-cover" />
+            {photo ? (
+              <img src={photo} alt="" className="h-full w-full object-cover" />
             ) : (
               <Car className="h-5 w-5 text-muted-foreground" />
             )}
@@ -35,20 +27,13 @@ export function VehicleCard({ vehicle, totalExpenses, topCategory, view }: Props
             <p className="font-medium truncate">
               {vehicle.brand} {vehicle.model}
             </p>
-            <div className="flex items-center gap-3 text-sm text-muted-foreground">
-              <span>{vehicle.year}</span>
-              <span className="flex items-center gap-1">
-                <Gauge className="h-3 w-3" />
-                {formatMileage(vehicle.mileage)}
-              </span>
-            </div>
+            <p className="text-sm text-muted-foreground">{vehicle.year}</p>
           </div>
-          <div className="text-right shrink-0">
-            <p className="font-semibold">{formatAmount(totalExpenses)}</p>
-            {topCategory && (
-              <Badge variant="secondary" className="text-xs">{topCategory}</Badge>
-            )}
-          </div>
+          {costPerKm != null && costPerKm > 0 && (
+            <span className="text-xs text-muted-foreground shrink-0">
+              {costPerKm.toFixed(1)} ₽/км
+            </span>
+          )}
         </div>
       </Link>
     )
@@ -56,34 +41,34 @@ export function VehicleCard({ vehicle, totalExpenses, topCategory, view }: Props
 
   return (
     <Link to={`/vehicles/${vehicle.id}`}>
-      <Card className="transition-colors hover:bg-accent/50 h-full">
-        <CardHeader className="pb-3">
-          <div className="flex items-start justify-between">
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-muted overflow-hidden">
-              {vehicle.photo ? (
-                <img src={`/api${vehicle.photo}`} alt="" className="h-full w-full object-cover" />
-              ) : (
-                <Car className="h-5 w-5 text-muted-foreground" />
-              )}
+      <Card className="overflow-hidden transition-colors hover:bg-accent/50 h-full">
+        <div className={photo ? "flex" : ""}>
+          {photo && (
+            <div className="w-[38%] shrink-0">
+              <img
+                src={photo}
+                alt={`${vehicle.brand} ${vehicle.model}`}
+                className="h-full w-full object-cover"
+              />
             </div>
-            {topCategory && (
-              <Badge variant="secondary" className="text-xs">{topCategory}</Badge>
+          )}
+          <div className={photo ? "flex flex-col justify-center p-5" : "p-5"}>
+            {!photo && (
+              <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-lg bg-muted">
+                <Car className="h-5 w-5 text-muted-foreground" />
+              </div>
+            )}
+            <h3 className="text-base font-semibold">
+              {vehicle.brand} {vehicle.model}
+            </h3>
+            <p className="mt-1 text-sm text-muted-foreground">{vehicle.year}</p>
+            {costPerKm != null && costPerKm > 0 && (
+              <p className="mt-1 text-xs text-muted-foreground">
+                ~{costPerKm.toFixed(1)} ₽/км
+              </p>
             )}
           </div>
-          <CardTitle className="text-base mt-3">
-            {vehicle.brand} {vehicle.model}
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex items-center justify-between text-sm text-muted-foreground">
-            <span>{vehicle.year}</span>
-            <span className="flex items-center gap-1">
-              <Gauge className="h-3 w-3" />
-              {formatMileage(vehicle.mileage)}
-            </span>
-          </div>
-          <p className="mt-3 text-lg font-semibold">{formatAmount(totalExpenses)}</p>
-        </CardContent>
+        </div>
       </Card>
     </Link>
   )

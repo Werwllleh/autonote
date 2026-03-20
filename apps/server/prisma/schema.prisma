@@ -29,14 +29,22 @@ model Vehicle {
   mileage Int    @default(0)
   photo   String?
 
+  vin                String?   @map("vin")
+  licensePlate       String?   @map("license_plate")
+  registrationNumber String?   @map("registration_number")
+  purchaseDate       DateTime? @map("purchase_date")
+  purchasePrice      Float?    @map("purchase_price")
+  notes              String?
+
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
   userId String @map("user_id")
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  expenses Expense[]
-  parts    Part[]
+  expenses         Expense[]
+  parts            Part[]
+  serviceIntervals ServiceInterval[]
 
   @@map("vehicles")
 }
@@ -74,12 +82,15 @@ model Expense {
   description String?
   mileage     Int?
 
-  liters       Float? @map("liters")
+  liters        Float? @map("liters")
   pricePerLiter Float? @map("price_per_liter")
-  bonuses      Float? @map("bonuses")
+  bonuses       Float? @map("bonuses")
 
-  parts        Json?  @map("parts")
-  laborCost    Float? @map("labor_cost")
+  parts     Json?  @map("parts")
+  laborCost Float? @map("labor_cost")
+
+  dateFrom DateTime? @map("date_from")
+  dateTo   DateTime? @map("date_to")
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
@@ -91,4 +102,22 @@ model Expense {
   category   Category @relation(fields: [categoryId], references: [id])
 
   @@map("expenses")
+}
+
+model ServiceInterval {
+  id             String @id @default(uuid())
+  name           String
+  intervalKm     Int?   @map("interval_km")
+  intervalMonths Int?   @map("interval_months")
+
+  lastServiceDate    DateTime? @map("last_service_date")
+  lastServiceMileage Int?      @map("last_service_mileage")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  vehicleId String  @map("vehicle_id")
+  vehicle   Vehicle @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+
+  @@map("service_intervals")
 }

@@ -16,7 +16,7 @@ export function LoginPage() {
   const accessToken = useAuthStore((s) => s.accessToken)
 
   useEffect(() => {
-    if (accessToken) navigate("/", { replace: true })
+    if (accessToken) navigate("/dashboard", { replace: true })
   }, [accessToken, navigate])
 
   const handleSubmit = (e: FormEvent) => {
@@ -31,7 +31,7 @@ export function LoginPage() {
           <div className="mx-auto mb-2 flex h-10 w-10 items-center justify-center rounded-lg bg-primary text-primary-foreground">
             <Car className="h-5 w-5" />
           </div>
-          <CardTitle className="text-xl">Вход в AutoNote</CardTitle>
+          <CardTitle className="text-xl">Вход в AutoNotes</CardTitle>
         </CardHeader>
         <form onSubmit={handleSubmit}>
           <CardContent className="space-y-4">
