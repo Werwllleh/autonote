@@ -10,7 +10,6 @@ import { ExpenseDialog } from "@/components/expense-dialog"
 import { ImportDialog } from "@/components/import-dialog"
 import { EditVehicleDialog } from "@/components/edit-vehicle-dialog"
 import { PartsInventory } from "@/components/parts-inventory"
-import { ServiceIntervals } from "@/components/service-intervals"
 import { CategoryPieChart } from "@/components/charts/category-pie-chart"
 import { MonthlyLineChart } from "@/components/charts/monthly-line-chart"
 import { Badge } from "@/components/ui/badge"
@@ -46,6 +45,7 @@ import {
   ArrowDownRight,
   Droplets,
   Info,
+  Plus,
 } from "lucide-react"
 
 function formatAmount(amount: number) {
@@ -203,7 +203,7 @@ export function VehiclePage() {
     : null
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 pb-20 sm:pb-0">
       {/* Back + actions */}
       <div className="flex items-center justify-between">
         <Link
@@ -422,8 +422,8 @@ export function VehiclePage() {
         </div>
       )}
 
-      {/* Service intervals */}
-      <ServiceIntervals vehicleId={vehicle.id} currentMileage={vehicle.mileage} />
+      {/* TODO: Service intervals hidden for now */}
+      {/* <ServiceIntervals vehicleId={vehicle.id} currentMileage={vehicle.mileage} /> */}
 
       {/* Parts inventory */}
       <PartsInventory vehicleId={vehicle.id} />
@@ -463,7 +463,9 @@ export function VehiclePage() {
             <Button variant="outline" size="icon" onClick={handleExportCsv} className="sm:hidden h-8 w-8">
               <Download className="h-4 w-4" />
             </Button>
-            <ExpenseDialog vehicleId={vehicle.id} />
+            <div className="hidden sm:block">
+              <ExpenseDialog vehicleId={vehicle.id} />
+            </div>
           </div>
         </div>
 
@@ -630,6 +632,21 @@ export function VehiclePage() {
             )}
           </>
         )}
+      </div>
+
+      {/* Fixed mobile button */}
+      <div className="fixed bottom-4 left-0 right-0 flex justify-center sm:hidden z-50">
+        <div className="w-[90%]">
+          <ExpenseDialog
+            vehicleId={vehicle.id}
+            trigger={
+              <Button className="w-full">
+                <Plus className="mr-2 h-4 w-4" />
+                Добавить расход
+              </Button>
+            }
+          />
+        </div>
       </div>
     </div>
   )

@@ -6,6 +6,7 @@ export interface Vehicle {
   model: string
   year: number
   mileage: number
+  initialMileage: number
   photo: string | null
   vin: string | null
   licensePlate: string | null

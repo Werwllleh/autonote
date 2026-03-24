@@ -78,9 +78,16 @@ export class StatsService {
       monthlyAvg = total / monthKeys.length;
     }
 
-    // Cost per km
+    // Cost per km (from initial mileage to last expense with mileage)
+    const expensesWithMileage = expenses
+      .filter((e) => e.mileage !== null && e.mileage > 0)
+      .sort((a, b) => a.mileage! - b.mileage!);
+    const lastMileage = expensesWithMileage.length > 0
+      ? expensesWithMileage[expensesWithMileage.length - 1].mileage!
+      : null;
+    const drivenKm = lastMileage !== null ? lastMileage - vehicle.initialMileage : null;
     const costPerKm =
-      vehicle.mileage > 0 ? Math.round((total / vehicle.mileage) * 100) / 100 : null;
+      drivenKm && drivenKm > 0 ? Math.round((total / drivenKm) * 100) / 100 : null;
 
     return {
       total,

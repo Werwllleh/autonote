@@ -19,7 +19,8 @@
       "Bash(nginx -T)",
       "Bash(cp -r /home/alex/apps/main/autonote/apps/client/dist/* /var/www/auto-notes.ru/client/ 2>&1)",
       "Bash(cp -r /home/alex/apps/main/autonote/apps/client/dist/* /var/www/auto-notes.ru/client/)",
-      "Bash(find:*)"
+      "Bash(find:*)",
+      "Bash(apps/server/node_modules/.bin/prisma migrate:*)"
     ]
   }
 }

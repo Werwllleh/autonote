@@ -26,8 +26,9 @@ model Vehicle {
   brand   String
   model   String
   year    Int
-  mileage Int    @default(0)
-  photo   String?
+  mileage        Int @default(0)
+  initialMileage Int @default(0) @map("initial_mileage")
+  photo          String?
 
   vin                String?   @map("vin")
   licensePlate       String?   @map("license_plate")

@@ -28,7 +28,7 @@ export class VehicleService {
 
   create(dto: CreateVehicleDto, userId: string) {
     return this.prisma.vehicle.create({
-      data: { ...dto, userId },
+      data: { ...dto, initialMileage: dto.mileage ?? 0, userId },
     });
   }
 
