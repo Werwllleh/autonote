@@ -26,4 +26,7 @@ export const userApi = {
 
   removeAvatar: () =>
     api.delete<UserProfile>("/user/avatar").then((r) => r.data),
+
+  deleteAccount: (password: string) =>
+    api.delete("/user/account", { data: { password } }).then((r) => r.data),
 }

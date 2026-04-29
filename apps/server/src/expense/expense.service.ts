@@ -138,8 +138,10 @@ export class ExpenseService {
     if (rows.length === 0)
       throw new BadRequestException('Файл не содержит данных');
 
-    // Load categories for name→id mapping
-    const categories = await this.prisma.category.findMany();
+    // Load categories for name→id mapping (system + user's custom)
+    const categories = await this.prisma.category.findMany({
+      where: { OR: [{ isSystem: true }, { userId }] },
+    });
     const catMap = new Map<string, string>();
     for (const c of categories) {
       catMap.set(c.name.toLowerCase().trim(), c.id);

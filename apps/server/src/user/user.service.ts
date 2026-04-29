@@ -93,4 +93,30 @@ export class UserService {
       select: { id: true, email: true, name: true, avatar: true },
     });
   }
+
+  async deleteAccount(userId: string, password: string) {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+      include: { vehicles: { select: { photo: true } } },
+    });
+    if (!user) throw new NotFoundException('User not found');
+
+    const valid = await bcrypt.compare(password, user.password);
+    if (!valid) throw new UnauthorizedException('Неверный пароль');
+
+    // Delete uploaded files: avatar + vehicle photos
+    const filesToDelete: string[] = [];
+    if (user.avatar) filesToDelete.push(user.avatar);
+    for (const v of user.vehicles) {
+      if (v.photo) filesToDelete.push(v.photo);
+    }
+    await Promise.all(
+      filesToDelete.map((url) => this.uploadService.removeImage(url)),
+    );
+
+    // Cascade deletes vehicles, expenses, parts, categories, service intervals
+    await this.prisma.user.delete({ where: { id: userId } });
+
+    return { deleted: true };
+  }
 }

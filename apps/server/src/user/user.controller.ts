@@ -64,4 +64,12 @@ export class UserController {
   removeAvatar(@CurrentUser('id') userId: string) {
     return this.userService.removeAvatar(userId);
   }
+
+  @Delete('account')
+  deleteAccount(
+    @CurrentUser('id') userId: string,
+    @Body('password') password: string,
+  ) {
+    return this.userService.deleteAccount(userId, password);
+  }
 }

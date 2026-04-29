@@ -62,6 +62,19 @@ export class StatsService {
 
     const total = expenses.reduce((s, e) => s + e.amount, 0);
 
+    // Stock value (parts sitting in inventory = money already spent)
+    const stockParts = await this.prisma.part.findMany({
+      where: { vehicleId },
+    });
+    const stockValue = stockParts.reduce(
+      (s, p) => s + p.quantity * p.price,
+      0,
+    );
+    const totalWithStock = total + stockValue;
+    if (stockValue > 0) {
+      byCategory['Склад запчастей'] = stockValue;
+    }
+
     // Month comparison
     const now = new Date();
     const currentMonthKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
@@ -87,10 +100,12 @@ export class StatsService {
       : null;
     const drivenKm = lastMileage !== null ? lastMileage - vehicle.initialMileage : null;
     const costPerKm =
-      drivenKm && drivenKm > 0 ? Math.round((total / drivenKm) * 100) / 100 : null;
+      drivenKm && drivenKm > 0 ? Math.round((totalWithStock / drivenKm) * 100) / 100 : null;
 
     return {
-      total,
+      total: totalWithStock,
+      expensesTotal: total,
+      stockValue,
       count: expenses.length,
       byCategory,
       byMonth,
@@ -111,12 +126,25 @@ export class StatsService {
       orderBy: { date: 'asc' },
     });
 
-    const total = expenses.reduce((s, e) => s + e.amount, 0);
+    const expensesTotal = expenses.reduce((s, e) => s + e.amount, 0);
+
+    // Stock value across all user's vehicles
+    const stockParts = await this.prisma.part.findMany({
+      where: { vehicle: { userId } },
+    });
+    const stockValue = stockParts.reduce(
+      (s, p) => s + p.quantity * p.price,
+      0,
+    );
+    const total = expensesTotal + stockValue;
 
     const byCategory: Record<string, number> = {};
     for (const e of expenses) {
       byCategory[e.category.name] =
         (byCategory[e.category.name] || 0) + e.amount;
+    }
+    if (stockValue > 0) {
+      byCategory['Склад запчастей'] = stockValue;
     }
 
     const byMonth: Record<string, number> = {};
@@ -148,6 +176,8 @@ export class StatsService {
 
     return {
       total,
+      expensesTotal,
+      stockValue,
       count: expenses.length,
       byCategory,
       byMonth,

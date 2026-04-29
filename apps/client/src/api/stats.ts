@@ -3,6 +3,8 @@ import type { Expense } from "./expenses"
 
 export interface VehicleStats {
   total: number
+  expensesTotal: number
+  stockValue: number
   count: number
   byCategory: Record<string, number>
   byMonth: Record<string, number>
@@ -17,6 +19,8 @@ export interface VehicleStats {
 
 export interface OverallStats {
   total: number
+  expensesTotal: number
+  stockValue: number
   count: number
   byCategory: Record<string, number>
   byMonth: Record<string, number>

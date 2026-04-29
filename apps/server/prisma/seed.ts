@@ -16,9 +16,9 @@ const categories = [
 async function main() {
   for (const cat of categories) {
     await prisma.category.upsert({
-      where: { slug: cat.slug },
-      update: {},
-      create: cat,
+      where: { slug_userId: { slug: cat.slug, userId: null as any } },
+      update: { isSystem: true },
+      create: { ...cat, isSystem: true },
     });
   }
   console.log('Seeded categories:', categories.map((c) => c.name).join(', '));

@@ -1,5 +1,6 @@
 import { useState, useMemo, type FormEvent } from "react"
 import { useParts, useCreatePart, useUpdatePart, useDeletePart } from "@/hooks/use-parts"
+import { PartDetailDialog } from "@/components/part-detail-dialog"
 import type { Part } from "@/api/parts"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -249,45 +250,46 @@ function PartGroupRow({
       {expanded && (
         <div className="border-t divide-y">
           {group.items.map((part) => (
-            <div
-              key={part.id}
-              className="flex items-center gap-3 px-3 py-2 pl-10 bg-muted/20"
-            >
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-3 text-xs text-muted-foreground">
-                  <span>
-                    {part.quantity} шт. × {formatAmount(part.price)}
-                  </span>
-                  <span className="font-medium text-foreground">
-                    = {formatAmount(part.quantity * part.price)}
-                  </span>
+            <PartDetailDialog key={part.id} part={part}>
+              <div
+                className="flex items-center gap-3 px-3 py-2 pl-10 bg-muted/20 hover:bg-muted/40 transition-colors"
+              >
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-3 text-xs text-muted-foreground">
+                    <span>
+                      {part.quantity} шт. × {formatAmount(part.price)}
+                    </span>
+                    <span className="font-medium text-foreground">
+                      = {formatAmount(part.quantity * part.price)}
+                    </span>
+                  </div>
+                </div>
+                <div className="flex items-center gap-1 shrink-0">
+                  <PartFormDialog
+                    vehicleId={vehicleId}
+                    part={part}
+                    allParts={allParts}
+                    trigger={
+                      <Button variant="ghost" size="icon" className="h-7 w-7">
+                        <Pencil className="h-3.5 w-3.5 text-muted-foreground" />
+                      </Button>
+                    }
+                  />
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-7 w-7"
+                    onClick={() => {
+                      if (confirm(`Удалить "${part.name}" (${formatAmount(part.price)}) со склада?`)) {
+                        deletePart.mutate({ id: part.id, vehicleId })
+                      }
+                    }}
+                  >
+                    <Trash2 className="h-3.5 w-3.5 text-muted-foreground" />
+                  </Button>
                 </div>
               </div>
-              <div className="flex items-center gap-1 shrink-0">
-                <PartFormDialog
-                  vehicleId={vehicleId}
-                  part={part}
-                  allParts={allParts}
-                  trigger={
-                    <Button variant="ghost" size="icon" className="h-7 w-7">
-                      <Pencil className="h-3.5 w-3.5 text-muted-foreground" />
-                    </Button>
-                  }
-                />
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-7 w-7"
-                  onClick={() => {
-                    if (confirm(`Удалить "${part.name}" (${formatAmount(part.price)}) со склада?`)) {
-                      deletePart.mutate({ id: part.id, vehicleId })
-                    }
-                  }}
-                >
-                  <Trash2 className="h-3.5 w-3.5 text-muted-foreground" />
-                </Button>
-              </div>
-            </div>
+            </PartDetailDialog>
           ))}
         </div>
       )}
@@ -307,54 +309,56 @@ function SinglePartRow({
   const deletePart = useDeletePart()
 
   return (
-    <div className="flex items-center gap-3 rounded-lg border px-3 py-2.5">
-      <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-2">
-          <span className="font-medium text-sm">{part.name}</span>
-          {part.article && (
-            <span className="text-xs text-muted-foreground">{part.article}</span>
-          )}
+    <PartDetailDialog part={part}>
+      <div className="flex items-center gap-3 rounded-lg border px-3 py-2.5 hover:bg-muted/50 transition-colors">
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2">
+            <span className="font-medium text-sm">{part.name}</span>
+            {part.article && (
+              <span className="text-xs text-muted-foreground">{part.article}</span>
+            )}
+          </div>
+          <div className="mt-0.5 flex items-center gap-3 text-xs text-muted-foreground">
+            <span>
+              {part.quantity} шт. × {formatAmount(part.price)}
+            </span>
+            <span className="font-medium text-foreground">
+              = {formatAmount(part.quantity * part.price)}
+            </span>
+          </div>
         </div>
-        <div className="mt-0.5 flex items-center gap-3 text-xs text-muted-foreground">
-          <span>
-            {part.quantity} шт. × {formatAmount(part.price)}
-          </span>
-          <span className="font-medium text-foreground">
-            = {formatAmount(part.quantity * part.price)}
-          </span>
-        </div>
-      </div>
-      <div className="flex items-center gap-1 shrink-0">
-        <Badge
-          variant={part.quantity > 0 ? "secondary" : "destructive"}
-          className="text-xs"
-        >
-          {part.quantity} шт.
-        </Badge>
-        <PartFormDialog
-          vehicleId={vehicleId}
-          part={part}
-          allParts={allParts}
-          trigger={
-            <Button variant="ghost" size="icon" className="h-7 w-7">
-              <Pencil className="h-3.5 w-3.5 text-muted-foreground" />
-            </Button>
-          }
-        />
-        <Button
-          variant="ghost"
-          size="icon"
-          className="h-7 w-7"
-          onClick={() => {
-            if (confirm(`Удалить "${part.name}" со склада?`)) {
-              deletePart.mutate({ id: part.id, vehicleId })
+        <div className="flex items-center gap-1 shrink-0">
+          <Badge
+            variant={part.quantity > 0 ? "secondary" : "destructive"}
+            className="text-xs"
+          >
+            {part.quantity} шт.
+          </Badge>
+          <PartFormDialog
+            vehicleId={vehicleId}
+            part={part}
+            allParts={allParts}
+            trigger={
+              <Button variant="ghost" size="icon" className="h-7 w-7">
+                <Pencil className="h-3.5 w-3.5 text-muted-foreground" />
+              </Button>
             }
-          }}
-        >
-          <Trash2 className="h-3.5 w-3.5 text-muted-foreground" />
-        </Button>
+          />
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-7 w-7"
+            onClick={() => {
+              if (confirm(`Удалить "${part.name}" со склада?`)) {
+                deletePart.mutate({ id: part.id, vehicleId })
+              }
+            }}
+          >
+            <Trash2 className="h-3.5 w-3.5 text-muted-foreground" />
+          </Button>
+        </div>
       </div>
-    </div>
+    </PartDetailDialog>
   )
 }
 

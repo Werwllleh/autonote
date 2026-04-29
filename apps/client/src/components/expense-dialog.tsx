@@ -1,6 +1,6 @@
-import { useState, useMemo, useEffect, type FormEvent, type ReactNode } from "react"
+import { useState, useMemo, useEffect, useRef, type FormEvent, type ReactNode } from "react"
 import { useCreateExpense, useUpdateExpense } from "@/hooks/use-expenses"
-import { useCategories } from "@/hooks/use-categories"
+import { useCategories, useCreateCategory } from "@/hooks/use-categories"
 import { useParts } from "@/hooks/use-parts"
 import { useQueryClient } from "@tanstack/react-query"
 import type { Expense } from "@/api/expenses"
@@ -10,7 +10,10 @@ import { Label } from "@/components/ui/label"
 import {
   Select,
   SelectContent,
+  SelectGroup,
   SelectItem,
+  SelectLabel,
+  SelectSeparator,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
@@ -21,7 +24,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog"
-import { Plus, Trash2, Package } from "lucide-react"
+import { Plus, Trash2, Package, X } from "lucide-react"
 
 interface PartRow {
   article: string
@@ -65,6 +68,13 @@ export function ExpenseDialog({ vehicleId, expense, trigger }: ExpenseDialogProp
   const create = useCreateExpense()
   const update = useUpdateExpense()
   const mutation = isEdit ? update : create
+  const createCategory = useCreateCategory()
+  const [showNewCategory, setShowNewCategory] = useState(false)
+  const [newCategoryName, setNewCategoryName] = useState("")
+  const newCategoryInputRef = useRef<HTMLInputElement>(null)
+
+  const systemCategories = useMemo(() => categories.filter((c) => c.isSystem), [categories])
+  const customCategories = useMemo(() => categories.filter((c) => !c.isSystem), [categories])
 
   useEffect(() => {
     if (open && expense) {
@@ -321,18 +331,106 @@ export function ExpenseDialog({ vehicleId, expense, trigger }: ExpenseDialogProp
           <fieldset disabled={isPending} className="space-y-4">
             <div className="space-y-2">
               <Label>Категория</Label>
-              <Select required value={categoryId} onValueChange={setCategoryId}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Выберите категорию" />
-                </SelectTrigger>
-                <SelectContent>
-                  {categories.map((cat) => (
-                    <SelectItem key={cat.id} value={cat.id}>
-                      {cat.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              {showNewCategory ? (
+                <div className="flex gap-2">
+                  <Input
+                    ref={newCategoryInputRef}
+                    placeholder="Название категории"
+                    value={newCategoryName}
+                    onChange={(e) => setNewCategoryName(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        e.preventDefault()
+                        if (newCategoryName.trim()) {
+                          createCategory.mutate(newCategoryName.trim(), {
+                            onSuccess: (cat) => {
+                              setCategoryId(cat.id)
+                              setNewCategoryName("")
+                              setShowNewCategory(false)
+                            },
+                          })
+                        }
+                      }
+                      if (e.key === "Escape") {
+                        setShowNewCategory(false)
+                        setNewCategoryName("")
+                      }
+                    }}
+                  />
+                  <Button
+                    type="button"
+                    size="icon"
+                    variant="outline"
+                    disabled={!newCategoryName.trim() || createCategory.isPending}
+                    onClick={() => {
+                      if (newCategoryName.trim()) {
+                        createCategory.mutate(newCategoryName.trim(), {
+                          onSuccess: (cat) => {
+                            setCategoryId(cat.id)
+                            setNewCategoryName("")
+                            setShowNewCategory(false)
+                          },
+                        })
+                      }
+                    }}
+                  >
+                    <Plus className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    type="button"
+                    size="icon"
+                    variant="ghost"
+                    onClick={() => {
+                      setShowNewCategory(false)
+                      setNewCategoryName("")
+                    }}
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                </div>
+              ) : (
+                <Select required value={categoryId} onValueChange={setCategoryId}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Выберите категорию" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectGroup>
+                      {systemCategories.map((cat) => (
+                        <SelectItem key={cat.id} value={cat.id}>
+                          {cat.name}
+                        </SelectItem>
+                      ))}
+                    </SelectGroup>
+                    {customCategories.length > 0 && (
+                      <>
+                        <SelectSeparator />
+                        <SelectGroup>
+                          <SelectLabel>Мои категории</SelectLabel>
+                          {customCategories.map((cat) => (
+                            <SelectItem key={cat.id} value={cat.id}>
+                              {cat.name}
+                            </SelectItem>
+                          ))}
+                        </SelectGroup>
+                      </>
+                    )}
+                    <SelectSeparator />
+                    <button
+                      type="button"
+                      className="relative flex w-full cursor-pointer items-center rounded-sm py-1.5 px-2 text-sm text-muted-foreground hover:bg-accent hover:text-accent-foreground outline-none"
+                      onMouseDown={(e) => {
+                        e.preventDefault()
+                        e.stopPropagation()
+                        setShowNewCategory(true)
+                        setTimeout(() => newCategoryInputRef.current?.focus(), 50)
+                      }}
+                    >
+                      <Plus className="mr-2 h-3.5 w-3.5" />
+                      Добавить категорию
+                    </button>
+                  </SelectContent>
+                </Select>
+              )}
             </div>
 
             {/* === FUEL === */}

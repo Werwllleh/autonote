@@ -20,7 +20,10 @@
       "Bash(cp -r /home/alex/apps/main/autonote/apps/client/dist/* /var/www/auto-notes.ru/client/ 2>&1)",
       "Bash(cp -r /home/alex/apps/main/autonote/apps/client/dist/* /var/www/auto-notes.ru/client/)",
       "Bash(find:*)",
-      "Bash(apps/server/node_modules/.bin/prisma migrate:*)"
+      "Bash(apps/server/node_modules/.bin/prisma migrate:*)",
+      "Bash(script -qec \"npx prisma migrate dev --name add-user-categories\" /dev/null)",
+      "Bash(kill %1)",
+      "Bash(pkill -f \"prisma migrate\")"
     ]
   }
 }

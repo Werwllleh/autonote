@@ -7,16 +7,25 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum UserRole {
+  USER
+  ADMIN
+}
+
 model User {
   id        String   @id @default(uuid())
   email     String   @unique
   password  String
   name      String?
   avatar    String?
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
+  role          UserRole @default(USER)
+  emailVerified Boolean  @default(false) @map("email_verified")
+  verifyToken   String?  @unique @map("verify_token")
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
 
-  vehicles Vehicle[]
+  vehicles   Vehicle[]
+  categories Category[]
 
   @@map("users")
 }
@@ -46,17 +55,35 @@ model Vehicle {
   expenses         Expense[]
   parts            Part[]
   serviceIntervals ServiceInterval[]
+  publicReports    PublicReport[]
 
   @@map("vehicles")
 }
 
+model PublicReport {
+  id        String   @id @default(uuid())
+  token     String   @unique
+  expiresAt DateTime @map("expires_at")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  vehicleId String  @map("vehicle_id")
+  vehicle   Vehicle @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+
+  @@map("public_reports")
+}
+
 model Category {
-  id   String @id @default(uuid())
-  name String @unique
-  slug String @unique
+  id     String  @id @default(uuid())
+  name   String
+  slug   String
+  isSystem Boolean @default(false) @map("is_system")
+
+  userId String? @map("user_id")
+  user   User?   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   expenses Expense[]
 
+  @@unique([slug, userId])
   @@map("categories")
 }
 

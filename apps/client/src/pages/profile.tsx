@@ -1,12 +1,15 @@
 import { useState, useRef, type FormEvent } from "react"
+import { useNavigate } from "react-router-dom"
 import { useProfile, useUpdateEmail, useUpdatePassword, useUploadAvatar, useRemoveAvatar } from "@/hooks/use-profile"
+import { useAuthStore } from "@/lib/auth-store"
+import { userApi } from "@/api/user"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Camera, Trash2, Check } from "lucide-react"
+import { Camera, Trash2, Check, AlertTriangle } from "lucide-react"
 
 export function ProfilePage() {
   const { data: profile, isLoading } = useProfile()
@@ -25,6 +28,14 @@ export function ProfilePage() {
   const [newPassword, setNewPassword] = useState("")
   const [passwordOpen, setPasswordOpen] = useState(false)
   const [passwordSuccess, setPasswordSuccess] = useState(false)
+
+  const [deleteOpen, setDeleteOpen] = useState(false)
+  const [deletePassword, setDeletePassword] = useState("")
+  const [deleteConfirm, setDeleteConfirm] = useState("")
+  const [deletePending, setDeletePending] = useState(false)
+  const [deleteError, setDeleteError] = useState("")
+  const navigate = useNavigate()
+  const { logout } = useAuthStore()
 
   const handleEmailSubmit = (e: FormEvent) => {
     e.preventDefault()
@@ -270,6 +281,102 @@ export function ProfilePage() {
       <div className="text-xs text-muted-foreground">
         Аккаунт создан: {new Date(profile.createdAt).toLocaleDateString("ru-RU")}
       </div>
+
+      {/* Delete account */}
+      <Card className="border-destructive/30">
+        <CardHeader>
+          <CardTitle className="text-base text-destructive flex items-center gap-2">
+            <AlertTriangle className="h-4 w-4" />
+            Удаление аккаунта
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <p className="text-sm text-muted-foreground">
+            Все ваши данные будут удалены безвозвратно: автомобили, расходы, запчасти, категории и фотографии.
+          </p>
+          {!deleteOpen ? (
+            <Button
+              variant="outline"
+              size="sm"
+              className="text-destructive border-destructive/30 hover:bg-destructive/10"
+              onClick={() => setDeleteOpen(true)}
+            >
+              <Trash2 className="mr-1 h-3 w-3" />
+              Удалить аккаунт
+            </Button>
+          ) : (
+            <form
+              onSubmit={async (e: FormEvent) => {
+                e.preventDefault()
+                setDeleteError("")
+                if (deleteConfirm !== "УДАЛИТЬ") {
+                  setDeleteError("Введите УДАЛИТЬ для подтверждения")
+                  return
+                }
+                setDeletePending(true)
+                try {
+                  await userApi.deleteAccount(deletePassword)
+                  logout()
+                  navigate("/login")
+                } catch (err: any) {
+                  setDeleteError(err?.response?.data?.message || "Ошибка удаления")
+                } finally {
+                  setDeletePending(false)
+                }
+              }}
+              className="space-y-3"
+            >
+              <div className="rounded-lg border border-destructive/20 bg-destructive/5 p-3 text-sm">
+                Это действие необратимо. Все данные будут удалены навсегда.
+              </div>
+              <div className="space-y-2">
+                <Label>Текущий пароль</Label>
+                <Input
+                  required
+                  type="password"
+                  value={deletePassword}
+                  onChange={(e) => setDeletePassword(e.target.value)}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>Введите УДАЛИТЬ для подтверждения</Label>
+                <Input
+                  required
+                  value={deleteConfirm}
+                  onChange={(e) => setDeleteConfirm(e.target.value)}
+                  placeholder="УДАЛИТЬ"
+                />
+              </div>
+              {deleteError && (
+                <p className="text-sm text-destructive">{deleteError}</p>
+              )}
+              <div className="flex gap-2">
+                <Button
+                  type="submit"
+                  variant="destructive"
+                  size="sm"
+                  disabled={deletePending}
+                >
+                  {deletePending ? "Удаление..." : "Удалить навсегда"}
+                </Button>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => {
+                    setDeleteOpen(false)
+                    setDeletePassword("")
+                    setDeleteConfirm("")
+                    setDeleteError("")
+                  }}
+                >
+                  Отмена
+                </Button>
+              </div>
+            </form>
+          )}
+        </CardContent>
+      </Card>
     </div>
   )
 }

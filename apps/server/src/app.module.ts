@@ -12,6 +12,9 @@ import { StatsModule } from './stats/stats.module';
 import { UploadModule } from './upload/upload.module';
 import { PartModule } from './part/part.module';
 import { ServiceIntervalModule } from './service-interval/service-interval.module';
+import { AdminModule } from './admin/admin.module';
+import { MailModule } from './mail/mail.module';
+import { ReportModule } from './report/report.module';
 
 @Module({
   imports: [
@@ -31,6 +34,9 @@ import { ServiceIntervalModule } from './service-interval/service-interval.modul
     UploadModule,
     PartModule,
     ServiceIntervalModule,
+    AdminModule,
+    MailModule,
+    ReportModule,
   ],
 })
 export class AppModule {}

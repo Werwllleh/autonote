@@ -7,8 +7,10 @@ import { useDeleteVehicle } from "@/hooks/use-vehicles"
 import { useVehicleStats } from "@/hooks/use-stats"
 import { useAuthStore } from "@/lib/auth-store"
 import { ExpenseDialog } from "@/components/expense-dialog"
+import { ExpenseDetailDialog } from "@/components/expense-detail-dialog"
 import { ImportDialog } from "@/components/import-dialog"
 import { EditVehicleDialog } from "@/components/edit-vehicle-dialog"
+import { ShareReportDialog } from "@/components/share-report-dialog"
 import { PartsInventory } from "@/components/parts-inventory"
 import { CategoryPieChart } from "@/components/charts/category-pie-chart"
 import { MonthlyLineChart } from "@/components/charts/monthly-line-chart"
@@ -38,6 +40,7 @@ import {
   Receipt,
   Search,
   ArrowUpDown,
+  BarChart3,
   Wrench,
   Camera,
   TrendingUp,
@@ -45,6 +48,7 @@ import {
   ArrowDownRight,
   Droplets,
   Info,
+  Package,
   Plus,
 } from "lucide-react"
 
@@ -83,6 +87,7 @@ export function VehiclePage() {
   const [expensesOpen, setExpensesOpen] = useState(false)
   const [collapsedMonths, setCollapsedMonths] = useState<Set<string>>(new Set())
   const [metaOpen, setMetaOpen] = useState(false)
+  const [chartsOpen, setChartsOpen] = useState(false)
   const token = useAuthStore((s) => s.accessToken)
 
   const { data: vehicle, isLoading: vehicleLoading } = useQuery({
@@ -214,6 +219,7 @@ export function VehiclePage() {
           Назад
         </Link>
         <div className="flex items-center gap-2">
+          <ShareReportDialog vehicleId={vehicle.id} />
           <EditVehicleDialog vehicle={vehicle} />
           <Button variant="outline" size="icon" onClick={handleDeleteVehicle} className="h-8 w-8 sm:h-9 sm:w-9">
             <Trash2 className="h-4 w-4 text-destructive" />
@@ -319,25 +325,44 @@ export function VehiclePage() {
 
       {/* Summary cards */}
       <div className="grid grid-cols-2 gap-3 sm:gap-4 sm:grid-cols-4">
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Всего расходов
+        <Card className="relative overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-violet-500/5" />
+          <CardHeader className="relative pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-1.5">
+              <div className="flex h-5 w-5 items-center justify-center rounded bg-blue-500/10">
+                <Receipt className="h-3 w-3 text-blue-500" />
+              </div>
+              Всего потрачено
             </CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="relative">
             <p className="text-2xl font-bold">{formatAmount(stats?.total ?? 0)}</p>
+            {stats && stats.stockValue > 0 && (
+              <div className="mt-1 space-y-0.5 text-xs text-muted-foreground">
+                <div className="flex justify-between">
+                  <span>Расходы:</span>
+                  <span>{formatAmount(stats.expensesTotal)}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="flex items-center gap-1"><Package className="h-3 w-3" />Склад:</span>
+                  <span>{formatAmount(stats.stockValue)}</span>
+                </div>
+              </div>
+            )}
           </CardContent>
         </Card>
 
-        {/* This month vs last */}
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
+        <Card className="relative overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 to-teal-500/5" />
+          <CardHeader className="relative pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-1.5">
+              <div className="flex h-5 w-5 items-center justify-center rounded bg-emerald-500/10">
+                <Calendar className="h-3 w-3 text-emerald-500" />
+              </div>
               В этом месяце
             </CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="relative">
             <p className="text-2xl font-bold">{formatAmount(stats?.currentMonthTotal ?? 0)}</p>
             {monthChange !== null && (
               <div className={`flex items-center gap-1 text-xs mt-1 ${monthChange > 0 ? "text-destructive" : "text-emerald-500"}`}>
@@ -349,14 +374,17 @@ export function VehiclePage() {
         </Card>
 
         {stats?.avgFuelCostPer100km != null && (
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-1">
-                <Fuel className="h-3 w-3" />
+          <Card className="relative overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-br from-amber-500/5 to-orange-500/5" />
+            <CardHeader className="relative pb-2">
+              <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-1.5">
+                <div className="flex h-5 w-5 items-center justify-center rounded bg-amber-500/10">
+                  <Fuel className="h-3 w-3 text-amber-500" />
+                </div>
                 Топливо / 100 км
               </CardTitle>
             </CardHeader>
-            <CardContent>
+            <CardContent className="relative">
               <p className="text-2xl font-bold">{formatAmount(stats.avgFuelCostPer100km)}</p>
               {stats.avgLitersPer100km != null && (
                 <p className="text-xs text-muted-foreground mt-1 flex items-center gap-1">
@@ -369,28 +397,34 @@ export function VehiclePage() {
         )}
 
         {stats?.costPerKm != null && (
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-1">
-                <Gauge className="h-3 w-3" />
+          <Card className="relative overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-br from-violet-500/5 to-purple-500/5" />
+            <CardHeader className="relative pb-2">
+              <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-1.5">
+                <div className="flex h-5 w-5 items-center justify-center rounded bg-violet-500/10">
+                  <Gauge className="h-3 w-3 text-violet-500" />
+                </div>
                 Стоимость км
               </CardTitle>
             </CardHeader>
-            <CardContent>
+            <CardContent className="relative">
               <p className="text-2xl font-bold">{stats.costPerKm.toFixed(1)} ₽</p>
             </CardContent>
           </Card>
         )}
 
         {stats?.yearlyForecast != null && stats.yearlyForecast > 0 && (
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-1">
-                <TrendingUp className="h-3 w-3" />
+          <Card className="relative overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-br from-rose-500/5 to-pink-500/5" />
+            <CardHeader className="relative pb-2">
+              <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-1.5">
+                <div className="flex h-5 w-5 items-center justify-center rounded bg-rose-500/10">
+                  <TrendingUp className="h-3 w-3 text-rose-500" />
+                </div>
                 Прогноз / год
               </CardTitle>
             </CardHeader>
-            <CardContent>
+            <CardContent className="relative">
               <p className="text-2xl font-bold">{formatAmount(stats.yearlyForecast)}</p>
               <p className="text-xs text-muted-foreground mt-1">
                 ~{formatAmount(stats.monthlyAvg)} / мес.
@@ -400,25 +434,42 @@ export function VehiclePage() {
         )}
       </div>
 
-      {/* Charts */}
+      {/* Charts — collapsed by default */}
       {stats && Object.keys(stats.byCategory).length > 0 && (
-        <div className="grid gap-4 md:grid-cols-2">
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-base">По категориям</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <CategoryPieChart data={stats.byCategory} />
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-base">Динамика расходов</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <MonthlyLineChart data={stats.byMonth} />
-            </CardContent>
-          </Card>
+        <div className="space-y-3">
+          <button
+            type="button"
+            className="flex items-center gap-2 hover:opacity-80 transition-opacity"
+            onClick={() => setChartsOpen(!chartsOpen)}
+          >
+            {chartsOpen ? (
+              <ChevronDown className="h-4 w-4 text-muted-foreground" />
+            ) : (
+              <ChevronRight className="h-4 w-4 text-muted-foreground" />
+            )}
+            <BarChart3 className="h-5 w-5 text-muted-foreground" />
+            <h2 className="text-lg font-semibold">Аналитика</h2>
+          </button>
+          {chartsOpen && (
+            <div className="grid gap-4 md:grid-cols-2">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-base">По категориям</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <CategoryPieChart data={stats.byCategory} />
+                </CardContent>
+              </Card>
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-base">Динамика расходов</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <MonthlyLineChart data={stats.byMonth} />
+                </CardContent>
+              </Card>
+            </div>
+          )}
         </div>
       )}
 
@@ -450,7 +501,7 @@ export function VehiclePage() {
             )}
             {!expensesOpen && expenses.length > 0 && (
               <span className="text-sm text-muted-foreground ml-1">
-                {formatAmount(stats?.total ?? 0)}
+                {formatAmount(stats?.expensesTotal ?? 0)}
               </span>
             )}
           </button>
@@ -550,79 +601,83 @@ export function VehiclePage() {
                     {!collapsedMonths.has(group.key) && (
                       <div className="mt-1 space-y-1.5">
                         {group.expenses.map((expense) => (
-                          <div
-                            key={expense.id}
-                            className="flex items-center gap-3 sm:gap-4 rounded-lg border px-3 sm:px-4 py-3"
-                          >
-                            <div className="flex-1 min-w-0">
-                              <div className="flex items-center gap-2">
-                                <Badge variant="secondary">{expense.category.name}</Badge>
-                                {expense.description && (
-                                  <span className="text-sm text-muted-foreground truncate">
-                                    {expense.description}
+                          <ExpenseDetailDialog key={expense.id} expense={expense}>
+                            <div
+                              className="flex items-center gap-3 sm:gap-4 rounded-lg border px-3 sm:px-4 py-3 hover:bg-muted/50 transition-colors"
+                            >
+                              <div className="flex-1 min-w-0">
+                                <div className="flex items-center gap-2">
+                                  <Badge variant="secondary">{expense.category.name}</Badge>
+                                  {expense.description && (
+                                    <span className="text-sm text-muted-foreground truncate">
+                                      {expense.description}
+                                    </span>
+                                  )}
+                                </div>
+                                <div className="mt-1 flex items-center gap-3 text-xs text-muted-foreground flex-wrap">
+                                  <span className="flex items-center gap-1">
+                                    <Calendar className="h-3 w-3" />
+                                    {formatDate(expense.date)}
                                   </span>
-                                )}
+                                  {expense.mileage && (
+                                    <span className="flex items-center gap-1">
+                                      <Gauge className="h-3 w-3" />
+                                      {expense.mileage.toLocaleString("ru-RU")} км
+                                    </span>
+                                  )}
+                                  {expense.liters && expense.pricePerLiter && (
+                                    <span className="flex items-center gap-1">
+                                      <Fuel className="h-3 w-3" />
+                                      {expense.liters} л × {expense.pricePerLiter} руб.
+                                      {expense.bonuses ? ` (-${expense.bonuses} бонусы)` : ""}
+                                    </span>
+                                  )}
+                                  {expense.parts && expense.parts.length > 0 && (() => {
+                                    const partsSum = expense.parts.reduce((s, p) => s + p.quantity * p.price, 0)
+                                    return (
+                                      <span className="flex items-center gap-1">
+                                        <Wrench className="h-3 w-3" />
+                                        запчасти {formatAmount(partsSum)}
+                                        {expense.laborCost ? ` · работа ${formatAmount(expense.laborCost)}` : ""}
+                                      </span>
+                                    )
+                                  })()}
+                                  {!expense.parts?.length && expense.laborCost && (
+                                    <span className="flex items-center gap-1">
+                                      <Wrench className="h-3 w-3" />
+                                      работа {formatAmount(expense.laborCost)}
+                                    </span>
+                                  )}
+                                </div>
                               </div>
-                              <div className="mt-1 flex items-center gap-3 text-xs text-muted-foreground flex-wrap">
-                                <span className="flex items-center gap-1">
-                                  <Calendar className="h-3 w-3" />
-                                  {formatDate(expense.date)}
+                              <div className="flex items-center gap-1 sm:gap-2 shrink-0">
+                                <span className="font-semibold text-sm sm:text-base">
+                                  {formatAmount(expense.amount)}
                                 </span>
-                                {expense.mileage && (
-                                  <span className="flex items-center gap-1">
-                                    <Gauge className="h-3 w-3" />
-                                    {expense.mileage.toLocaleString("ru-RU")} км
-                                  </span>
-                                )}
-                                {expense.liters && expense.pricePerLiter && (
-                                  <span className="flex items-center gap-1">
-                                    <Fuel className="h-3 w-3" />
-                                    {expense.liters} л × {expense.pricePerLiter} руб.
-                                    {expense.bonuses ? ` (-${expense.bonuses} бонусы)` : ""}
-                                  </span>
-                                )}
-                                {expense.parts && expense.parts.length > 0 && (
-                                  <span className="flex items-center gap-1">
-                                    <Wrench className="h-3 w-3" />
-                                    {expense.parts.length} запч.
-                                    {expense.laborCost ? ` + работа ${formatAmount(expense.laborCost)}` : ""}
-                                  </span>
-                                )}
-                                {!expense.parts?.length && expense.laborCost && (
-                                  <span className="flex items-center gap-1">
-                                    <Wrench className="h-3 w-3" />
-                                    работа {formatAmount(expense.laborCost)}
-                                  </span>
-                                )}
+                                <ExpenseDialog
+                                  vehicleId={vehicle.id}
+                                  expense={expense}
+                                  trigger={
+                                    <Button variant="ghost" size="icon" className="h-8 w-8">
+                                      <Pencil className="h-4 w-4 text-muted-foreground" />
+                                    </Button>
+                                  }
+                                />
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  className="h-8 w-8"
+                                  onClick={() => {
+                                    if (confirm("Удалить расход?")) {
+                                      deleteExpense.mutate(expense.id)
+                                    }
+                                  }}
+                                >
+                                  <Trash2 className="h-4 w-4 text-muted-foreground" />
+                                </Button>
                               </div>
                             </div>
-                            <div className="flex items-center gap-1 sm:gap-2 shrink-0">
-                              <span className="font-semibold text-sm sm:text-base">
-                                {formatAmount(expense.amount)}
-                              </span>
-                              <ExpenseDialog
-                                vehicleId={vehicle.id}
-                                expense={expense}
-                                trigger={
-                                  <Button variant="ghost" size="icon" className="h-8 w-8">
-                                    <Pencil className="h-4 w-4 text-muted-foreground" />
-                                  </Button>
-                                }
-                              />
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                className="h-8 w-8"
-                                onClick={() => {
-                                  if (confirm("Удалить расход?")) {
-                                    deleteExpense.mutate(expense.id)
-                                  }
-                                }}
-                              >
-                                <Trash2 className="h-4 w-4 text-muted-foreground" />
-                              </Button>
-                            </div>
-                          </div>
+                          </ExpenseDetailDialog>
                         ))}
                       </div>
                     )}

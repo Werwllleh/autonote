@@ -13,6 +13,8 @@ export interface Category {
   id: string
   name: string
   slug: string
+  isSystem: boolean
+  userId: string | null
 }
 
 export interface InventoryPart {
