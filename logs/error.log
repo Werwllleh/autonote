@@ -1,0 +1,12 @@
+You have triggered an unhandledRejection, you may have forgotten to catch a Promise rejection:
+PrismaClientInitializationError: Can't reach database server at `localhost:5433`
+
+Please make sure your database server is running at `localhost:5433`.
+    at r (/home/alex/apps/main/autonote/apps/server/node_modules/@prisma/client/src/runtime/core/engines/library/LibraryEngine.ts:440:17)
+    at Proxy.onModuleInit (/home/alex/apps/main/autonote/apps/server/src/prisma/prisma.service.ts:7:5)
+    at async Promise.all (index 0)
+    at callModuleInitHook (/home/alex/apps/main/autonote/node_modules/@nestjs/core/hooks/on-module-init.hook.js:43:5)
+    at NestApplication.callInitHook (/home/alex/apps/main/autonote/node_modules/@nestjs/core/nest-application-context.js:252:13)
+    at NestApplication.init (/home/alex/apps/main/autonote/node_modules/@nestjs/core/nest-application.js:103:9)
+    at NestApplication.listen (/home/alex/apps/main/autonote/node_modules/@nestjs/core/nest-application.js:175:13)
+    at bootstrap (/home/alex/apps/main/autonote/apps/server/src/main.ts:16:3)

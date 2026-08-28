@@ -21,6 +21,7 @@ export interface InventoryPart {
   id: string
   name: string
   article: string | null
+  location: string | null
   quantity: number
   price: number
   vehicleId: string

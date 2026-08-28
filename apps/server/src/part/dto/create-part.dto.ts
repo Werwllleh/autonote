@@ -8,6 +8,10 @@ export class CreatePartDto {
   @IsString()
   article?: string;
 
+  @IsOptional()
+  @IsString()
+  location?: string;
+
   @IsInt()
   @Min(1)
   quantity: number;

@@ -40,7 +40,9 @@ export function PartDetailDialog({ part, children }: PartDetailDialogProps) {
       <div
         className="cursor-pointer"
         onClick={(e) => {
-          if ((e.target as HTMLElement).closest("button")) return
+          const target = e.target as HTMLElement
+          if (target.closest("button")) return
+          if (target.closest('[role="dialog"]')) return
           setOpen(true)
         }}
       >
@@ -60,6 +62,12 @@ export function PartDetailDialog({ part, children }: PartDetailDialogProps) {
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Артикул</span>
                 <span className="font-mono">{part.article}</span>
+              </div>
+            )}
+            {part.location && (
+              <div className="flex justify-between gap-3">
+                <span className="text-muted-foreground">Где лежит</span>
+                <span className="text-right">{part.location}</span>
               </div>
             )}
             <div className="flex justify-between">

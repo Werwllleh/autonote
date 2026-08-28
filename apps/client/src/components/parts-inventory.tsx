@@ -34,6 +34,7 @@ function PartFormDialog({
   const [open, setOpen] = useState(false)
   const [name, setName] = useState("")
   const [article, setArticle] = useState("")
+  const [location, setLocation] = useState("")
   const [quantity, setQuantity] = useState("")
   const [price, setPrice] = useState("")
 
@@ -55,12 +56,14 @@ function PartFormDialog({
     if (isOpen && part) {
       setName(part.name)
       setArticle(part.article || "")
+      setLocation(part.location || "")
       setQuantity(String(part.quantity))
       setPrice(String(part.price))
     }
     if (isOpen && !part) {
       setName("")
       setArticle("")
+      setLocation("")
       setQuantity("")
       setPrice("")
     }
@@ -84,6 +87,7 @@ function PartFormDialog({
           vehicleId,
           name,
           article: article || undefined,
+          location: location || undefined,
           quantity: Number(quantity),
           price: Number(price),
         },
@@ -94,6 +98,7 @@ function PartFormDialog({
         {
           name: finalName,
           article: article || undefined,
+          location: location || undefined,
           quantity: Number(quantity),
           price: Number(price),
           vehicleId,
@@ -150,6 +155,14 @@ function PartFormDialog({
                 />
               </div>
             )}
+            <div className="space-y-2">
+              <Label>Где лежит</Label>
+              <Input
+                value={location}
+                onChange={(e) => setLocation(e.target.value)}
+                placeholder="Гараж, полка 2"
+              />
+            </div>
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label>Количество</Label>

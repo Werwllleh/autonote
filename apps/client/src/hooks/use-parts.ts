@@ -22,7 +22,7 @@ export function useCreatePart() {
 export function useUpdatePart() {
   const qc = useQueryClient()
   return useMutation({
-    mutationFn: ({ id, ...data }: { id: string; vehicleId: string; name?: string; article?: string; quantity?: number; price?: number }) =>
+    mutationFn: ({ id, ...data }: { id: string; vehicleId: string; name?: string; article?: string; location?: string; quantity?: number; price?: number }) =>
       partsApi.update(id, data),
     onSuccess: (_data, variables) => {
       qc.invalidateQueries({ queryKey: ["parts", variables.vehicleId] })

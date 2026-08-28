@@ -64,6 +64,17 @@ export class ReportService {
       orderBy: { date: 'desc' },
     });
 
+    const inventoryParts = await this.prisma.part.findMany({
+      where: { vehicleId: report.vehicleId },
+      select: {
+        name: true,
+        article: true,
+        quantity: true,
+        price: true,
+      },
+      orderBy: { name: 'asc' },
+    });
+
     const totalSpent = expenses.reduce((s, e) => s + e.amount, 0);
 
     // Last recorded mileage from expenses (fallback to vehicle.mileage)
@@ -91,10 +102,20 @@ export class ReportService {
         laborCost: e.laborCost,
         liters: e.liters,
         pricePerLiter: e.pricePerLiter,
+        bonuses: e.bonuses,
+        dateFrom: e.dateFrom ? e.dateFrom.toISOString() : null,
+        dateTo: e.dateTo ? e.dateTo.toISOString() : null,
+        createdAt: e.createdAt.toISOString(),
+        updatedAt: e.updatedAt.toISOString(),
       })),
       totalSpent,
       byCategory,
       expenseCount: expenses.length,
+      inventoryParts,
+      inventoryTotal: inventoryParts.reduce(
+        (s, p) => s + p.quantity * p.price,
+        0,
+      ),
       expiresAt: report.expiresAt.toISOString(),
     };
   }

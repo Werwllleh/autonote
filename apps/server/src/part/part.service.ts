@@ -10,8 +10,9 @@ export class PartService {
   async findAll(vehicleId: string, userId: string) {
     // Verify vehicle belongs to user
     await this.verifyVehicle(vehicleId, userId);
+    // Закончившиеся запчасти (0 шт.) не показываем на складе
     return this.prisma.part.findMany({
-      where: { vehicleId },
+      where: { vehicleId, quantity: { gt: 0 } },
       orderBy: { name: 'asc' },
     });
   }
@@ -22,6 +23,7 @@ export class PartService {
       data: {
         name: dto.name,
         article: dto.article,
+        location: dto.location,
         quantity: dto.quantity,
         price: dto.price,
         vehicleId: dto.vehicleId,

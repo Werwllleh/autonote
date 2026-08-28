@@ -4,6 +4,7 @@ export interface Part {
   id: string
   name: string
   article: string | null
+  location: string | null
   quantity: number
   price: number
   vehicleId: string
@@ -14,6 +15,7 @@ export interface Part {
 interface CreatePartPayload {
   name: string
   article?: string
+  location?: string
   quantity: number
   price: number
   vehicleId: string
@@ -22,6 +24,7 @@ interface CreatePartPayload {
 interface UpdatePartPayload {
   name?: string
   article?: string
+  location?: string
   quantity?: number
   price?: number
 }

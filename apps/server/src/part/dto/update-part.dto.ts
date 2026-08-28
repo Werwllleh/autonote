@@ -18,4 +18,8 @@ export class UpdatePartDto {
   @IsNumber()
   @Min(0)
   price?: number;
+
+  @IsOptional()
+  @IsString()
+  location?: string;
 }

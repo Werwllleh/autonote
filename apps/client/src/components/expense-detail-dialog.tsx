@@ -45,8 +45,9 @@ export function ExpenseDetailDialog({ expense, children }: ExpenseDetailDialogPr
       <div
         className="cursor-pointer"
         onClick={(e) => {
-          // Don't open if clicking on buttons inside
-          if ((e.target as HTMLElement).closest("button")) return
+          const target = e.target as HTMLElement
+          if (target.closest("button")) return
+          if (target.closest('[role="dialog"]')) return
           setOpen(true)
         }}
       >

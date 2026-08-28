@@ -6,6 +6,12 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Separator } from "@/components/ui/separator"
 import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
+import {
   Select,
   SelectContent,
   SelectItem,
@@ -24,8 +30,11 @@ import {
   AlertTriangle,
   Search,
   X,
+  Droplets,
+  ChevronDown,
+  ChevronRight,
 } from "lucide-react"
-import type { PublicReport } from "@/api/reports"
+import type { PublicReport, PublicReportExpense } from "@/api/reports"
 import { reportsApi } from "@/api/reports"
 
 function formatAmount(amount: number) {
@@ -59,6 +68,179 @@ function CategoryIcon({ slug }: { slug: string }) {
   return <Receipt className="h-3.5 w-3.5" />
 }
 
+interface ExpenseDialogProps {
+  expense: PublicReportExpense
+  open: boolean
+  onOpenChange: (open: boolean) => void
+}
+
+function PublicExpenseDialog({ expense, open, onOpenChange }: ExpenseDialogProps) {
+  const isFuel = expense.categorySlug === "fuel"
+  const isMaintenance = expense.categorySlug === "maintenance"
+  const isInsurance = expense.categorySlug === "insurance"
+
+  const partsSum = expense.parts?.reduce((s, p) => s + p.quantity * p.price, 0) ?? 0
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-h-[85vh] overflow-y-auto sm:max-w-md max-sm:!top-auto max-sm:!bottom-0 max-sm:!translate-y-0 max-sm:!translate-x-[-50%] max-sm:rounded-b-none max-sm:rounded-t-2xl max-sm:data-[state=open]:slide-in-from-bottom max-sm:data-[state=closed]:slide-out-to-bottom max-sm:data-[state=open]:zoom-in-100 max-sm:data-[state=closed]:zoom-out-100">
+        <DialogHeader>
+          <div className="flex items-center gap-2">
+            <Badge>{expense.category}</Badge>
+            <span className="text-2xl font-bold">{formatAmount(expense.amount)}</span>
+          </div>
+          <DialogTitle className="sr-only">Детали расхода</DialogTitle>
+        </DialogHeader>
+
+        <div className="space-y-4">
+          {/* Basic info */}
+          <div className="grid grid-cols-2 gap-3 text-sm">
+            <div className="flex items-center gap-2 text-muted-foreground">
+              <Calendar className="h-4 w-4 shrink-0" />
+              <span>{formatDate(expense.date)}</span>
+            </div>
+            {expense.mileage && (
+              <div className="flex items-center gap-2 text-muted-foreground">
+                <Gauge className="h-4 w-4 shrink-0" />
+                <span>{expense.mileage.toLocaleString("ru-RU")} км</span>
+              </div>
+            )}
+          </div>
+
+          {expense.description && (
+            <p className="text-sm">{expense.description}</p>
+          )}
+
+          {/* Fuel details */}
+          {isFuel && expense.liters && expense.pricePerLiter && (
+            <>
+              <Separator />
+              <div className="space-y-2">
+                <h4 className="text-sm font-medium flex items-center gap-2">
+                  <Fuel className="h-4 w-4" />
+                  Топливо
+                </h4>
+                <div className="rounded-lg bg-muted p-3 space-y-1.5 text-sm">
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground flex items-center gap-1">
+                      <Droplets className="h-3.5 w-3.5" />
+                      Объём
+                    </span>
+                    <span>{expense.liters} л</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Цена за литр</span>
+                    <span>{expense.pricePerLiter.toFixed(2)} ₽</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Полная стоимость</span>
+                    <span>{formatAmount(expense.liters * expense.pricePerLiter)}</span>
+                  </div>
+                  {expense.bonuses != null && expense.bonuses > 0 && (
+                    <>
+                      <div className="flex justify-between text-emerald-600">
+                        <span>Бонусы</span>
+                        <span>−{formatAmount(expense.bonuses)}</span>
+                      </div>
+                      <Separator />
+                      <div className="flex justify-between font-semibold">
+                        <span>Итого</span>
+                        <span>{formatAmount(expense.amount)}</span>
+                      </div>
+                    </>
+                  )}
+                </div>
+              </div>
+            </>
+          )}
+
+          {/* Maintenance details */}
+          {isMaintenance && (expense.parts?.length || expense.laborCost) && (
+            <>
+              <Separator />
+              <div className="space-y-2">
+                <h4 className="text-sm font-medium flex items-center gap-2">
+                  <Wrench className="h-4 w-4" />
+                  ТО
+                </h4>
+                <div className="rounded-lg bg-muted p-3 space-y-2 text-sm">
+                  {expense.parts && expense.parts.length > 0 && (
+                    <div className="space-y-1.5">
+                      <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                        Запчасти
+                      </span>
+                      {expense.parts.map((part, i) => (
+                        <div key={i} className="flex justify-between">
+                          <span className="text-muted-foreground">
+                            {part.article && (
+                              <span className="font-mono text-xs mr-1">{part.article}</span>
+                            )}
+                            {part.name}
+                            {part.quantity > 1 && ` × ${part.quantity}`}
+                          </span>
+                          <span className="shrink-0 ml-2">{formatAmount(part.quantity * part.price)}</span>
+                        </div>
+                      ))}
+                      {expense.parts.length > 1 && (
+                        <div className="flex justify-between font-medium pt-1 border-t border-border/50">
+                          <span className="text-muted-foreground">Запчасти итого</span>
+                          <span>{formatAmount(partsSum)}</span>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                  {expense.laborCost != null && expense.laborCost > 0 && (
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Работа</span>
+                      <span>{formatAmount(expense.laborCost)}</span>
+                    </div>
+                  )}
+                  {expense.parts && expense.parts.length > 0 && expense.laborCost != null && expense.laborCost > 0 && (
+                    <>
+                      <Separator />
+                      <div className="flex justify-between font-semibold">
+                        <span>Итого</span>
+                        <span>{formatAmount(expense.amount)}</span>
+                      </div>
+                    </>
+                  )}
+                </div>
+              </div>
+            </>
+          )}
+
+          {/* Insurance details */}
+          {isInsurance && (expense.dateFrom || expense.dateTo) && (
+            <>
+              <Separator />
+              <div className="space-y-2">
+                <h4 className="text-sm font-medium flex items-center gap-2">
+                  <Shield className="h-4 w-4" />
+                  Полис
+                </h4>
+                <div className="rounded-lg bg-muted p-3 space-y-1.5 text-sm">
+                  {expense.dateFrom && (
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Начало</span>
+                      <span>{formatDate(expense.dateFrom)}</span>
+                    </div>
+                  )}
+                  {expense.dateTo && (
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Окончание</span>
+                      <span>{formatDate(expense.dateTo)}</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </>
+          )}
+        </div>
+      </DialogContent>
+    </Dialog>
+  )
+}
+
 export function PublicReportPage() {
   const { token } = useParams<{ token: string }>()
   const [report, setReport] = useState<PublicReport | null>(null)
@@ -68,6 +250,8 @@ export function PublicReportPage() {
   const [search, setSearch] = useState("")
   const [dateFrom, setDateFrom] = useState("")
   const [dateTo, setDateTo] = useState("")
+  const [historyOpen, setHistoryOpen] = useState(false)
+  const [selected, setSelected] = useState<PublicReportExpense | null>(null)
 
   const expenses = report?.expenses ?? []
 
@@ -205,14 +389,7 @@ export function PublicReportPage() {
         </div>
 
         {/* Summary — reacts to filters */}
-        <div className="grid grid-cols-3 gap-3">
-          <Card className="relative overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-violet-500/5" />
-            <CardContent className="relative py-4 text-center">
-              <p className="text-xs text-muted-foreground">{hasFilters ? "По фильтру" : "Всего потрачено"}</p>
-              <p className="text-xl font-bold mt-1">{formatAmount(filteredTotal)}</p>
-            </CardContent>
-          </Card>
+        <div className="grid grid-cols-2 gap-3">
           <Card className="relative overflow-hidden">
             <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 to-teal-500/5" />
             <CardContent className="relative py-4 text-center">
@@ -305,26 +482,38 @@ export function PublicReportPage() {
 
         <Separator />
 
-        {/* Expense history — filtered */}
+        {/* Expense history — filtered, collapsible */}
         <div className="space-y-3">
-          <h2 className="text-lg font-semibold flex items-center gap-2">
-            <Receipt className="h-5 w-5 text-muted-foreground" />
-            История расходов
-            {hasFilters && (
-              <span className="text-sm font-normal text-muted-foreground">
-                ({filtered.length} из {expenses.length})
-              </span>
+          <button
+            type="button"
+            onClick={() => setHistoryOpen((v) => !v)}
+            className="flex w-full items-center gap-2 text-left"
+          >
+            {historyOpen ? (
+              <ChevronDown className="h-5 w-5 text-muted-foreground shrink-0" />
+            ) : (
+              <ChevronRight className="h-5 w-5 text-muted-foreground shrink-0" />
             )}
-          </h2>
+            <Receipt className="h-5 w-5 text-muted-foreground shrink-0" />
+            <h2 className="text-lg font-semibold">История расходов</h2>
+            <span className="text-sm font-normal text-muted-foreground">
+              {hasFilters ? `(${filtered.length} из ${expenses.length})` : `(${filtered.length})`}
+            </span>
+          </button>
 
-          {filtered.length === 0 ? (
+          {historyOpen && (
+            filtered.length === 0 ? (
             <p className="text-sm text-muted-foreground py-8 text-center">
               {hasFilters ? "Ничего не найдено" : "Нет записей"}
             </p>
           ) : (
             <div className="space-y-2">
               {filtered.map((e, i) => (
-                <div key={i} className="rounded-lg border px-3 py-3">
+                <div
+                  key={i}
+                  onClick={() => setSelected(e)}
+                  className="rounded-lg border px-3 py-3 cursor-pointer transition-colors hover:bg-muted/40"
+                >
                   <div className="flex items-center justify-between gap-2">
                     <div className="flex items-center gap-2 min-w-0">
                       <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-muted">
@@ -365,8 +554,17 @@ export function PublicReportPage() {
                 </div>
               ))}
             </div>
+          )
           )}
         </div>
+
+        {selected && (
+          <PublicExpenseDialog
+            expense={selected}
+            open={!!selected}
+            onOpenChange={(o) => !o && setSelected(null)}
+          />
+        )}
 
         {/* Footer */}
         <div className="text-center space-y-2 py-6">

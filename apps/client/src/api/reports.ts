@@ -17,6 +17,11 @@ export interface PublicReportExpense {
   laborCost: number | null
   liters: number | null
   pricePerLiter: number | null
+  bonuses: number | null
+  dateFrom: string | null
+  dateTo: string | null
+  createdAt: string
+  updatedAt: string
 }
 
 export interface PublicReport {
@@ -34,6 +39,13 @@ export interface PublicReport {
   totalSpent: number
   byCategory: Record<string, number>
   expenseCount: number
+  inventoryParts: {
+    name: string
+    article: string | null
+    quantity: number
+    price: number
+  }[]
+  inventoryTotal: number
   expiresAt: string
 }
 
