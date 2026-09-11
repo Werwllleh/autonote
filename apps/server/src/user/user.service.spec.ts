@@ -46,9 +46,14 @@ describe('UserService', () => {
   describe('updateNotificationSettings', () => {
     it('updates expenseRemindersEnabled for the given user', async () => {
       prisma.user.findUnique.mockResolvedValue({ id: 'u1' });
-      prisma.user.update.mockResolvedValue({ id: 'u1', expenseRemindersEnabled: false });
+      prisma.user.update.mockResolvedValue({
+        id: 'u1',
+        expenseRemindersEnabled: false,
+      });
 
-      await service.updateNotificationSettings('u1', { expenseRemindersEnabled: false });
+      await service.updateNotificationSettings('u1', {
+        expenseRemindersEnabled: false,
+      });
 
       expect(prisma.user.update).toHaveBeenCalledWith({
         where: { id: 'u1' },
@@ -61,7 +66,9 @@ describe('UserService', () => {
       prisma.user.findUnique.mockResolvedValue(null);
 
       await expect(
-        service.updateNotificationSettings('missing', { expenseRemindersEnabled: true }),
+        service.updateNotificationSettings('missing', {
+          expenseRemindersEnabled: true,
+        }),
       ).rejects.toThrow('User not found');
     });
   });

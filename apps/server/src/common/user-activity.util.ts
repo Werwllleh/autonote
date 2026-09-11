@@ -24,14 +24,22 @@ export async function getLastActivityDates(
     const expenseMax = await prisma.expense.groupBy({
       by: ['vehicleId'],
       where: { vehicleId: { in: vehicleIds } },
-      _max: { date: true },
+      _max: { date: true, createdAt: true },
     });
 
     for (const stat of expenseMax) {
       const userId = vehicleToUser.get(stat.vehicleId);
-      if (!userId || !stat._max.date) continue;
+      if (!userId) continue;
+      // Take the max of both the user-entered date and the row's createdAt,
+      // so backdated entries (catching up a paper logbook) don't make a
+      // freshly-created expense look stale.
+      const candidates = [stat._max.date, stat._max.createdAt].filter(
+        (d): d is Date => d != null,
+      );
+      if (candidates.length === 0) continue;
+      const latest = candidates.reduce((a, b) => (b > a ? b : a));
       const current = activity.get(userId);
-      if (!current || stat._max.date > current) activity.set(userId, stat._max.date);
+      if (!current || latest > current) activity.set(userId, latest);
     }
   }
 

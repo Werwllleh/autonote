@@ -19,7 +19,10 @@ describe('AuthService.login', () => {
       providers: [
         AuthService,
         { provide: PrismaService, useValue: prisma },
-        { provide: JwtService, useValue: { sign: jest.fn().mockReturnValue('token') } },
+        {
+          provide: JwtService,
+          useValue: { sign: jest.fn().mockReturnValue('token') },
+        },
         { provide: ConfigService, useValue: { get: () => 'secret' } },
         { provide: MailService, useValue: { sendVerification: jest.fn() } },
       ],

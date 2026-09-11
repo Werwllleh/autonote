@@ -68,10 +68,7 @@ export class ExpenseService {
       include: { category: true, vehicle: true },
     });
 
-    await this.prisma.user.update({
-      where: { id: vehicle.userId },
-      data: { expenseReminderCount: 0 },
-    });
+    await this.resetExpenseReminderCount(vehicle.userId);
 
     return expense;
   }
@@ -269,11 +266,22 @@ export class ExpenseService {
 
     const result = await this.prisma.expense.createMany({ data: toCreate });
 
+    if (result.count > 0) {
+      await this.resetExpenseReminderCount(userId);
+    }
+
     return {
       imported: result.count,
       total: rows.length,
       errors,
     };
+  }
+
+  private async resetExpenseReminderCount(userId: string) {
+    await this.prisma.user.update({
+      where: { id: userId },
+      data: { expenseReminderCount: 0 },
+    });
   }
 
   private parseDate(str: string): Date | null {

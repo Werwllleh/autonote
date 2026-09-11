@@ -283,7 +283,7 @@ export function ProfilePage() {
         <CardHeader>
           <CardTitle className="text-base">Уведомления</CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="space-y-4">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm">Напоминать добавить расход</p>
@@ -299,6 +299,11 @@ export function ProfilePage() {
               }
             />
           </div>
+          {updateNotificationSettings.error && (
+            <p className="text-sm text-destructive">
+              {(updateNotificationSettings.error as any)?.response?.data?.message || "Ошибка"}
+            </p>
+          )}
         </CardContent>
       </Card>
 

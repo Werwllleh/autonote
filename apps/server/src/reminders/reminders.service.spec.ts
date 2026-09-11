@@ -10,7 +10,10 @@ describe('RemindersService', () => {
     vehicle: { findMany: jest.Mock };
     expense: { groupBy: jest.Mock };
   };
-  let mail: { sendVerificationReminder: jest.Mock; sendExpenseReminder: jest.Mock };
+  let mail: {
+    sendVerificationReminder: jest.Mock;
+    sendExpenseReminder: jest.Mock;
+  };
 
   beforeEach(async () => {
     prisma = {
@@ -57,7 +60,10 @@ describe('RemindersService', () => {
 
       await service.sendVerificationReminders();
 
-      expect(mail.sendVerificationReminder).toHaveBeenCalledWith('u1@test.com', 'tok1');
+      expect(mail.sendVerificationReminder).toHaveBeenCalledWith(
+        'u1@test.com',
+        'tok1',
+      );
       expect(prisma.user.update).toHaveBeenCalledWith({
         where: { id: 'u1' },
         data: {
@@ -102,8 +108,12 @@ describe('RemindersService', () => {
       const old = new Date();
       old.setDate(old.getDate() - 20);
 
-      prisma.user.findMany.mockResolvedValue([{ id: 'u1', email: 'u1@test.com' }]);
-      prisma.vehicle.findMany.mockResolvedValue([{ id: 'v1', userId: 'u1', createdAt: old }]);
+      prisma.user.findMany.mockResolvedValue([
+        { id: 'u1', email: 'u1@test.com' },
+      ]);
+      prisma.vehicle.findMany.mockResolvedValue([
+        { id: 'v1', userId: 'u1', createdAt: old },
+      ]);
       prisma.expense.groupBy.mockResolvedValue([]);
 
       await service.sendExpenseReminders();
@@ -119,7 +129,9 @@ describe('RemindersService', () => {
     });
 
     it('skips a user whose activity is within the last 14 days', async () => {
-      prisma.user.findMany.mockResolvedValue([{ id: 'u1', email: 'u1@test.com' }]);
+      prisma.user.findMany.mockResolvedValue([
+        { id: 'u1', email: 'u1@test.com' },
+      ]);
       prisma.vehicle.findMany.mockResolvedValue([
         { id: 'v1', userId: 'u1', createdAt: new Date() },
       ]);
