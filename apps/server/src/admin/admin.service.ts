@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { UserRole } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
+import { getLastActivityDates } from '../common/user-activity.util';
 
 @Injectable()
 export class AdminService {
@@ -32,17 +33,19 @@ export class AdminService {
     };
   }
 
-  async getUsers(page = 1, limit = 20, search?: string) {
+  async getUsers(page = 1, limit = 20, search?: string, unverifiedOnly?: boolean) {
     const skip = (page - 1) * limit;
 
-    const where = search
-      ? {
-          OR: [
-            { email: { contains: search, mode: 'insensitive' as const } },
-            { name: { contains: search, mode: 'insensitive' as const } },
-          ],
-        }
-      : {};
+    const where: Record<string, unknown> = {};
+    if (search) {
+      where.OR = [
+        { email: { contains: search, mode: 'insensitive' as const } },
+        { name: { contains: search, mode: 'insensitive' as const } },
+      ];
+    }
+    if (unverifiedOnly) {
+      where.emailVerified = false;
+    }
 
     const [users, total] = await Promise.all([
       this.prisma.user.findMany({
@@ -58,6 +61,8 @@ export class AdminService {
           role: true,
           createdAt: true,
           updatedAt: true,
+          emailVerified: true,
+          lastLoginAt: true,
           _count: { select: { vehicles: true, categories: true } },
         },
       }),
@@ -93,6 +98,8 @@ export class AdminService {
       userExpenseMap.set(userId, cur);
     }
 
+    const activityMap = await getLastActivityDates(this.prisma, userIds);
+
     const enriched = users.map((u) => {
       const expStat = userExpenseMap.get(u.id);
       return {
@@ -100,6 +107,7 @@ export class AdminService {
         vehicleCount: u._count.vehicles,
         expenseCount: expStat?.count || 0,
         expenseTotal: expStat?.total || 0,
+        lastActivityAt: activityMap.get(u.id) ?? null,
       };
     });
 
@@ -117,6 +125,8 @@ export class AdminService {
         role: true,
         createdAt: true,
         updatedAt: true,
+        emailVerified: true,
+        lastLoginAt: true,
         vehicles: {
           select: {
             id: true,
@@ -130,7 +140,10 @@ export class AdminService {
       },
     });
     if (!user) throw new NotFoundException('User not found');
-    return user;
+
+    const activityMap = await getLastActivityDates(this.prisma, [id]);
+
+    return { ...user, lastActivityAt: activityMap.get(id) ?? null };
   }
 
   async updateUserRole(id: string, role: UserRole) {

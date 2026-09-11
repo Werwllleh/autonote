@@ -35,11 +35,13 @@ export class AdminController {
     @Query('page') page?: string,
     @Query('limit') limit?: string,
     @Query('search') search?: string,
+    @Query('unverifiedOnly') unverifiedOnly?: string,
   ) {
     return this.adminService.getUsers(
       page ? parseInt(page, 10) : 1,
       limit ? parseInt(limit, 10) : 20,
       search || undefined,
+      unverifiedOnly === 'true',
     );
   }
 
