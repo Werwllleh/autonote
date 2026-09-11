@@ -24,6 +24,13 @@ model User {
   createdAt     DateTime @default(now()) @map("created_at")
   updatedAt     DateTime @updatedAt @map("updated_at")
 
+  lastLoginAt                DateTime? @map("last_login_at")
+  lastVerificationReminderAt DateTime? @map("last_verification_reminder_at")
+  verificationReminderCount  Int       @default(0) @map("verification_reminder_count")
+  lastExpenseReminderAt      DateTime? @map("last_expense_reminder_at")
+  expenseReminderCount       Int       @default(0) @map("expense_reminder_count")
+  expenseRemindersEnabled    Boolean   @default(true) @map("expense_reminders_enabled")
+
   vehicles   Vehicle[]
   categories Category[]
 
