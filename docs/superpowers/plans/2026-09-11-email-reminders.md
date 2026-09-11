@@ -298,7 +298,7 @@ describe('MailService reminders', () => {
     expect(sendMailMock).toHaveBeenCalledWith(
       expect.objectContaining({
         to: 'user@test.com',
-        subject: expect.stringContaining('Подтвердите'),
+        subject: expect.stringContaining('подтвердите'),
         html: expect.stringContaining('tok123'),
       }),
     );
