@@ -4,6 +4,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { Switch } from "@/components/ui/switch"
+import { Label } from "@/components/ui/label"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import {
   Dialog,
@@ -75,8 +77,22 @@ function UserDetailDialog({ user, onClose }: { user: AdminUserDetail | null; onC
               <Badge variant={user.role === "ADMIN" ? "default" : "secondary"}>{user.role}</Badge>
             </div>
             <div className="flex justify-between">
+              <span className="text-muted-foreground">Email</span>
+              <Badge variant={user.emailVerified ? "secondary" : "destructive"}>
+                {user.emailVerified ? "Подтверждён" : "Не подтверждён"}
+              </Badge>
+            </div>
+            <div className="flex justify-between">
               <span className="text-muted-foreground">Регистрация</span>
               <span>{formatDate(user.createdAt)}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-muted-foreground">Последний вход</span>
+              <span>{user.lastLoginAt ? formatDate(user.lastLoginAt) : "никогда"}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-muted-foreground">Последняя активность</span>
+              <span>{user.lastActivityAt ? formatDate(user.lastActivityAt) : "—"}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-muted-foreground">ID</span>
@@ -116,10 +132,11 @@ export function AdminPage() {
   const [search, setSearch] = useState("")
   const [searchQuery, setSearchQuery] = useState("")
   const [page, setPage] = useState(1)
+  const [unverifiedOnly, setUnverifiedOnly] = useState(false)
   const [selectedUser, setSelectedUser] = useState<AdminUserDetail | null>(null)
 
   const { data: stats } = useAdminStats()
-  const { data: usersData, isLoading } = useAdminUsers(page, searchQuery || undefined)
+  const { data: usersData, isLoading } = useAdminUsers(page, searchQuery || undefined, unverifiedOnly)
   const updateRole = useUpdateUserRole()
   const deleteUser = useDeleteUser()
 
@@ -224,20 +241,35 @@ export function AdminPage() {
         <CardHeader className="pb-3">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <CardTitle className="text-base">Пользователи</CardTitle>
-            <div className="flex gap-2">
-              <div className="relative flex-1 sm:w-64">
-                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                <Input
-                  placeholder="Поиск по email или имени..."
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                  onKeyDown={(e) => e.key === "Enter" && handleSearch()}
-                  className="pl-9"
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+              <div className="flex items-center gap-2 shrink-0">
+                <Switch
+                  id="unverified-only"
+                  checked={unverifiedOnly}
+                  onCheckedChange={(checked) => {
+                    setUnverifiedOnly(checked)
+                    setPage(1)
+                  }}
                 />
+                <Label htmlFor="unverified-only" className="text-sm font-normal text-muted-foreground whitespace-nowrap">
+                  Только неподтверждённые
+                </Label>
               </div>
-              <Button variant="outline" size="sm" onClick={handleSearch}>
-                Найти
-              </Button>
+              <div className="flex gap-2">
+                <div className="relative flex-1 sm:w-64">
+                  <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                  <Input
+                    placeholder="Поиск по email или имени..."
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                    onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+                    className="pl-9"
+                  />
+                </div>
+                <Button variant="outline" size="sm" onClick={handleSearch}>
+                  Найти
+                </Button>
+              </div>
             </div>
           </div>
         </CardHeader>
@@ -272,6 +304,11 @@ export function AdminPage() {
                             Admin
                           </Badge>
                         )}
+                        {!user.emailVerified && (
+                          <Badge variant="destructive" className="text-xs shrink-0">
+                            Не подтверждён
+                          </Badge>
+                        )}
                       </div>
                       <div className="flex items-center gap-3 text-xs text-muted-foreground mt-0.5">
                         {user.name && <span>{user.email}</span>}
@@ -280,6 +317,12 @@ export function AdminPage() {
                         {user.expenseTotal > 0 && (
                           <span className="hidden sm:inline">{formatAmount(user.expenseTotal)}</span>
                         )}
+                        <span className="hidden md:inline">
+                          Вход: {user.lastLoginAt ? formatDate(user.lastLoginAt) : "никогда"}
+                        </span>
+                        <span className="hidden md:inline">
+                          Активность: {user.lastActivityAt ? formatDate(user.lastActivityAt) : "—"}
+                        </span>
                       </div>
                     </div>
 

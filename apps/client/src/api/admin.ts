@@ -16,6 +16,9 @@ export interface AdminUser {
   role: "USER" | "ADMIN"
   createdAt: string
   updatedAt: string
+  emailVerified: boolean
+  lastLoginAt: string | null
+  lastActivityAt: string | null
   vehicleCount: number
   expenseCount: number
   expenseTotal: number
@@ -29,6 +32,9 @@ export interface AdminUserDetail {
   role: "USER" | "ADMIN"
   createdAt: string
   updatedAt: string
+  emailVerified: boolean
+  lastLoginAt: string | null
+  lastActivityAt: string | null
   vehicles: {
     id: string
     brand: string
@@ -48,8 +54,10 @@ export interface UsersResponse {
 
 export const adminApi = {
   getStats: () => api.get<AdminStats>("/admin/stats").then((r) => r.data),
-  getUsers: (page = 1, search?: string) =>
-    api.get<UsersResponse>("/admin/users", { params: { page, search } }).then((r) => r.data),
+  getUsers: (page = 1, search?: string, unverifiedOnly?: boolean) =>
+    api
+      .get<UsersResponse>("/admin/users", { params: { page, search, unverifiedOnly: unverifiedOnly || undefined } })
+      .then((r) => r.data),
   getUser: (id: string) => api.get<AdminUserDetail>(`/admin/users/${id}`).then((r) => r.data),
   updateRole: (id: string, role: "USER" | "ADMIN") =>
     api.put(`/admin/users/${id}/role`, { role }).then((r) => r.data),

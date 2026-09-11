@@ -8,10 +8,10 @@ export function useAdminStats() {
   })
 }
 
-export function useAdminUsers(page = 1, search?: string) {
+export function useAdminUsers(page = 1, search?: string, unverifiedOnly?: boolean) {
   return useQuery({
-    queryKey: ["admin", "users", page, search],
-    queryFn: () => adminApi.getUsers(page, search),
+    queryKey: ["admin", "users", page, search, unverifiedOnly],
+    queryFn: () => adminApi.getUsers(page, search, unverifiedOnly),
   })
 }
 
