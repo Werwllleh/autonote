@@ -1,4 +1,4 @@
-import { IsEmail, IsOptional, IsString, MinLength } from 'class-validator';
+import { IsBoolean, IsEmail, IsOptional, IsString, MinLength } from 'class-validator';
 
 export class UpdateEmailDto {
   @IsEmail()
@@ -15,4 +15,9 @@ export class UpdatePasswordDto {
   @IsString()
   @MinLength(6)
   newPassword: string;
+}
+
+export class UpdateNotificationSettingsDto {
+  @IsBoolean()
+  expenseRemindersEnabled: boolean;
 }

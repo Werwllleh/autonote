@@ -15,7 +15,11 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { UserService } from './user.service';
-import { UpdateEmailDto, UpdatePasswordDto } from './dto/update-profile.dto';
+import {
+  UpdateEmailDto,
+  UpdatePasswordDto,
+  UpdateNotificationSettingsDto,
+} from './dto/update-profile.dto';
 
 @UseGuards(JwtAuthGuard)
 @Controller('user')
@@ -41,6 +45,14 @@ export class UserController {
     @Body() dto: UpdatePasswordDto,
   ) {
     return this.userService.updatePassword(userId, dto);
+  }
+
+  @Put('notification-settings')
+  updateNotificationSettings(
+    @CurrentUser('id') userId: string,
+    @Body() dto: UpdateNotificationSettingsDto,
+  ) {
+    return this.userService.updateNotificationSettings(userId, dto);
   }
 
   @Put('avatar')
