@@ -49,7 +49,7 @@ export class ExpenseService {
       await this.partService.deductStock(dto.stockParts, userId);
     }
 
-    return this.prisma.expense.create({
+    const expense = await this.prisma.expense.create({
       data: {
         amount: dto.amount,
         date: new Date(dto.date),
@@ -67,6 +67,13 @@ export class ExpenseService {
       },
       include: { category: true, vehicle: true },
     });
+
+    await this.prisma.user.update({
+      where: { id: vehicle.userId },
+      data: { expenseReminderCount: 0 },
+    });
+
+    return expense;
   }
 
   async update(id: string, dto: UpdateExpenseDto, userId: string) {
