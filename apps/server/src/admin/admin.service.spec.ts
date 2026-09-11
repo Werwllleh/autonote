@@ -1,6 +1,9 @@
 import { Test } from '@nestjs/testing';
 import { AdminService } from './admin.service';
 import { PrismaService } from '../prisma/prisma.service';
+import { StatsService } from '../stats/stats.service';
+import { ExpenseService } from '../expense/expense.service';
+import { PartService } from '../part/part.service';
 
 describe('AdminService', () => {
   let service: AdminService;
@@ -12,9 +15,12 @@ describe('AdminService', () => {
       update: jest.Mock;
       delete: jest.Mock;
     };
-    vehicle: { findMany: jest.Mock };
+    vehicle: { findMany: jest.Mock; findUnique: jest.Mock };
     expense: { groupBy: jest.Mock };
   };
+  let statsService: { getVehicleStats: jest.Mock };
+  let expenseService: { findAll: jest.Mock };
+  let partService: { findAll: jest.Mock };
 
   beforeEach(async () => {
     prisma = {
@@ -25,12 +31,21 @@ describe('AdminService', () => {
         update: jest.fn(),
         delete: jest.fn(),
       },
-      vehicle: { findMany: jest.fn() },
+      vehicle: { findMany: jest.fn(), findUnique: jest.fn() },
       expense: { groupBy: jest.fn() },
     };
+    statsService = { getVehicleStats: jest.fn() };
+    expenseService = { findAll: jest.fn() };
+    partService = { findAll: jest.fn() };
 
     const module = await Test.createTestingModule({
-      providers: [AdminService, { provide: PrismaService, useValue: prisma }],
+      providers: [
+        AdminService,
+        { provide: PrismaService, useValue: prisma },
+        { provide: StatsService, useValue: statsService },
+        { provide: ExpenseService, useValue: expenseService },
+        { provide: PartService, useValue: partService },
+      ],
     }).compile();
 
     service = module.get(AdminService);
@@ -172,6 +187,40 @@ describe('AdminService', () => {
       prisma.user.findUnique.mockResolvedValue(null);
 
       await expect(service.getUser('missing')).rejects.toThrow('User not found');
+    });
+  });
+
+  describe('getVehicleCard', () => {
+    it('resolves the owner from the vehicle and orchestrates stats/expenses/parts using that owner id', async () => {
+      prisma.vehicle.findUnique.mockResolvedValue({
+        id: 'v1',
+        brand: 'Toyota',
+        model: 'Camry',
+        userId: 'u1',
+        user: { id: 'u1', email: 'owner@test.com', name: 'Owner' },
+      });
+      statsService.getVehicleStats.mockResolvedValue({ total: 1000 });
+      expenseService.findAll.mockResolvedValue([{ id: 'e1' }]);
+      partService.findAll.mockResolvedValue([{ id: 'p1' }]);
+
+      const result = await service.getVehicleCard('v1');
+
+      expect(statsService.getVehicleStats).toHaveBeenCalledWith('v1', 'u1');
+      expect(expenseService.findAll).toHaveBeenCalledWith('u1', 'v1');
+      expect(partService.findAll).toHaveBeenCalledWith('v1', 'u1');
+      expect(result).toEqual({
+        vehicle: expect.objectContaining({ id: 'v1', brand: 'Toyota', model: 'Camry' }),
+        owner: { id: 'u1', email: 'owner@test.com', name: 'Owner' },
+        stats: { total: 1000 },
+        expenses: [{ id: 'e1' }],
+        parts: [{ id: 'p1' }],
+      });
+    });
+
+    it('throws NotFoundException when the vehicle does not exist', async () => {
+      prisma.vehicle.findUnique.mockResolvedValue(null);
+
+      await expect(service.getVehicleCard('missing')).rejects.toThrow('Vehicle not found');
     });
   });
 });

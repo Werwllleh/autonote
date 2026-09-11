@@ -50,6 +50,11 @@ export class AdminController {
     return this.adminService.getUser(id);
   }
 
+  @Get('vehicles/:id')
+  getVehicleCard(@Param('id', ParseUUIDPipe) id: string) {
+    return this.adminService.getVehicleCard(id);
+  }
+
   @Put('users/:id/role')
   updateRole(
     @Param('id', ParseUUIDPipe) id: string,
