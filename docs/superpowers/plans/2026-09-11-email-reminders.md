@@ -15,7 +15,7 @@
 - Verification reminder: every 3 days, capped at 3 sends, never opt-out.
 - Expense nudge: after 14 days of inactivity, capped at 5 sends, resets to 0 when the user adds a new expense, opt-out via `User.expenseRemindersEnabled` (default `true`).
 - All new server code ships with Jest unit tests using mocked `PrismaService`/`MailService` (this repo has zero existing unit tests — these tasks establish the pattern; follow it exactly for consistency).
-- Run all server commands from `apps/server/` unless noted; run Prisma migration commands from the repo root (`/home/alex/apps/main/autonote`) via the existing `npm run db:migrate` script.
+- Run all server commands from `apps/server/` unless noted; run Prisma migration commands from the repo root of this workspace via the existing `npm run db:migrate` script — this plan executes inside the git worktree at `/home/alex/apps/main/autonote/.worktrees/email-reminders`, NOT the main checkout at `/home/alex/apps/main/autonote`. Never target the main checkout path.
 - No frontend test runner exists in this repo (Vite/React only) — the frontend task is verified by `tsc` build + manual check, not TDD.
 
 ---
@@ -64,7 +64,7 @@ model User {
 Run from the repo root:
 
 ```bash
-cd /home/alex/apps/main/autonote
+cd /home/alex/apps/main/autonote/.worktrees/email-reminders
 npm run db:migrate -- --name add_reminder_fields
 ```
 
@@ -1525,7 +1525,7 @@ Expected: exits 0.
 - [ ] **Step 4: Confirm the migration is applied to the dev database**
 
 ```bash
-cd /home/alex/apps/main/autonote && npx prisma migrate status --schema apps/server/prisma/schema.prisma
+cd /home/alex/apps/main/autonote/.worktrees/email-reminders && npx prisma migrate status --schema apps/server/prisma/schema.prisma
 ```
 
 Expected: "Database schema is up to date!"
