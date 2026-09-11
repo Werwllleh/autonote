@@ -25,6 +25,16 @@ export function useUpdatePassword() {
   })
 }
 
+export function useUpdateNotificationSettings() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: userApi.updateNotificationSettings,
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["user"] })
+    },
+  })
+}
+
 export function useUploadAvatar() {
   const qc = useQueryClient()
   return useMutation({

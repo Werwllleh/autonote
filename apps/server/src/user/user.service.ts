@@ -7,7 +7,11 @@ import {
 import * as bcrypt from 'bcrypt';
 import { PrismaService } from '../prisma/prisma.service';
 import { UploadService } from '../upload/upload.service';
-import { UpdateEmailDto, UpdatePasswordDto } from './dto/update-profile.dto';
+import {
+  UpdateEmailDto,
+  UpdatePasswordDto,
+  UpdateNotificationSettingsDto,
+} from './dto/update-profile.dto';
 
 @Injectable()
 export class UserService {
@@ -19,7 +23,14 @@ export class UserService {
   async getProfile(userId: string) {
     const user = await this.prisma.user.findUnique({
       where: { id: userId },
-      select: { id: true, email: true, name: true, avatar: true, createdAt: true },
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        avatar: true,
+        createdAt: true,
+        expenseRemindersEnabled: true,
+      },
     });
     if (!user) throw new NotFoundException('User not found');
     return user;
@@ -60,6 +71,17 @@ export class UserService {
     });
 
     return { message: 'Пароль изменён' };
+  }
+
+  async updateNotificationSettings(userId: string, dto: UpdateNotificationSettingsDto) {
+    const user = await this.prisma.user.findUnique({ where: { id: userId } });
+    if (!user) throw new NotFoundException('User not found');
+
+    return this.prisma.user.update({
+      where: { id: userId },
+      data: { expenseRemindersEnabled: dto.expenseRemindersEnabled },
+      select: { id: true, email: true, name: true, avatar: true, expenseRemindersEnabled: true },
+    });
   }
 
   async updateAvatar(userId: string, file: Express.Multer.File) {
