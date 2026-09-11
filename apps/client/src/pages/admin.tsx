@@ -1,4 +1,5 @@
 import { useState } from "react"
+import { Link } from "react-router-dom"
 import { useAdminStats, useAdminUsers, useUpdateUserRole, useDeleteUser } from "@/hooks/use-admin"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -104,15 +105,26 @@ function UserDetailDialog({ user, onClose }: { user: AdminUserDetail | null; onC
             <div className="space-y-2">
               <h4 className="text-sm font-medium">Автомобили ({user.vehicles.length})</h4>
               {user.vehicles.map((v) => (
-                <div key={v.id} className="flex items-center justify-between rounded-lg border px-3 py-2 text-sm">
-                  <div>
+                <Link
+                  key={v.id}
+                  to={`/admin/vehicles/${v.id}`}
+                  className="flex items-center gap-3 rounded-lg border px-3 py-2 text-sm hover:bg-muted/50 transition-colors"
+                >
+                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-muted overflow-hidden">
+                    {v.photo ? (
+                      <img src={`/api${v.photo}`} alt="" className="h-full w-full object-cover" />
+                    ) : (
+                      <Car className="h-4 w-4 text-muted-foreground" />
+                    )}
+                  </div>
+                  <div className="flex-1 min-w-0">
                     <span className="font-medium">{v.brand} {v.model}</span>
                     <span className="text-muted-foreground ml-2">{v.year}</span>
                   </div>
-                  <div className="text-xs text-muted-foreground">
+                  <div className="text-xs text-muted-foreground shrink-0">
                     {v.mileage.toLocaleString()} км · {v._count.expenses} расх.
                   </div>
-                </div>
+                </Link>
               ))}
             </div>
           )}
