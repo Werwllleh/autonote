@@ -4,6 +4,7 @@ dist
 *.local
 .DS_Store
 apps/server/generated
+.worktrees/
 
 # Beads / Dolt files (added by bd init)
 .dolt/
