@@ -23,6 +23,14 @@ export function useAdminUser(id: string) {
   })
 }
 
+export function useAdminVehicleCard(id: string | undefined) {
+  return useQuery({
+    queryKey: ["admin", "vehicles", id],
+    queryFn: () => adminApi.getVehicleCard(id!),
+    enabled: !!id,
+  })
+}
+
 export function useUpdateUserRole() {
   const qc = useQueryClient()
   return useMutation({

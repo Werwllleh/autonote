@@ -7,5 +7,6 @@ import { PartModule } from '../part/part.module';
   imports: [PartModule],
   controllers: [ExpenseController],
   providers: [ExpenseService],
+  exports: [ExpenseService],
 })
 export class ExpenseModule {}

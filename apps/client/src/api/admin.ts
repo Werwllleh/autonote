@@ -1,4 +1,8 @@
 import { api } from "./client"
+import type { Vehicle } from "./vehicles"
+import type { VehicleStats } from "./stats"
+import type { Expense } from "./expenses"
+import type { Part } from "./parts"
 
 export interface AdminStats {
   userCount: number
@@ -41,8 +45,17 @@ export interface AdminUserDetail {
     model: string
     year: number
     mileage: number
+    photo: string | null
     _count: { expenses: number }
   }[]
+}
+
+export interface AdminVehicleCard {
+  vehicle: Vehicle
+  owner: { id: string; email: string; name: string | null }
+  stats: VehicleStats
+  expenses: Expense[]
+  parts: Part[]
 }
 
 export interface UsersResponse {
@@ -59,6 +72,8 @@ export const adminApi = {
       .get<UsersResponse>("/admin/users", { params: { page, search, unverifiedOnly: unverifiedOnly || undefined } })
       .then((r) => r.data),
   getUser: (id: string) => api.get<AdminUserDetail>(`/admin/users/${id}`).then((r) => r.data),
+  getVehicleCard: (id: string) =>
+    api.get<AdminVehicleCard>(`/admin/vehicles/${id}`).then((r) => r.data),
   updateRole: (id: string, role: "USER" | "ADMIN") =>
     api.put(`/admin/users/${id}/role`, { role }).then((r) => r.data),
   deleteUser: (id: string) => api.delete(`/admin/users/${id}`).then((r) => r.data),

@@ -9,6 +9,7 @@ import { DashboardPage } from "@/pages/dashboard"
 import { VehiclePage } from "@/pages/vehicle"
 import { ProfilePage } from "@/pages/profile"
 import { AdminPage } from "@/pages/admin"
+import { AdminVehiclePage } from "@/pages/admin-vehicle"
 import { VerifyPage } from "@/pages/verify"
 import { PublicReportPage } from "@/pages/public-report"
 import { AdminRoute } from "@/components/admin-route"
@@ -46,6 +47,7 @@ function App() {
             <Route path="/vehicles/:id" element={<VehiclePage />} />
             <Route path="/profile" element={<ProfilePage />} />
             <Route path="/admin" element={<AdminRoute><AdminPage /></AdminRoute>} />
+            <Route path="/admin/vehicles/:id" element={<AdminRoute><AdminVehiclePage /></AdminRoute>} />
           </Route>
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>

@@ -2,10 +2,18 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { UserRole } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { getLastActivityDates } from '../common/user-activity.util';
+import { StatsService } from '../stats/stats.service';
+import { ExpenseService } from '../expense/expense.service';
+import { PartService } from '../part/part.service';
 
 @Injectable()
 export class AdminService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private statsService: StatsService,
+    private expenseService: ExpenseService,
+    private partService: PartService,
+  ) {}
 
   async getStats() {
     const [userCount, vehicleCount, expenseCount] = await Promise.all([
@@ -134,6 +142,7 @@ export class AdminService {
             model: true,
             year: true,
             mileage: true,
+            photo: true,
             _count: { select: { expenses: true } },
           },
         },
@@ -144,6 +153,24 @@ export class AdminService {
     const activityMap = await getLastActivityDates(this.prisma, [id]);
 
     return { ...user, lastActivityAt: activityMap.get(id) ?? null };
+  }
+
+  async getVehicleCard(vehicleId: string) {
+    const vehicle = await this.prisma.vehicle.findUnique({
+      where: { id: vehicleId },
+      include: { user: { select: { id: true, email: true, name: true } } },
+    });
+    if (!vehicle) throw new NotFoundException('Vehicle not found');
+
+    const { user: owner, ...vehicleData } = vehicle;
+
+    const [stats, expenses, parts] = await Promise.all([
+      this.statsService.getVehicleStats(vehicleId, owner.id),
+      this.expenseService.findAll(owner.id, vehicleId),
+      this.partService.findAll(vehicleId, owner.id),
+    ]);
+
+    return { vehicle: vehicleData, owner, stats, expenses, parts };
   }
 
   async updateUserRole(id: string, role: UserRole) {
