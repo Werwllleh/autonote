@@ -6,6 +6,7 @@ export interface UserProfile {
   name: string | null
   avatar: string | null
   createdAt: string
+  expenseRemindersEnabled: boolean
 }
 
 export const userApi = {
@@ -17,6 +18,9 @@ export const userApi = {
 
   updatePassword: (data: { currentPassword: string; newPassword: string }) =>
     api.put("/user/password", data).then((r) => r.data),
+
+  updateNotificationSettings: (data: { expenseRemindersEnabled: boolean }) =>
+    api.put<UserProfile>("/user/notification-settings", data).then((r) => r.data),
 
   uploadAvatar: (file: File) => {
     const fd = new FormData()

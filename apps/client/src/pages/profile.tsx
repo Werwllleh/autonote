@@ -1,6 +1,6 @@
 import { useState, useRef, type FormEvent } from "react"
 import { useNavigate } from "react-router-dom"
-import { useProfile, useUpdateEmail, useUpdatePassword, useUploadAvatar, useRemoveAvatar } from "@/hooks/use-profile"
+import { useProfile, useUpdateEmail, useUpdatePassword, useUploadAvatar, useRemoveAvatar, useUpdateNotificationSettings } from "@/hooks/use-profile"
 import { useAuthStore } from "@/lib/auth-store"
 import { userApi } from "@/api/user"
 import { Button } from "@/components/ui/button"
@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Switch } from "@/components/ui/switch"
 import { Camera, Trash2, Check, AlertTriangle } from "lucide-react"
 
 export function ProfilePage() {
@@ -17,6 +18,7 @@ export function ProfilePage() {
   const updatePassword = useUpdatePassword()
   const uploadAvatar = useUploadAvatar()
   const removeAvatar = useRemoveAvatar()
+  const updateNotificationSettings = useUpdateNotificationSettings()
   const fileRef = useRef<HTMLInputElement>(null)
 
   const [email, setEmail] = useState("")
@@ -273,6 +275,30 @@ export function ProfilePage() {
               </div>
             </form>
           )}
+        </CardContent>
+      </Card>
+
+      {/* Notifications */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base">Уведомления</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm">Напоминать добавить расход</p>
+              <p className="text-xs text-muted-foreground">
+                Письмо, если по машине долго не было новых расходов. Письма о подтверждении почты отключить нельзя.
+              </p>
+            </div>
+            <Switch
+              checked={profile.expenseRemindersEnabled}
+              disabled={updateNotificationSettings.isPending}
+              onCheckedChange={(checked) =>
+                updateNotificationSettings.mutate({ expenseRemindersEnabled: checked })
+              }
+            />
+          </div>
         </CardContent>
       </Card>
 
