@@ -1,8 +1,4 @@
-import {
-  Injectable,
-  NotFoundException,
-  GoneException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException, GoneException } from '@nestjs/common';
 import { randomBytes } from 'crypto';
 import { PrismaService } from '../prisma/prisma.service';
 

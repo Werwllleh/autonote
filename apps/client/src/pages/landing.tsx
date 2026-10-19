@@ -257,11 +257,6 @@ const stats = [
 export function LandingPage() {
   const isAuthed = useAuthStore((s) => !!s.accessToken)
 
-  // On app domain, if authenticated, redirect straight to dashboard
-  if (isAuthed && isAppDomain()) {
-    return <Navigate to="/dashboard" replace />
-  }
-
   const heroRef = useRef<HTMLDivElement>(null)
   const { scrollYProgress } = useScroll({
     target: heroRef,
@@ -269,6 +264,11 @@ export function LandingPage() {
   })
   const heroY = useTransform(scrollYProgress, [0, 1], [0, 150])
   const heroOpacity = useTransform(scrollYProgress, [0, 0.8], [1, 0])
+
+  // On app domain, if authenticated, redirect straight to dashboard
+  if (isAuthed && isAppDomain()) {
+    return <Navigate to="/dashboard" replace />
+  }
 
   return (
     <div className="min-h-screen bg-background text-foreground overflow-x-hidden">

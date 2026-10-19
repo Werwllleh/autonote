@@ -32,8 +32,8 @@ export function LoginPage() {
       const data = await authApi.login({ email, password })
       setTokens(data.accessToken, data.refreshToken)
       navigate("/dashboard")
-    } catch (err: any) {
-      const msg = err?.response?.data?.message
+    } catch (err: unknown) {
+      const msg = (err as { response?: { data?: { message?: string } } })?.response?.data?.message
       if (msg === "EMAIL_NOT_VERIFIED") {
         setNotVerified(true)
       } else {

@@ -40,10 +40,7 @@ export class VehicleController {
   }
 
   @Post()
-  create(
-    @Body() dto: CreateVehicleDto,
-    @CurrentUser('id') userId: string,
-  ) {
+  create(@Body() dto: CreateVehicleDto, @CurrentUser('id') userId: string) {
     return this.vehicleService.create(dto, userId);
   }
 

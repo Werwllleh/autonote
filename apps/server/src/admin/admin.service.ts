@@ -41,7 +41,12 @@ export class AdminService {
     };
   }
 
-  async getUsers(page = 1, limit = 20, search?: string, unverifiedOnly?: boolean) {
+  async getUsers(
+    page = 1,
+    limit = 20,
+    search?: string,
+    unverifiedOnly?: boolean,
+  ) {
     const skip = (page - 1) * limit;
 
     const where: Record<string, unknown> = {};
@@ -93,10 +98,7 @@ export class AdminService {
     });
     const vehicleToUser = new Map(vehicles.map((v) => [v.id, v.userId]));
 
-    const userExpenseMap = new Map<
-      string,
-      { count: number; total: number }
-    >();
+    const userExpenseMap = new Map<string, { count: number; total: number }>();
     for (const stat of expenseStats) {
       const userId = vehicleToUser.get(stat.vehicleId);
       if (!userId) continue;

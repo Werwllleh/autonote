@@ -35,10 +35,7 @@ export class ReportController {
   /** Revoke a report link (authenticated) */
   @UseGuards(JwtAuthGuard)
   @Delete(':token')
-  revoke(
-    @Param('token') token: string,
-    @CurrentUser('id') userId: string,
-  ) {
+  revoke(@Param('token') token: string, @CurrentUser('id') userId: string) {
     return this.reportService.revoke(token, userId);
   }
 }

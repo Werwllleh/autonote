@@ -169,7 +169,10 @@ describe('AdminService', () => {
         { id: 'v1', userId: 'u1', createdAt: new Date('2026-01-01') },
       ]);
       prisma.expense.groupBy.mockResolvedValue([
-        { vehicleId: 'v1', _max: { date: activityDate, createdAt: activityDate } },
+        {
+          vehicleId: 'v1',
+          _max: { date: activityDate, createdAt: activityDate },
+        },
       ]);
 
       const result = await service.getUser('u1');
@@ -186,7 +189,9 @@ describe('AdminService', () => {
     it('throws NotFoundException when the user does not exist', async () => {
       prisma.user.findUnique.mockResolvedValue(null);
 
-      await expect(service.getUser('missing')).rejects.toThrow('User not found');
+      await expect(service.getUser('missing')).rejects.toThrow(
+        'User not found',
+      );
     });
   });
 
@@ -209,7 +214,11 @@ describe('AdminService', () => {
       expect(expenseService.findAll).toHaveBeenCalledWith('u1', 'v1');
       expect(partService.findAll).toHaveBeenCalledWith('v1', 'u1');
       expect(result).toEqual({
-        vehicle: expect.objectContaining({ id: 'v1', brand: 'Toyota', model: 'Camry' }),
+        vehicle: expect.objectContaining({
+          id: 'v1',
+          brand: 'Toyota',
+          model: 'Camry',
+        }),
         owner: { id: 'u1', email: 'owner@test.com', name: 'Owner' },
         stats: { total: 1000 },
         expenses: [{ id: 'e1' }],
@@ -220,7 +229,9 @@ describe('AdminService', () => {
     it('throws NotFoundException when the vehicle does not exist', async () => {
       prisma.vehicle.findUnique.mockResolvedValue(null);
 
-      await expect(service.getVehicleCard('missing')).rejects.toThrow('Vehicle not found');
+      await expect(service.getVehicleCard('missing')).rejects.toThrow(
+        'Vehicle not found',
+      );
     });
   });
 });

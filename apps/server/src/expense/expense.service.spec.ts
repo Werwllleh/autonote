@@ -7,18 +7,24 @@ import { PartService } from '../part/part.service';
 describe('ExpenseService', () => {
   let service: ExpenseService;
   let prisma: {
-    vehicle: { findFirst: jest.Mock };
+    vehicle: { findFirst: jest.Mock; findUnique: jest.Mock; update: jest.Mock };
     expense: { create: jest.Mock; createMany: jest.Mock };
     user: { update: jest.Mock };
     category: { findMany: jest.Mock };
+    $transaction: jest.Mock;
   };
 
   beforeEach(async () => {
     prisma = {
-      vehicle: { findFirst: jest.fn() },
+      vehicle: {
+        findFirst: jest.fn(),
+        findUnique: jest.fn(),
+        update: jest.fn(),
+      },
       expense: { create: jest.fn(), createMany: jest.fn() },
       user: { update: jest.fn() },
       category: { findMany: jest.fn() },
+      $transaction: jest.fn((cb: (tx: unknown) => unknown) => cb(prisma)),
     };
 
     const module = await Test.createTestingModule({
@@ -34,7 +40,11 @@ describe('ExpenseService', () => {
 
   describe('create', () => {
     it('resets the owning user expenseReminderCount after creating an expense', async () => {
-      prisma.vehicle.findFirst.mockResolvedValue({ id: 'v1', userId: 'u1' });
+      prisma.vehicle.findFirst.mockResolvedValue({
+        id: 'v1',
+        userId: 'u1',
+        mileage: 10000,
+      });
       prisma.expense.create.mockResolvedValue({ id: 'e1' });
 
       await service.create(
@@ -50,6 +60,31 @@ describe('ExpenseService', () => {
       expect(prisma.user.update).toHaveBeenCalledWith({
         where: { id: 'u1' },
         data: { expenseReminderCount: 0 },
+      });
+    });
+
+    it('automatically updates vehicle mileage when expense mileage is higher', async () => {
+      prisma.vehicle.findFirst.mockResolvedValue({
+        id: 'v1',
+        userId: 'u1',
+        mileage: 50000,
+      });
+      prisma.expense.create.mockResolvedValue({ id: 'e1' });
+
+      await service.create(
+        {
+          amount: 2500,
+          date: '2026-01-01',
+          vehicleId: 'v1',
+          categoryId: 'c1',
+          mileage: 55000,
+        } as any,
+        'u1',
+      );
+
+      expect(prisma.vehicle.update).toHaveBeenCalledWith({
+        where: { id: 'v1' },
+        data: { mileage: 55000 },
       });
     });
   });

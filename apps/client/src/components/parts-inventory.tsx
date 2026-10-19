@@ -382,52 +382,48 @@ export function PartsInventory({ vehicleId }: PartsInventoryProps) {
 
   const totalValue = parts.reduce((sum, p) => sum + p.quantity * p.price, 0)
 
-  // Filter parts by search query
-  const filteredParts = useMemo(() => {
-    if (!search.trim()) return parts
-    const q = search.trim().toLowerCase()
-    return parts.filter(
-      (p) =>
-        p.name.toLowerCase().includes(q) ||
-        (p.article && p.article.toLowerCase().includes(q)),
-    )
-  }, [parts, search])
+  // Filter and group parts by search query and article
+  const q = search.trim().toLowerCase()
+  const filteredParts = q
+    ? parts.filter(
+        (p) =>
+          p.name.toLowerCase().includes(q) ||
+          (p.article && p.article.toLowerCase().includes(q)),
+      )
+    : parts
 
-  // Group filtered parts by article, ungrouped parts (no article) stay standalone
-  const { groups, standalone } = useMemo(() => {
-    const articleMap = new Map<string, Part[]>()
-    const standalone: Part[] = []
+  const articleMap = new Map<string, Part[]>()
+  const standaloneList: Part[] = []
 
-    for (const part of filteredParts) {
-      if (part.article) {
-        const key = part.article.toUpperCase()
-        const arr = articleMap.get(key) || []
-        arr.push(part)
-        articleMap.set(key, arr)
-      } else {
-        standalone.push(part)
-      }
+  for (const part of filteredParts) {
+    if (part.article) {
+      const key = part.article.toUpperCase()
+      const arr = articleMap.get(key) || []
+      arr.push(part)
+      articleMap.set(key, arr)
+    } else {
+      standaloneList.push(part)
     }
+  }
 
-    const groups: PartGroup[] = []
-    const soloFromArticle: Part[] = []
+  const groups: PartGroup[] = []
+  const soloFromArticle: Part[] = []
 
-    for (const [article, items] of articleMap) {
-      if (items.length === 1) {
-        soloFromArticle.push(items[0])
-      } else {
-        groups.push({
-          article,
-          name: items[0].name,
-          items,
-          totalQty: items.reduce((s, p) => s + p.quantity, 0),
-          totalValue: items.reduce((s, p) => s + p.quantity * p.price, 0),
-        })
-      }
+  for (const [article, items] of articleMap) {
+    if (items.length === 1) {
+      soloFromArticle.push(items[0])
+    } else {
+      groups.push({
+        article,
+        name: items[0].name,
+        items,
+        totalQty: items.reduce((s, p) => s + p.quantity, 0),
+        totalValue: items.reduce((s, p) => s + p.quantity * p.price, 0),
+      })
     }
+  }
 
-    return { groups, standalone: [...soloFromArticle, ...standalone] }
-  }, [filteredParts])
+  const standalone = [...soloFromArticle, ...standaloneList]
 
   return (
     <div className="space-y-3">

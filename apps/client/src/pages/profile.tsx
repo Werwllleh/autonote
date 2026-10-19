@@ -12,6 +12,14 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Switch } from "@/components/ui/switch"
 import { Camera, Trash2, Check, AlertTriangle } from "lucide-react"
 
+function getErrorMessage(error: unknown, fallback = "Ошибка"): string {
+  if (error && typeof error === "object" && "response" in error) {
+    const res = (error as { response?: { data?: { message?: string } } }).response
+    if (res?.data?.message) return res.data.message
+  }
+  return fallback
+}
+
 export function ProfilePage() {
   const { data: profile, isLoading } = useProfile()
   const updateEmail = useUpdateEmail()
@@ -194,7 +202,7 @@ export function ProfilePage() {
               </div>
               {updateEmail.error && (
                 <p className="text-sm text-destructive">
-                  {(updateEmail.error as any)?.response?.data?.message || "Ошибка"}
+                  {getErrorMessage(updateEmail.error)}
                 </p>
               )}
               <div className="flex gap-2">
@@ -257,7 +265,7 @@ export function ProfilePage() {
               </div>
               {updatePassword.error && (
                 <p className="text-sm text-destructive">
-                  {(updatePassword.error as any)?.response?.data?.message || "Ошибка"}
+                  {getErrorMessage(updatePassword.error)}
                 </p>
               )}
               <div className="flex gap-2">
@@ -301,7 +309,7 @@ export function ProfilePage() {
           </div>
           {updateNotificationSettings.error && (
             <p className="text-sm text-destructive">
-              {(updateNotificationSettings.error as any)?.response?.data?.message || "Ошибка"}
+              {getErrorMessage(updateNotificationSettings.error)}
             </p>
           )}
         </CardContent>
@@ -349,8 +357,8 @@ export function ProfilePage() {
                   await userApi.deleteAccount(deletePassword)
                   logout()
                   navigate("/login")
-                } catch (err: any) {
-                  setDeleteError(err?.response?.data?.message || "Ошибка удаления")
+                } catch (err: unknown) {
+                  setDeleteError(getErrorMessage(err, "Ошибка удаления"))
                 } finally {
                   setDeletePending(false)
                 }

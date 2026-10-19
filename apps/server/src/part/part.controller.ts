@@ -30,10 +30,7 @@ export class PartController {
   }
 
   @Post()
-  create(
-    @Body() dto: CreatePartDto,
-    @CurrentUser('id') userId: string,
-  ) {
+  create(@Body() dto: CreatePartDto, @CurrentUser('id') userId: string) {
     return this.partService.create(dto, userId);
   }
 

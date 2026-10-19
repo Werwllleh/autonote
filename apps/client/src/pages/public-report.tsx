@@ -241,6 +241,8 @@ function PublicExpenseDialog({ expense, open, onOpenChange }: ExpenseDialogProps
   )
 }
 
+const EMPTY_EXPENSES: PublicReportExpense[] = []
+
 export function PublicReportPage() {
   const { token } = useParams<{ token: string }>()
   const [report, setReport] = useState<PublicReport | null>(null)
@@ -253,7 +255,7 @@ export function PublicReportPage() {
   const [historyOpen, setHistoryOpen] = useState(false)
   const [selected, setSelected] = useState<PublicReportExpense | null>(null)
 
-  const expenses = report?.expenses ?? []
+  const expenses = report?.expenses ?? EMPTY_EXPENSES
 
   const categories = useMemo(() => {
     const set = new Set<string>()

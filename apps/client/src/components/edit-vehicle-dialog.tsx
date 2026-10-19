@@ -1,4 +1,4 @@
-import { useState, useEffect, type FormEvent } from "react"
+import { useState, type FormEvent } from "react"
 import { useUpdateVehicle } from "@/hooks/use-vehicles"
 import { useQueryClient } from "@tanstack/react-query"
 import type { Vehicle } from "@/api/vehicles"
@@ -34,8 +34,8 @@ export function EditVehicleDialog({ vehicle }: Props) {
   const update = useUpdateVehicle()
   const qc = useQueryClient()
 
-  useEffect(() => {
-    if (open) {
+  const handleOpenChange = (newOpen: boolean) => {
+    if (newOpen) {
       setBrand(vehicle.brand)
       setModel(vehicle.model)
       setYear(String(vehicle.year))
@@ -47,7 +47,8 @@ export function EditVehicleDialog({ vehicle }: Props) {
       setPurchasePrice(vehicle.purchasePrice ? String(vehicle.purchasePrice) : "")
       setNotes(vehicle.notes || "")
     }
-  }, [open, vehicle])
+    setOpen(newOpen)
+  }
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault()
@@ -75,7 +76,7 @@ export function EditVehicleDialog({ vehicle }: Props) {
   }
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
         <Button variant="outline" size="icon" className="h-8 w-8 sm:h-9 sm:w-9">
           <Pencil className="h-4 w-4" />

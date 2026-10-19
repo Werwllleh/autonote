@@ -31,10 +31,7 @@ export class CategoryController {
   }
 
   @Post()
-  create(
-    @Body() dto: CreateCategoryDto,
-    @CurrentUser('id') userId: string,
-  ) {
+  create(@Body() dto: CreateCategoryDto, @CurrentUser('id') userId: string) {
     return this.categoryService.create(dto, userId);
   }
 

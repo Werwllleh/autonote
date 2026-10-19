@@ -50,8 +50,7 @@ export class ExpenseController {
   @Get('import/template')
   downloadTemplate(@Res() res: Response) {
     const BOM = '\uFEFF';
-    const header =
-      'Дата;Категория;Сумма;Описание;Пробег;Литры;Цена за литр\n';
+    const header = 'Дата;Категория;Сумма;Описание;Пробег;Литры;Цена за литр\n';
     const example = '15.03.2026;Топливо;3200;АИ-95 Лукойл;56340;42.5;75.3\n';
     res.setHeader('Content-Type', 'text/csv; charset=utf-8');
     res.setHeader(
@@ -117,10 +116,7 @@ export class ExpenseController {
   }
 
   @Post()
-  create(
-    @Body() dto: CreateExpenseDto,
-    @CurrentUser('id') userId: string,
-  ) {
+  create(@Body() dto: CreateExpenseDto, @CurrentUser('id') userId: string) {
     return this.expenseService.create(dto, userId);
   }
 

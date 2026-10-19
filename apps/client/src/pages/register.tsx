@@ -27,8 +27,8 @@ export function RegisterPage() {
     try {
       await authApi.register({ email, password, name: name || undefined })
       setSent(true)
-    } catch (err: any) {
-      const msg = err?.response?.data?.message
+    } catch (err: unknown) {
+      const msg = (err as { response?: { data?: { message?: string } } })?.response?.data?.message
       if (msg === "Email already in use") {
         setError("Email уже используется")
       } else {

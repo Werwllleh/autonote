@@ -42,8 +42,9 @@ export class AuthService {
     });
 
     // Send verification email (don't block on failure)
-    this.mail.sendVerification(dto.email, verifyToken).catch((err) => {
-      console.error('Failed to send verification email:', err.message);
+    this.mail.sendVerification(dto.email, verifyToken).catch((err: unknown) => {
+      const msg = err instanceof Error ? err.message : String(err);
+      console.error('Failed to send verification email:', msg);
     });
 
     return { message: 'Письмо с подтверждением отправлено на ' + dto.email };
@@ -53,7 +54,8 @@ export class AuthService {
     const user = await this.prisma.user.findUnique({
       where: { verifyToken: token },
     });
-    if (!user) throw new BadRequestException('Неверная или просроченная ссылка');
+    if (!user)
+      throw new BadRequestException('Неверная или просроченная ссылка');
 
     await this.prisma.user.update({
       where: { id: user.id },
@@ -66,7 +68,8 @@ export class AuthService {
   async resendVerification(email: string) {
     const user = await this.prisma.user.findUnique({ where: { email } });
     if (!user) throw new BadRequestException('Пользователь не найден');
-    if (user.emailVerified) throw new BadRequestException('Email уже подтверждён');
+    if (user.emailVerified)
+      throw new BadRequestException('Email уже подтверждён');
 
     const verifyToken = randomUUID();
     await this.prisma.user.update({

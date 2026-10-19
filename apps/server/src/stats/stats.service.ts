@@ -66,10 +66,7 @@ export class StatsService {
     const stockParts = await this.prisma.part.findMany({
       where: { vehicleId },
     });
-    const stockValue = stockParts.reduce(
-      (s, p) => s + p.quantity * p.price,
-      0,
-    );
+    const stockValue = stockParts.reduce((s, p) => s + p.quantity * p.price, 0);
     const totalWithStock = total + stockValue;
     if (stockValue > 0) {
       byCategory['Склад запчастей'] = stockValue;
@@ -95,12 +92,16 @@ export class StatsService {
     const expensesWithMileage = expenses
       .filter((e) => e.mileage !== null && e.mileage > 0)
       .sort((a, b) => a.mileage! - b.mileage!);
-    const lastMileage = expensesWithMileage.length > 0
-      ? expensesWithMileage[expensesWithMileage.length - 1].mileage!
-      : null;
-    const drivenKm = lastMileage !== null ? lastMileage - vehicle.initialMileage : null;
+    const lastMileage =
+      expensesWithMileage.length > 0
+        ? expensesWithMileage[expensesWithMileage.length - 1].mileage!
+        : null;
+    const drivenKm =
+      lastMileage !== null ? lastMileage - vehicle.initialMileage : null;
     const costPerKm =
-      drivenKm && drivenKm > 0 ? Math.round((totalWithStock / drivenKm) * 100) / 100 : null;
+      drivenKm && drivenKm > 0
+        ? Math.round((totalWithStock / drivenKm) * 100) / 100
+        : null;
 
     return {
       total: totalWithStock,
@@ -132,10 +133,7 @@ export class StatsService {
     const stockParts = await this.prisma.part.findMany({
       where: { vehicle: { userId } },
     });
-    const stockValue = stockParts.reduce(
-      (s, p) => s + p.quantity * p.price,
-      0,
-    );
+    const stockValue = stockParts.reduce((s, p) => s + p.quantity * p.price, 0);
     const total = expensesTotal + stockValue;
 
     const byCategory: Record<string, number> = {};
@@ -222,10 +220,7 @@ export class StatsService {
     });
 
     // Group by vehicle — only latest per vehicle
-    const latestInsurance = new Map<
-      string,
-      (typeof insuranceExpenses)[0]
-    >();
+    const latestInsurance = new Map<string, (typeof insuranceExpenses)[0]>();
     for (const e of insuranceExpenses) {
       if (!latestInsurance.has(e.vehicleId)) {
         latestInsurance.set(e.vehicleId, e);

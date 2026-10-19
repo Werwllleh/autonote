@@ -44,28 +44,41 @@ export class ExpenseService {
     });
     if (!vehicle) throw new NotFoundException('Vehicle not found');
 
-    // Deduct stock parts if provided
-    if (dto.stockParts?.length) {
-      await this.partService.deductStock(dto.stockParts, userId);
-    }
+    const expense = await this.prisma.$transaction(async (tx) => {
+      // Deduct stock parts if provided
+      if (dto.stockParts?.length) {
+        await this.partService.deductStock(dto.stockParts, userId, tx);
+      }
 
-    const expense = await this.prisma.expense.create({
-      data: {
-        amount: dto.amount,
-        date: new Date(dto.date),
-        description: dto.description,
-        mileage: dto.mileage,
-        vehicleId: dto.vehicleId,
-        categoryId: dto.categoryId,
-        liters: dto.liters,
-        pricePerLiter: dto.pricePerLiter,
-        bonuses: dto.bonuses,
-        parts: dto.parts ? (dto.parts as unknown as Prisma.InputJsonValue) : undefined,
-        laborCost: dto.laborCost,
-        dateFrom: dto.dateFrom ? new Date(dto.dateFrom) : undefined,
-        dateTo: dto.dateTo ? new Date(dto.dateTo) : undefined,
-      },
-      include: { category: true, vehicle: true },
+      const created = await tx.expense.create({
+        data: {
+          amount: dto.amount,
+          date: new Date(dto.date),
+          description: dto.description,
+          mileage: dto.mileage,
+          vehicleId: dto.vehicleId,
+          categoryId: dto.categoryId,
+          liters: dto.liters,
+          pricePerLiter: dto.pricePerLiter,
+          bonuses: dto.bonuses,
+          parts: dto.parts
+            ? (dto.parts as unknown as Prisma.InputJsonValue)
+            : undefined,
+          laborCost: dto.laborCost,
+          dateFrom: dto.dateFrom ? new Date(dto.dateFrom) : undefined,
+          dateTo: dto.dateTo ? new Date(dto.dateTo) : undefined,
+        },
+        include: { category: true, vehicle: true },
+      });
+
+      if (dto.mileage && dto.mileage > vehicle.mileage) {
+        await tx.vehicle.update({
+          where: { id: vehicle.id },
+          data: { mileage: dto.mileage },
+        });
+      }
+
+      return created;
     });
 
     await this.resetExpenseReminderCount(vehicle.userId);
@@ -107,11 +120,24 @@ export class ExpenseService {
       data.dateTo = new Date(dto.dateTo);
     }
 
-    return this.prisma.expense.update({
+    const updated = await this.prisma.expense.update({
       where: { id },
       data,
       include: { category: true, vehicle: true },
     });
+
+    if (
+      dto.mileage &&
+      updated.vehicle &&
+      dto.mileage > updated.vehicle.mileage
+    ) {
+      await this.prisma.vehicle.update({
+        where: { id: updated.vehicleId },
+        data: { mileage: dto.mileage },
+      });
+    }
+
+    return updated;
   }
 
   async remove(id: string, userId: string) {
@@ -163,7 +189,13 @@ export class ExpenseService {
       const get = (keys: string[]) => {
         for (const k of keys) {
           const val = row[k];
-          if (val !== undefined && val !== '') return String(val).trim();
+          if (val !== undefined && val !== null && val !== '') {
+            if (typeof val === 'object') {
+              if (val instanceof Date) return val.toISOString();
+              return JSON.stringify(val);
+            }
+            return String(val as string | number | boolean).trim();
+          }
         }
         return '';
       };
@@ -224,9 +256,7 @@ export class ExpenseService {
       // Resolve category
       const categoryId = catMap.get(categoryStr.toLowerCase());
       if (!categoryId) {
-        errors.push(
-          `Строка ${rowNum}: категория "${categoryStr}" не найдена`,
-        );
+        errors.push(`Строка ${rowNum}: категория "${categoryStr}" не найдена`);
         continue;
       }
 
@@ -245,8 +275,7 @@ export class ExpenseService {
         amount,
         date,
         description: description || undefined,
-        mileage:
-          mileage !== undefined && !isNaN(mileage) ? mileage : undefined,
+        mileage: mileage !== undefined && !isNaN(mileage) ? mileage : undefined,
         liters: liters !== undefined && !isNaN(liters) ? liters : undefined,
         pricePerLiter:
           pricePerLiter !== undefined && !isNaN(pricePerLiter)
@@ -267,6 +296,25 @@ export class ExpenseService {
     const result = await this.prisma.expense.createMany({ data: toCreate });
 
     if (result.count > 0) {
+      const maxMileage = toCreate.reduce<number>(
+        (max, item) =>
+          typeof item.mileage === 'number' && item.mileage > max
+            ? item.mileage
+            : max,
+        0,
+      );
+      if (maxMileage > 0) {
+        const vehicle = await this.prisma.vehicle.findUnique({
+          where: { id: vehicleId },
+          select: { mileage: true },
+        });
+        if (vehicle && maxMileage > vehicle.mileage) {
+          await this.prisma.vehicle.update({
+            where: { id: vehicleId },
+            data: { mileage: maxMileage },
+          });
+        }
+      }
       await this.resetExpenseReminderCount(userId);
     }
 

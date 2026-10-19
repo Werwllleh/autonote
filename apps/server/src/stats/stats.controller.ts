@@ -21,10 +21,7 @@ export class StatsController {
   }
 
   @Get('recent')
-  getRecent(
-    @CurrentUser('id') userId: string,
-    @Query('limit') limit?: string,
-  ) {
+  getRecent(@CurrentUser('id') userId: string, @Query('limit') limit?: string) {
     return this.statsService.getRecentExpenses(
       userId,
       limit ? parseInt(limit, 10) : 5,

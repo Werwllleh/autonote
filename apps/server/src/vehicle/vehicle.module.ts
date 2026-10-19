@@ -6,10 +6,7 @@ import { VehicleService } from './vehicle.service';
 import { UploadModule } from '../upload/upload.module';
 
 @Module({
-  imports: [
-    MulterModule.register({ storage: memoryStorage() }),
-    UploadModule,
-  ],
+  imports: [MulterModule.register({ storage: memoryStorage() }), UploadModule],
   controllers: [VehicleController],
   providers: [VehicleService],
 })

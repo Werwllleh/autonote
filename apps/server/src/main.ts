@@ -15,4 +15,7 @@ async function bootstrap() {
   app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
   await app.listen(process.env.PORT ?? 3001);
 }
-bootstrap();
+bootstrap().catch((err: unknown) => {
+  console.error('Failed to start server:', err);
+  process.exit(1);
+});

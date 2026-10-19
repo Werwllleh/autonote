@@ -26,6 +26,7 @@ interface Props {
 export function ServiceIntervals({ vehicleId, currentMileage }: Props) {
   const { data: intervals = [] } = useServiceIntervals(vehicleId)
   const [open, setOpen] = useState(false)
+  const [now] = useState(() => Date.now())
 
   if (intervals.length === 0 && !open) {
     return (
@@ -80,9 +81,9 @@ export function ServiceIntervals({ vehicleId, currentMileage }: Props) {
               : null
 
             const isOverdueKm = remaining !== null && remaining <= 0
-            const isOverdueDate = nextDate !== null && nextDate < new Date()
+            const isOverdueDate = nextDate !== null && nextDate.getTime() < now
             const isWarningKm = remaining !== null && !isOverdueKm && si.intervalKm && remaining <= si.intervalKm * 0.1
-            const isWarningDate = nextDate !== null && !isOverdueDate && nextDate.getTime() - Date.now() < 30 * 24 * 60 * 60 * 1000
+            const isWarningDate = nextDate !== null && !isOverdueDate && nextDate.getTime() - now < 30 * 24 * 60 * 60 * 1000
 
             return (
               <div key={si.id} className="flex items-center gap-3 rounded-lg border px-4 py-3">

@@ -10,17 +10,16 @@ export function VerifyPage() {
   const [params] = useSearchParams()
   const navigate = useNavigate()
   const { setTokens } = useAuthStore()
-  const [status, setStatus] = useState<"loading" | "success" | "error">("loading")
-  const [errorMsg, setErrorMsg] = useState("")
-
   const token = params.get("token")
+  const [status, setStatus] = useState<"loading" | "success" | "error">(
+    token ? "loading" : "error",
+  )
+  const [errorMsg, setErrorMsg] = useState(
+    token ? "" : "Отсутствует токен подтверждения",
+  )
 
   useEffect(() => {
-    if (!token) {
-      setStatus("error")
-      setErrorMsg("Отсутствует токен подтверждения")
-      return
-    }
+    if (!token) return
 
     authApi
       .verify(token)
@@ -35,7 +34,7 @@ export function VerifyPage() {
           err?.response?.data?.message || "Неверная или просроченная ссылка",
         )
       })
-  }, [token])
+  }, [token, navigate, setTokens])
 
   return (
     <div className="relative flex min-h-screen items-center justify-center bg-background px-4">

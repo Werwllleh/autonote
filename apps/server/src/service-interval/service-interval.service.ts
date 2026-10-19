@@ -31,11 +31,7 @@ export class ServiceIntervalService {
     });
   }
 
-  async update(
-    id: string,
-    dto: UpdateServiceIntervalDto,
-    userId: string,
-  ) {
+  async update(id: string, dto: UpdateServiceIntervalDto, userId: string) {
     const interval = await this.findOne(id, userId);
     const { lastServiceDate, ...rest } = dto;
     return this.prisma.serviceInterval.update({
@@ -43,9 +39,7 @@ export class ServiceIntervalService {
       data: {
         ...rest,
         ...(lastServiceDate !== undefined && {
-          lastServiceDate: lastServiceDate
-            ? new Date(lastServiceDate)
-            : null,
+          lastServiceDate: lastServiceDate ? new Date(lastServiceDate) : null,
         }),
       },
     });
@@ -62,8 +56,7 @@ export class ServiceIntervalService {
     const interval = await this.prisma.serviceInterval.findFirst({
       where: { id, vehicle: { userId } },
     });
-    if (!interval)
-      throw new NotFoundException('Service interval not found');
+    if (!interval) throw new NotFoundException('Service interval not found');
     return interval;
   }
 

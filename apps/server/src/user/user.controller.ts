@@ -32,10 +32,7 @@ export class UserController {
   }
 
   @Put('email')
-  updateEmail(
-    @CurrentUser('id') userId: string,
-    @Body() dto: UpdateEmailDto,
-  ) {
+  updateEmail(@CurrentUser('id') userId: string, @Body() dto: UpdateEmailDto) {
     return this.userService.updateEmail(userId, dto);
   }
 

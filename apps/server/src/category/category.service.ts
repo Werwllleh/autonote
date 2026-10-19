@@ -48,7 +48,7 @@ export class CategoryService {
       throw new ForbiddenException('Cannot edit system category');
     }
     if (category.userId !== userId) {
-      throw new ForbiddenException('Cannot edit another user\'s category');
+      throw new ForbiddenException("Cannot edit another user's category");
     }
     return this.prisma.category.update({ where: { id }, data: dto });
   }
@@ -59,7 +59,7 @@ export class CategoryService {
       throw new ForbiddenException('Cannot delete system category');
     }
     if (category.userId !== userId) {
-      throw new ForbiddenException('Cannot delete another user\'s category');
+      throw new ForbiddenException("Cannot delete another user's category");
     }
     return this.prisma.category.delete({ where: { id } });
   }

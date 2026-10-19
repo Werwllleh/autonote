@@ -1,4 +1,9 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
+import { Prisma } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreatePartDto } from './dto/create-part.dto';
 import { UpdatePartDto } from './dto/update-part.dto';
@@ -44,9 +49,17 @@ export class PartService {
     return this.prisma.part.delete({ where: { id: part.id } });
   }
 
-  async deductStock(items: { partId: string; quantity: number }[], userId: string) {
+  async deductStock(
+    items: { partId: string; quantity: number }[],
+    userId: string,
+    tx?: Prisma.TransactionClient,
+  ) {
+    const db = tx ?? this.prisma;
     for (const item of items) {
-      const part = await this.findOneOwned(item.partId, userId);
+      const part = await db.part.findFirst({
+        where: { id: item.partId, vehicle: { userId } },
+      });
+      if (!part) throw new NotFoundException('Part not found');
       if (part.quantity < item.quantity) {
         throw new BadRequestException(
           `Недостаточно "${part.name}" на складе: есть ${part.quantity}, нужно ${item.quantity}`,
@@ -55,7 +68,7 @@ export class PartService {
     }
     // All checks passed, deduct
     for (const item of items) {
-      await this.prisma.part.update({
+      await db.part.update({
         where: { id: item.partId },
         data: { quantity: { decrement: item.quantity } },
       });

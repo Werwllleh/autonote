@@ -73,14 +73,23 @@ export class UserService {
     return { message: 'Пароль изменён' };
   }
 
-  async updateNotificationSettings(userId: string, dto: UpdateNotificationSettingsDto) {
+  async updateNotificationSettings(
+    userId: string,
+    dto: UpdateNotificationSettingsDto,
+  ) {
     const user = await this.prisma.user.findUnique({ where: { id: userId } });
     if (!user) throw new NotFoundException('User not found');
 
     return this.prisma.user.update({
       where: { id: userId },
       data: { expenseRemindersEnabled: dto.expenseRemindersEnabled },
-      select: { id: true, email: true, name: true, avatar: true, expenseRemindersEnabled: true },
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        avatar: true,
+        expenseRemindersEnabled: true,
+      },
     });
   }
 

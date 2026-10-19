@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect, useRef, type FormEvent, type ReactNode } from "react"
+import { useState, useMemo, useRef, useCallback, type FormEvent, type ReactNode } from "react"
 import { useCreateExpense, useUpdateExpense } from "@/hooks/use-expenses"
 import { useCategories, useCreateCategory } from "@/hooks/use-categories"
 import { useParts } from "@/hooks/use-parts"
@@ -76,34 +76,52 @@ export function ExpenseDialog({ vehicleId, expense, trigger }: ExpenseDialogProp
   const systemCategories = useMemo(() => categories.filter((c) => c.isSystem), [categories])
   const customCategories = useMemo(() => categories.filter((c) => !c.isSystem), [categories])
 
-  useEffect(() => {
-    if (open && expense) {
-      setAmount(String(expense.amount))
-      setDate(expense.date.slice(0, 10))
-      setCategoryId(expense.categoryId)
-      setDescription(expense.description || "")
-      setMileage(expense.mileage ? String(expense.mileage) : "")
-      setLiters(expense.liters ? String(expense.liters) : "")
-      setPricePerLiter(expense.pricePerLiter ? String(expense.pricePerLiter) : "")
-      setBonuses(expense.bonuses ? String(expense.bonuses) : "")
-      setParts(
-        expense.parts?.length
-          ? expense.parts.map((p) => ({
-              article: p.article || "",
-              name: p.name,
-              quantity: String(p.quantity),
-              price: String(p.price),
-            }))
-          : [],
-      )
-      setLaborCost(expense.laborCost ? String(expense.laborCost) : "")
-      setDateFrom(expense.dateFrom?.slice(0, 10) || "")
-      setDateTo(expense.dateTo?.slice(0, 10) || "")
+  const reset = useCallback(() => {
+    setAmount("")
+    setDate(new Date().toISOString().slice(0, 10))
+    setCategoryId("")
+    setDescription("")
+    setMileage("")
+    setLiters("")
+    setPricePerLiter("")
+    setBonuses("")
+    setParts([])
+    setLaborCost("")
+    setStockItems([])
+    setDateFrom("")
+    setDateTo("")
+  }, [])
+
+  const handleOpenChange = (newOpen: boolean) => {
+    if (newOpen) {
+      if (expense) {
+        setAmount(String(expense.amount))
+        setDate(expense.date.slice(0, 10))
+        setCategoryId(expense.categoryId)
+        setDescription(expense.description || "")
+        setMileage(expense.mileage ? String(expense.mileage) : "")
+        setLiters(expense.liters ? String(expense.liters) : "")
+        setPricePerLiter(expense.pricePerLiter ? String(expense.pricePerLiter) : "")
+        setBonuses(expense.bonuses ? String(expense.bonuses) : "")
+        setParts(
+          expense.parts?.length
+            ? expense.parts.map((p) => ({
+                article: p.article || "",
+                name: p.name,
+                quantity: String(p.quantity),
+                price: String(p.price),
+              }))
+            : [],
+        )
+        setLaborCost(expense.laborCost ? String(expense.laborCost) : "")
+        setDateFrom(expense.dateFrom?.slice(0, 10) || "")
+        setDateTo(expense.dateTo?.slice(0, 10) || "")
+      } else {
+        reset()
+      }
     }
-    if (open && !expense) {
-      reset()
-    }
-  }, [open, expense])
+    setOpen(newOpen)
+  }
 
   const selectedCategory = useMemo(
     () => categories.find((c) => c.id === categoryId),
@@ -178,22 +196,6 @@ export function ExpenseDialog({ vehicleId, expense, trigger }: ExpenseDialogProp
   const removePart = (i: number) => setParts(parts.filter((_, idx) => idx !== i))
   const updatePart = (i: number, field: keyof PartRow, value: string) => {
     setParts(parts.map((p, idx) => (idx === i ? { ...p, [field]: value } : p)))
-  }
-
-  const reset = () => {
-    setAmount("")
-    setDate(new Date().toISOString().slice(0, 10))
-    setCategoryId("")
-    setDescription("")
-    setMileage("")
-    setLiters("")
-    setPricePerLiter("")
-    setBonuses("")
-    setParts([])
-    setLaborCost("")
-    setStockItems([])
-    setDateFrom("")
-    setDateTo("")
   }
 
   const handleSubmit = (e: FormEvent) => {
@@ -321,7 +323,7 @@ export function ExpenseDialog({ vehicleId, expense, trigger }: ExpenseDialogProp
   const showManualAmount = isMaintenance && !hasParts && !hasStockParts && laborCostNum === 0
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>{trigger || defaultTrigger}</DialogTrigger>
       <DialogContent className="max-h-[90vh] overflow-y-auto overflow-x-hidden p-4 sm:p-6">
         <DialogHeader>
