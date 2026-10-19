@@ -10,7 +10,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Car, LogOut, User, LayoutDashboard, ShieldCheck } from "lucide-react"
+import { LogOut, User, LayoutDashboard, ShieldCheck, Home } from "lucide-react"
 
 export function Layout() {
   const { data: user } = useMe()
@@ -25,63 +25,87 @@ export function Layout() {
   const isDashboard = location.pathname === "/dashboard"
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Subtle gradient overlay at top */}
-      <div className="pointer-events-none fixed inset-x-0 top-0 h-72 bg-gradient-to-b from-primary/[0.03] to-transparent" />
+    <div className="min-h-screen bg-[#F8F9FA] dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans antialiased selection:bg-slate-900 selection:text-white">
+      {/* Soft Ambient Radial Glow */}
+      <div className="pointer-events-none fixed inset-0 z-0 bg-[radial-gradient(ellipse_80%_50%_at_50%_-10%,rgba(226,232,240,0.7),transparent_100%)] dark:bg-[radial-gradient(ellipse_80%_50%_at_50%_-10%,rgba(30,41,59,0.5),transparent_100%)]" />
 
-      <header className="sticky top-0 z-50 border-b border-border/50 bg-background/80 backdrop-blur-xl">
-        <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-4">
-          <Link to="/dashboard" className="flex items-center gap-2.5 font-semibold transition-opacity hover:opacity-80">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-primary to-primary/80 text-primary-foreground shadow-sm">
-              <Car className="h-4 w-4" />
+      {/* Floating Capsule Header */}
+      <header className="sticky top-0 z-50 pt-3 sm:pt-4 px-3 sm:px-6">
+        <div className="mx-auto flex h-14 max-w-7xl items-center justify-between rounded-full border border-slate-200/90 dark:border-slate-800 bg-white/90 dark:bg-slate-900/90 px-4 sm:px-6 backdrop-blur-xl shadow-[0_10px_30px_rgba(0,0,0,0.04)]">
+          
+          {/* Left: Brand Pill */}
+          <Link to="/dashboard" className="flex items-center gap-2.5 transition-opacity hover:opacity-85">
+            <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-slate-950 dark:bg-white text-white dark:text-slate-950 font-black text-xs shadow-2xs">
+              AN
             </div>
-            <span className="hidden sm:inline">AutoNotes</span>
+            <div className="flex items-center gap-2">
+              <span className="font-extrabold tracking-tight text-slate-950 dark:text-white text-sm">AUTONOTES</span>
+              <span className="hidden sm:inline-flex items-center gap-1.5 rounded-full border border-emerald-300 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-950/40 px-2 py-0.5 text-[10px] font-mono text-emerald-700 dark:text-emerald-400 font-semibold">
+                <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                ГАРАЖ
+              </span>
+            </div>
           </Link>
 
-          <div className="flex items-center gap-1.5">
+          {/* Right: Actions & User */}
+          <div className="flex items-center gap-2">
+            <Link
+              to="/"
+              className="hidden md:inline-flex items-center gap-1.5 text-xs font-semibold text-slate-600 hover:text-slate-950 dark:text-slate-400 dark:hover:text-white px-3 py-1.5 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+            >
+              <Home className="h-3.5 w-3.5" />
+              <span>Главная</span>
+            </Link>
+
             {!isDashboard && (
-              <Button variant="ghost" size="sm" className="text-muted-foreground" asChild>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="text-xs font-semibold text-slate-700 dark:text-slate-300 rounded-full h-8 px-3 hover:bg-slate-100 dark:hover:bg-slate-800"
+                asChild
+              >
                 <Link to="/dashboard">
-                  <LayoutDashboard className="mr-1.5 h-4 w-4" />
-                  <span className="hidden sm:inline">Гараж</span>
+                  <LayoutDashboard className="mr-1.5 h-3.5 w-3.5" />
+                  <span>Гараж</span>
                 </Link>
               </Button>
             )}
+
             <ThemeToggle />
+
             {user && (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="relative h-8 w-8 rounded-full">
-                    <Avatar className="h-8 w-8 ring-2 ring-border">
+                  <Button variant="ghost" className="relative h-9 w-9 rounded-full p-0 ring-1 ring-slate-200 dark:ring-slate-800 hover:ring-slate-400">
+                    <Avatar className="h-8 w-8">
                       <AvatarImage src={avatarUrl} />
-                      <AvatarFallback className="text-xs bg-gradient-to-br from-primary/10 to-primary/5">
+                      <AvatarFallback className="text-xs font-bold bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-slate-100">
                         {user.email[0].toUpperCase()}
                       </AvatarFallback>
                     </Avatar>
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-48">
-                  <div className="px-2 py-1.5">
-                    <p className="text-sm font-medium truncate">{user.name || user.email}</p>
+                <DropdownMenuContent align="end" className="w-56 rounded-2xl border border-slate-200 dark:border-slate-800 p-2 shadow-xl bg-white dark:bg-slate-900">
+                  <div className="px-3 py-2 border-b border-slate-100 dark:border-slate-800 mb-1">
+                    <p className="text-xs font-bold truncate text-slate-950 dark:text-white">{user.name || user.email}</p>
                     {user.name && (
-                      <p className="text-xs text-muted-foreground truncate">{user.email}</p>
+                      <p className="text-[11px] text-slate-400 truncate font-mono mt-0.5">{user.email}</p>
                     )}
                   </div>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={() => navigate("/profile")}>
+                  <DropdownMenuItem onClick={() => navigate("/profile")} className="rounded-xl text-xs font-medium py-2">
                     <User className="mr-2 h-4 w-4" />
                     Личный кабинет
                   </DropdownMenuItem>
                   {user.role === "ADMIN" && (
-                    <DropdownMenuItem onClick={() => navigate("/admin")}>
+                    <DropdownMenuItem onClick={() => navigate("/admin")} className="rounded-xl text-xs font-medium py-2">
                       <ShieldCheck className="mr-2 h-4 w-4" />
                       Админ-панель
                     </DropdownMenuItem>
                   )}
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={logout} className="text-destructive focus:text-destructive">
+                  <DropdownMenuSeparator className="my-1 border-slate-100 dark:border-slate-800" />
+                  <DropdownMenuItem onClick={logout} className="rounded-xl text-xs font-medium py-2 text-rose-600 focus:text-rose-600 focus:bg-rose-50 dark:focus:bg-rose-950/30">
                     <LogOut className="mr-2 h-4 w-4" />
-                    Выйти
+                    Выйти из аккаунта
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
@@ -89,7 +113,9 @@ export function Layout() {
           </div>
         </div>
       </header>
-      <main className="relative mx-auto max-w-6xl px-4 py-6">
+
+      {/* Main Content Viewport */}
+      <main className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 py-6 sm:py-8">
         <Outlet />
       </main>
     </div>
