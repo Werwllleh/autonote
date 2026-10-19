@@ -1,12 +1,12 @@
 import { lazy, Suspense } from "react"
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom"
-import { Layout } from "@/components/layout"
+import { LandingPage } from "@/pages/landing"
 import { ProtectedRoute } from "@/components/protected-route"
 import { AdminRoute } from "@/components/admin-route"
 import { useTheme } from "@/hooks/use-theme"
 
-const LandingPage = lazy(() => import("@/pages/landing").then((m) => ({ default: m.LandingPage })))
+const Layout = lazy(() => import("@/components/layout").then((m) => ({ default: m.Layout })))
 const LoginPage = lazy(() => import("@/pages/login").then((m) => ({ default: m.LoginPage })))
 const RegisterPage = lazy(() => import("@/pages/register").then((m) => ({ default: m.RegisterPage })))
 const DashboardPage = lazy(() => import("@/pages/dashboard").then((m) => ({ default: m.DashboardPage })))

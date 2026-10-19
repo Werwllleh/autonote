@@ -273,12 +273,7 @@ export function LandingPage() {
   return (
     <div className="min-h-screen bg-background text-foreground overflow-x-hidden">
       {/* Header */}
-      <motion.header
-        initial={{ y: -100 }}
-        animate={{ y: 0 }}
-        transition={{ duration: 0.6, ease: [0.25, 0.46, 0.45, 0.94] }}
-        className="sticky top-0 z-50 border-b border-border/50 bg-background/80 backdrop-blur-xl"
-      >
+      <header className="sticky top-0 z-50 border-b border-border/50 bg-background/80 backdrop-blur-xl">
         <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-6">
           <a href="/" className="flex items-center gap-2 text-lg font-semibold">
             <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
@@ -322,7 +317,7 @@ export function LandingPage() {
             </div>
           </div>
         </div>
-      </motion.header>
+      </header>
 
       {/* Hero */}
       <section ref={heroRef} className="relative overflow-hidden">
@@ -350,49 +345,25 @@ export function LandingPage() {
           style={{ y: heroY, opacity: heroOpacity }}
           className="relative mx-auto max-w-6xl px-6 pb-20 pt-24 text-center sm:pb-28 sm:pt-32"
         >
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-            className="mb-6 inline-flex items-center gap-2 rounded-full border border-border/60 bg-muted/50 px-4 py-1.5 text-sm text-muted-foreground"
-          >
-            <motion.span
-              animate={{ scale: [1, 1.2, 1] }}
-              transition={{ duration: 2, repeat: Infinity }}
-              className="inline-block h-2 w-2 rounded-full bg-emerald-500"
-            />
+          <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-border/60 bg-muted/50 px-4 py-1.5 text-sm text-muted-foreground">
+            <span className="inline-block h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
             Удобный учёт без ограничений
-          </motion.div>
+          </div>
 
-          <motion.h1
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 0.3 }}
-            className="mx-auto max-w-4xl text-4xl font-bold leading-[1.1] tracking-tight sm:text-5xl md:text-6xl lg:text-7xl"
-          >
+          <h1 className="mx-auto max-w-4xl text-4xl font-bold leading-[1.1] tracking-tight sm:text-5xl md:text-6xl lg:text-7xl">
             Полный контроль над{" "}
             <span className="bg-gradient-to-r from-blue-500 via-violet-500 to-cyan-500 bg-clip-text text-transparent">
               расходами
             </span>{" "}
             на автомобиль
-          </motion.h1>
+          </h1>
 
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.5 }}
-            className="mx-auto mt-6 max-w-2xl text-lg text-muted-foreground sm:text-xl"
-          >
+          <p className="mx-auto mt-6 max-w-2xl text-lg text-muted-foreground sm:text-xl">
             Записывайте каждую трату — от заправки до капремонта. Анализируйте статистику,
             планируйте бюджет и сохраняйте полную историю обслуживания вашего автомобиля.
-          </motion.p>
+          </p>
 
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.7 }}
-            className="mt-10 flex flex-col items-center gap-4 sm:flex-row sm:justify-center"
-          >
+          <div className="mt-10 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
             {isAuthed ? (
               <Button size="lg" className="h-12 px-8 text-base" asChild>
                 <a href={appUrl("/dashboard")}>
@@ -411,7 +382,7 @@ export function LandingPage() {
             <Button variant="outline" size="lg" className="h-12 px-8 text-base" asChild>
               <a href="#benefits">Узнать больше</a>
             </Button>
-          </motion.div>
+          </div>
 
           {/* Floating cards decoration */}
           <div className="relative mx-auto mt-16 max-w-3xl">
