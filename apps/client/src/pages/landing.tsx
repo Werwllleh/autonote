@@ -34,7 +34,7 @@ function appUrl(path: string) {
 // Cloudmill Signature Animation Primitives
 // -------------------------------------------------------------
 
-// 1. TextReveal (Cloudmill text skew and unroll with mask)
+// 1. TextReveal (Smooth entrance without overflow clipping)
 export function TextReveal({
   children,
   delay = 0,
@@ -45,24 +45,23 @@ export function TextReveal({
   className?: string
 }) {
   return (
-    <div className={`overflow-hidden ${className}`}>
-      <motion.div
-        initial={{ opacity: 0, y: "130%", skewY: 4, scaleX: 0.98 }}
-        whileInView={{ opacity: 1, y: 0, skewY: 0, scaleX: 1 }}
-        viewport={{ once: true, margin: "-40px" }}
-        transition={{
-          duration: 1.05,
-          delay,
-          ease: [0.22, 1, 0.36, 1], // Signature Cloudmill cubic-bezier curve
-        }}
-      >
-        {children}
-      </motion.div>
-    </div>
+    <motion.div
+      initial={{ opacity: 0, y: 24 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "0px" }}
+      transition={{
+        duration: 0.7,
+        delay,
+        ease: [0.22, 1, 0.36, 1],
+      }}
+      className={className}
+    >
+      {children}
+    </motion.div>
   )
 }
 
-// 2. FadeUp (Cloudmill smooth fadeUp with translation)
+// 2. FadeUp (Smooth fadeUp with translation)
 export function FadeUp({
   children,
   delay = 0,
@@ -74,11 +73,11 @@ export function FadeUp({
 }) {
   return (
     <motion.div
-      initial={{ opacity: 0, y: 50 }}
+      initial={{ opacity: 0, y: 24 }}
       whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-40px" }}
+      viewport={{ once: true, margin: "0px" }}
       transition={{
-        duration: 0.9,
+        duration: 0.7,
         delay,
         ease: [0.22, 1, 0.36, 1],
       }}
@@ -112,7 +111,7 @@ const caseProjects = [
       assistant:
         "До замены моторного масла и фильтра осталось ровно 600 км. Также пора менять свечи зажигания (крайний раз меняли на 120 000 км). Подобрал оригинал Hyundai/Kia 18846-10060 и аналог NGK 1578. Кстати, фильтр Mann W81180 уже лежит у тебя в гараже — не покупай!",
     },
-    partLink: "https://www.autodoc.ru/price/0/1884610060",
+    partLink: "https://www.autodoc.ru/man/647/part/1884610060",
   },
   {
     num: "02",
@@ -131,7 +130,7 @@ const caseProjects = [
       assistant:
         "Для твоих тормозов 348мм рекомендую комплект Brembo P06106 (с керамическим наполнителем) или оригинальные 34106888459. Датчик износа 34356870351 тоже добавь в заказ на Автодоке.",
     },
-    partLink: "https://www.autodoc.ru/price/0/34106888459",
+    partLink: "https://www.autodoc.ru/man/511/part/34106888459",
   },
   {
     num: "03",
@@ -299,7 +298,7 @@ export function LandingPage() {
     {
       sender: "ivanych",
       text: "Держи проверенный вариант: Sangsin Brake SP1399 — отличные корейские колодки, не скрипят и берегут тормозной диск. Либо заводской оригинал Hyundai/Kia 58101-4LA00. Заказная ссылка на Автодоке уже готова!",
-      link: "https://www.autodoc.ru/price/0/SP1399",
+      link: "https://www.autodoc.ru/man/5315/part/sp1399",
       linkText: "Посмотреть Sangsin SP1399 на Autodoc.ru ↗",
     },
   ])
@@ -342,12 +341,12 @@ export function LandingPage() {
     if (query.toLowerCase().includes("масло") || query.toLowerCase().includes("то")) {
       reply =
         "По регламенту твоего мотора 1.6 рекомендую масло с допуском ACEA A5/B5 или API SP (вязкость 5W-30). До следующей замены осталось 600 км. Масляный фильтр Mann W81180 уже есть на твоем складе в гараже!"
-      link = "https://www.autodoc.ru/price/0/W81180"
+      link = "https://www.autodoc.ru/man/4/part/w81180"
       linkText = "Mann W81180 на Autodoc.ru ↗"
     } else if (query.toLowerCase().includes("свеч")) {
       reply =
         "Свечи зажигания по регламенту меняются каждые 30 000 км. Отличный проверенный комплект — иридиевые NGK LZKR6B-10E (арт. 1578). Записал артикул!"
-      link = "https://www.autodoc.ru/price/0/1578"
+      link = "https://www.autodoc.ru/man/15/part/1578"
       linkText = "Свечи NGK 1578 на Autodoc.ru ↗"
     } else if (query.toLowerCase().includes("заправ") || query.toLowerCase().includes("руб")) {
       reply =
@@ -417,11 +416,20 @@ export function LandingPage() {
             <div className="flex items-center gap-2">
               <a
                 href={isAuthed ? appUrl("/dashboard") : appUrl("/register")}
-                className="group flex h-10 sm:h-11 items-center gap-2.5 rounded-full bg-slate-900 px-5 sm:px-6 text-xs font-extrabold uppercase tracking-wider text-white transition-all duration-300 hover:bg-slate-800 active:scale-95 shadow-md"
+                className="group flex h-9 sm:h-11 items-center gap-2 sm:gap-2.5 rounded-full bg-slate-900 px-3.5 sm:px-6 text-[11px] sm:text-xs font-extrabold uppercase tracking-wider text-white transition-all duration-300 hover:bg-slate-800 active:scale-95 shadow-md whitespace-nowrap shrink-0"
               >
-                <span>{isAuthed ? "В гараж" : "Открыть гараж"}</span>
-                <div className="flex h-4 w-4 items-center justify-center rounded-full bg-white text-slate-950 transition-transform duration-300 group-hover:rotate-45">
-                  <Plus className="h-3 w-3" />
+                <span>
+                  {isAuthed ? (
+                    "В гараж"
+                  ) : (
+                    <>
+                      <span className="hidden sm:inline">Открыть гараж</span>
+                      <span className="sm:hidden">В гараж</span>
+                    </>
+                  )}
+                </span>
+                <div className="flex h-3.5 w-3.5 sm:h-4 sm:w-4 items-center justify-center rounded-full bg-white text-slate-950 transition-transform duration-300 group-hover:rotate-45 shrink-0">
+                  <Plus className="h-2.5 w-2.5 sm:h-3 sm:w-3" />
                 </div>
               </a>
 
@@ -753,7 +761,7 @@ export function LandingPage() {
                           handleQuickAction(
                             "Подскажи артикул свечей зажигания",
                             "Оригинальные свечи Hyundai/Kia 18846-10060 либо японские NGK 1578 (LZKR6B-10E). Комплект из 4 шт. уже ждет на Автодоке.",
-                            "https://www.autodoc.ru/price/0/1578",
+                            "https://www.autodoc.ru/man/15/part/1578",
                             "Свечи NGK 1578 на Autodoc ↗"
                           )
                         }
@@ -1023,22 +1031,26 @@ export function LandingPage() {
                   <button
                     type="button"
                     onClick={() => setOpenFeatureIdx(isOpen ? "" : feat.idx)}
-                    className="w-full py-8 sm:py-10 flex flex-col md:flex-row md:items-center justify-between text-left group"
+                    className="w-full py-6 sm:py-8 md:py-10 flex items-center justify-between text-left group gap-4"
                   >
-                    <div className="flex items-baseline gap-6 sm:gap-10">
-                      <span className="font-mono text-lg sm:text-2xl font-bold text-slate-400 group-hover:text-slate-950 transition-colors">
+                    <div className="flex items-baseline gap-4 sm:gap-8 md:gap-10 min-w-0 pr-2">
+                      <span className="font-mono text-base sm:text-2xl font-bold text-slate-400 group-hover:text-slate-950 transition-colors shrink-0">
                         {feat.idx}
                       </span>
-                      <h3 className="text-xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight text-slate-950 group-hover:text-slate-700 transition-colors">
+                      <h3 className="text-lg sm:text-2xl md:text-3xl lg:text-4xl font-extrabold tracking-tight text-slate-950 group-hover:text-slate-700 transition-colors">
                         {feat.title}
                       </h3>
                     </div>
 
-                    <div className="flex items-center gap-4 mt-4 md:mt-0 pl-12 md:pl-0">
+                    <div className="flex items-center gap-4 shrink-0">
                       <span className="hidden lg:inline-block text-xs font-mono text-slate-500">
                         {feat.short}
                       </span>
-                      <div className="flex h-10 w-10 items-center justify-center rounded-full border border-slate-300 bg-white text-slate-700 transition-transform duration-300 group-hover:rotate-45 shadow-2xs">
+                      <div
+                        className={`flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-full border border-slate-300 bg-white text-slate-700 transition-transform duration-300 ${
+                          isOpen ? "rotate-45 bg-slate-100" : "group-hover:rotate-45"
+                        } shadow-2xs shrink-0`}
+                      >
                         <Plus className="h-4 w-4" />
                       </div>
                     </div>
