@@ -268,6 +268,30 @@ const battleComparison = [
   },
 ]
 
+// FAQ Data matching Schema.org FAQPage
+const faqList = [
+  {
+    q: "Чем AutoNotes отличается от обычного блокнота или таблицы в Excel?",
+    a: "AutoNotes экономит время: заправку можно записать за 2 секунды в чате с ассистентом Иванычем. Сервис автоматически пересчитывает средний расход топлива, ведет учет одометра, напоминает о регламентном ТО и подбирает проверенные запчасти на Autodoc.ru. Фото чеков сжимаются в формат WebP и не выцветают со временем.",
+  },
+  {
+    q: "Как AI-механик Иваныч помогает экономить на ТО и ремонте?",
+    a: "Иваныч знает карту регламентных работ более 100 мировых марок. Он заранее подскажет, какие расходники пора менять, проверит гаражный склад (чтобы вы не купили фильтр или масло повторно) и предоставит ссылки на оригинальные OEM-артикулы и проверенные аналоги без сервисных наценок.",
+  },
+  {
+    q: "Как AutoNotes помогает продать автомобиль дороже на вторичном рынке?",
+    a: "AutoNotes формирует интерактивный PDF-паспорт и публичную онлайн-страницу автомобиля с прозрачной историей заправок, чеков и заказ-нарядов. Покупатели видят реальный пробег и регулярность ТО, что устраняет торг и повышает ликвидность автомобиля на 10–15%.",
+  },
+  {
+    q: "Нужно ли скачивать приложение из App Store или Google Play?",
+    a: "Нет, AutoNotes работает как прогрессивное веб-приложение (PWA). Вы можете добавить ярлык сервиса на рабочий стол iPhone или Android в один клик прямо из браузера. Приложение поддерживает работу в офлайн-режиме.",
+  },
+  {
+    q: "Сервис AutoNotes платный или бесплатный?",
+    a: "Базовый функционал сервиса, включая учет расходов, одометр, работу с Иванычем и гаражный склад, предоставляется бесплатно.",
+  },
+]
+
 // -------------------------------------------------------------
 // Main Component (Clean Light Aesthetic)
 // -------------------------------------------------------------
@@ -315,6 +339,7 @@ export function LandingPage() {
 
   // Feature accordion open state
   const [openFeatureIdx, setOpenFeatureIdx] = useState<string>("01")
+  const [openFaqIdx, setOpenFaqIdx] = useState<number | null>(0)
 
   // Quick action presets for demo (Smoothly appends without layout shift)
   const handleQuickAction = (text: string, reply: string, link?: string, linkText?: string) => {
@@ -396,17 +421,20 @@ export function LandingPage() {
 
             {/* Center: Navigation Links */}
             <nav className="hidden md:flex items-center gap-1 text-xs font-semibold text-slate-600">
-              <a href="#ivanych" className="rounded-full px-4 py-2 transition-colors hover:bg-slate-100 hover:text-slate-950">
+              <a href="#ivanych" className="rounded-full px-3.5 py-2 transition-colors hover:bg-slate-100 hover:text-slate-950">
                 01 Кейсы
               </a>
-              <a href="#expertise" className="rounded-full px-4 py-2 transition-colors hover:bg-slate-100 hover:text-slate-950">
+              <a href="#expertise" className="rounded-full px-3.5 py-2 transition-colors hover:bg-slate-100 hover:text-slate-950">
                 02 Экспертиза
               </a>
-              <a href="#features" className="rounded-full px-4 py-2 transition-colors hover:bg-slate-100 hover:text-slate-950">
+              <a href="#features" className="rounded-full px-3.5 py-2 transition-colors hover:bg-slate-100 hover:text-slate-950">
                 03 Возможности
               </a>
-              <a href="#battle" className="rounded-full px-4 py-2 transition-colors hover:bg-slate-100 hover:text-slate-950">
+              <a href="#battle" className="rounded-full px-3.5 py-2 transition-colors hover:bg-slate-100 hover:text-slate-950">
                 04 Баттл
+              </a>
+              <a href="#faq" className="rounded-full px-3.5 py-2 transition-colors hover:bg-slate-100 hover:text-slate-950">
+                05 FAQ
               </a>
             </nav>
 
@@ -488,6 +516,14 @@ export function LandingPage() {
                   <span>04 / Баттл: Блокнот vs Excel</span>
                   <ChevronRight className="h-4 w-4 text-slate-400" />
                 </a>
+                <a
+                  href="#faq"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex items-center justify-between text-slate-700 hover:text-slate-950 py-1.5 border-b border-slate-100"
+                >
+                  <span>05 / Частые вопросы (FAQ)</span>
+                  <ChevronRight className="h-4 w-4 text-slate-400" />
+                </a>
                 <div className="pt-2">
                   <Link
                     to={isAuthed ? "/dashboard" : "/register"}
@@ -566,8 +602,9 @@ export function LandingPage() {
             
             <FadeUp delay={0.4} className="mt-8 flex flex-col sm:flex-row sm:items-center gap-6 max-w-3xl">
               <p className="text-base sm:text-xl text-slate-600 leading-relaxed font-normal">
-                Забудьте о блокнотах и громоздких таблицах. Фиксируйте заправки за 2 секунды текстом в чате, 
-                находите проверенные запчасти со ссылками на Автодок и держите регламент под контролем.
+                Умный онлайн-учет расходов на автомобиль, электронная сервисная книжка и контроль ТО. 
+                Фиксируйте заправки за 2 секунды текстом в чате с Иванычем, находите проверенные запчасти 
+                со ссылками на Автодок и сохраняйте чеки навсегда.
               </p>
               <div className="shrink-0">
                 <Link
@@ -1219,6 +1256,80 @@ export function LandingPage() {
       </section>
 
       {/* ============================================================ */}
+      {/* 05 / SECTION 5: [ 5 ] ЧАСТЫЕ ВОПРОСЫ (FAQ)                 */}
+      {/* ============================================================ */}
+      <section id="faq" className="py-24 sm:py-36 border-t border-slate-200">
+        <div className="w-full max-w-[1720px] mx-auto px-6 sm:px-10 md:px-14 lg:px-16">
+          
+          <FadeUp>
+            <div className="flex items-center gap-4 mb-6">
+              <div className="flex h-12 w-12 items-center justify-center rounded-xl border border-slate-300 bg-white font-mono text-lg font-bold text-slate-950 shadow-sm">
+                5
+              </div>
+              <span className="text-xs uppercase font-mono tracking-widest text-slate-500 font-semibold">
+                ЧАСТЫЕ ВОПРОСЫ
+              </span>
+            </div>
+          </FadeUp>
+
+          <TextReveal delay={0.1}>
+            <h2 className="text-3xl sm:text-5xl lg:text-7xl font-black tracking-[-0.04em] text-slate-950 uppercase max-w-5xl leading-[1.05]">
+              ОТВЕТЫ НА ПОПУЛЯРНЫЕ ВОПРОСЫ ОБ AUTONOTES И ИВАНЫЧЕ
+            </h2>
+          </TextReveal>
+
+          <div className="mt-16 sm:mt-24 border-t border-slate-200">
+            {faqList.map((item, idx) => {
+              const isOpen = openFaqIdx === idx
+              return (
+                <div key={idx} className="border-b border-slate-200 transition-colors">
+                  <button
+                    type="button"
+                    onClick={() => setOpenFaqIdx(isOpen ? null : idx)}
+                    className="w-full py-6 sm:py-8 flex items-center justify-between text-left group gap-4"
+                  >
+                    <div className="flex items-baseline gap-4 sm:gap-8 min-w-0 pr-2">
+                      <span className="font-mono text-sm sm:text-lg font-bold text-slate-400 group-hover:text-slate-950 transition-colors shrink-0">
+                        {String(idx + 1).padStart(2, "0")}
+                      </span>
+                      <h3 className="text-base sm:text-xl md:text-2xl font-bold tracking-tight text-slate-950 group-hover:text-slate-700 transition-colors">
+                        {item.q}
+                      </h3>
+                    </div>
+
+                    <div
+                      className={`flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-full border border-slate-300 bg-white text-slate-700 transition-transform duration-300 ${
+                        isOpen ? "rotate-45 bg-slate-100" : "group-hover:rotate-45"
+                      } shadow-2xs shrink-0`}
+                    >
+                      <Plus className="h-4 w-4" />
+                    </div>
+                  </button>
+
+                  <AnimatePresence>
+                    {isOpen && (
+                      <motion.div
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: "auto" }}
+                        exit={{ opacity: 0, height: 0 }}
+                        transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+                        className="overflow-hidden"
+                      >
+                        <div className="pb-8 pl-8 sm:pl-16 max-w-4xl text-sm sm:text-base text-slate-600 leading-relaxed font-normal">
+                          {item.a}
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+              )
+            })}
+          </div>
+
+        </div>
+      </section>
+
+      {/* ============================================================ */}
       {/* 06 / MONUMENTAL CONTRAST CTA BANNER & CLEAN LIGHT FOOTER     */}
       {/* ============================================================ */}
       <footer id="contacts" className="pt-20 pb-16 border-t border-slate-200 relative overflow-hidden bg-white">
@@ -1229,7 +1340,7 @@ export function LandingPage() {
             <div className="relative z-10 max-w-4xl">
               <TextReveal>
                 <div className="text-xs font-mono uppercase tracking-widest text-amber-400 mb-4 font-semibold">
-                  [ 05 / СТАРТ РАБОТЫ ]
+                  [ 06 / СТАРТ РАБОТЫ ]
                 </div>
               </TextReveal>
               <TextReveal delay={0.1}>
@@ -1273,8 +1384,11 @@ export function LandingPage() {
                 <span>AutoNotes</span>
               </div>
               <p className="text-slate-500 text-xs leading-relaxed max-w-md">
-                Цифровой гараж и бортовой ассистент автолюбителя. Учет расходов, регламент ТО, склад запчастей и сезонный контроль шин.
+                Цифровой гараж и бортовой ассистент автолюбителя. Учет расходов на автомобиль, регламент ТО, склад запчастей и сезонный контроль шин.
               </p>
+              <div className="text-xs text-slate-400">
+                Поддержка: <a href="mailto:support@auto-notes.ru" className="text-slate-600 hover:text-slate-950 underline">support@auto-notes.ru</a>
+              </div>
             </div>
 
             {/* Col 2: Navigation */}
@@ -1299,6 +1413,11 @@ export function LandingPage() {
                 <li>
                   <a href="#battle" className="hover:text-slate-950 transition-colors">
                     04 / Честный Баттл
+                  </a>
+                </li>
+                <li>
+                  <a href="#faq" className="hover:text-slate-950 transition-colors">
+                    05 / Частые вопросы (FAQ)
                   </a>
                 </li>
               </ul>

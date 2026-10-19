@@ -1,0 +1,66 @@
+# robots.txt for https://auto-notes.ru
+
+User-agent: Yandex
+Allow: /$
+Allow: /assets/
+Allow: /icons/
+Allow: /avatars/
+Allow: /*.js$
+Allow: /*.css$
+Allow: /*.png$
+Allow: /*.jpg$
+Allow: /*.jpeg$
+Allow: /*.webp$
+Allow: /*.svg$
+Disallow: /dashboard
+Disallow: /vehicles/
+Disallow: /profile
+Disallow: /admin
+Disallow: /verify
+Disallow: /report/
+Disallow: /login
+Disallow: /register
+Disallow: /api/
+Disallow: /*?*token=
+Clean-param: utm_source&utm_medium&utm_campaign&utm_content&utm_term&yclid&gclid /
+
+User-agent: Googlebot
+Allow: /$
+Allow: /assets/
+Allow: /icons/
+Allow: /avatars/
+Allow: /*.js$
+Allow: /*.css$
+Allow: /*.png$
+Allow: /*.jpg$
+Allow: /*.jpeg$
+Allow: /*.webp$
+Allow: /*.svg$
+Disallow: /dashboard
+Disallow: /vehicles/
+Disallow: /profile
+Disallow: /admin
+Disallow: /verify
+Disallow: /report/
+Disallow: /login
+Disallow: /register
+Disallow: /api/
+Disallow: /*?*token=
+
+User-agent: *
+Allow: /$
+Allow: /assets/
+Allow: /icons/
+Allow: /avatars/
+Disallow: /dashboard
+Disallow: /vehicles/
+Disallow: /profile
+Disallow: /admin
+Disallow: /verify
+Disallow: /report/
+Disallow: /login
+Disallow: /register
+Disallow: /api/
+
+Sitemap: https://auto-notes.ru/sitemap.xml
+Host: https://auto-notes.ru
