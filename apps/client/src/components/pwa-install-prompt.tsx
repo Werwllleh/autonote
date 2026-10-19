@@ -11,7 +11,16 @@ interface BeforeInstallPromptEvent extends Event {
   prompt(): Promise<void>
 }
 
+function isMobileDevice(): boolean {
+  if (typeof window === "undefined") return false
+  const ua = window.navigator.userAgent.toLowerCase()
+  const isMobileUA = /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(ua)
+  const isIPadOS = navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1
+  return isMobileUA || isIPadOS
+}
+
 export function PwaInstallPrompt() {
+  const [isMobile, setIsMobile] = useState(false)
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null)
   const [isStandalone, setIsStandalone] = useState(false)
   const [isVisible, setIsVisible] = useState(false)
@@ -20,6 +29,12 @@ export function PwaInstallPrompt() {
   const [isInstalled, setIsInstalled] = useState(false)
 
   useEffect(() => {
+    // 0. Only show on mobile devices (smartphones and tablets)
+    if (!isMobileDevice()) {
+      return
+    }
+    setIsMobile(true)
+
     // 1. Check if app is already running in standalone PWA mode
     const checkStandalone = () => {
       const isStandaloneMode =
@@ -35,7 +50,7 @@ export function PwaInstallPrompt() {
 
     // 2. Platform detection
     const ua = window.navigator.userAgent.toLowerCase()
-    const ios = /iphone|ipad|ipod/.test(ua)
+    const ios = /iphone|ipad|ipod/.test(ua) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1)
     const android = /android/.test(ua)
     setIsIOS(ios)
 
@@ -103,7 +118,7 @@ export function PwaInstallPrompt() {
     }
   }
 
-  if (isStandalone || isInstalled) {
+  if (!isMobile || isStandalone || isInstalled) {
     return null
   }
 
