@@ -10,6 +10,10 @@ async function bootstrap() {
       'http://localhost:5173',
       'https://my.auto-notes.ru',
       'http://my.auto-notes.ru',
+      'https://auto-notes.ru',
+      'http://auto-notes.ru',
+      'https://www.auto-notes.ru',
+      'http://www.auto-notes.ru',
     ],
   });
   app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));

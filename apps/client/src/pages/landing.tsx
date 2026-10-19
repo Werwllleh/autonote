@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react"
-import { Navigate } from "react-router-dom"
+import { Navigate, Link } from "react-router-dom"
 import { motion, AnimatePresence } from "framer-motion"
 import {
   Fuel,
@@ -18,16 +18,14 @@ import {
 } from "lucide-react"
 import { useAuthStore } from "@/lib/auth-store"
 
-const APP_DOMAIN = "my.auto-notes.ru"
+const isStandalone =
+  typeof window !== "undefined" &&
+  (window.matchMedia("(display-mode: standalone)").matches ||
+    (window.navigator as unknown as { standalone?: boolean }).standalone === true)
 
 function isAppDomain() {
   const h = window.location.hostname
-  return h === APP_DOMAIN || h === "localhost" || h === "127.0.0.1"
-}
-
-function appUrl(path: string) {
-  if (isAppDomain()) return path
-  return `https://${APP_DOMAIN}${path}`
+  return h === "my.auto-notes.ru" || h === "localhost" || h === "127.0.0.1"
 }
 
 // -------------------------------------------------------------
@@ -363,8 +361,8 @@ export function LandingPage() {
   // Mobile menu state
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
-  // Redirect if logged in on app domain
-  if (isAuthed && isAppDomain()) {
+  // Redirect to dashboard if logged in inside installed standalone PWA or on app domain
+  if (isAuthed && (isStandalone || isAppDomain())) {
     return <Navigate to="/dashboard" replace />
   }
 
@@ -414,8 +412,8 @@ export function LandingPage() {
 
             {/* Right: Action Button & Mobile toggle */}
             <div className="flex items-center gap-2">
-              <a
-                href={isAuthed ? appUrl("/dashboard") : appUrl("/register")}
+              <Link
+                to={isAuthed ? "/dashboard" : "/register"}
                 className="group flex h-9 sm:h-11 items-center gap-2 sm:gap-2.5 rounded-full bg-slate-900 px-3.5 sm:px-6 text-[11px] sm:text-xs font-extrabold uppercase tracking-wider text-white transition-all duration-300 hover:bg-slate-800 active:scale-95 shadow-md whitespace-nowrap shrink-0"
               >
                 <span>
@@ -431,7 +429,7 @@ export function LandingPage() {
                 <div className="flex h-3.5 w-3.5 sm:h-4 sm:w-4 items-center justify-center rounded-full bg-white text-slate-950 transition-transform duration-300 group-hover:rotate-45 shrink-0">
                   <Plus className="h-2.5 w-2.5 sm:h-3 sm:w-3" />
                 </div>
-              </a>
+              </Link>
 
               {/* Mobile Menu trigger */}
               <button
@@ -491,12 +489,13 @@ export function LandingPage() {
                   <ChevronRight className="h-4 w-4 text-slate-400" />
                 </a>
                 <div className="pt-2">
-                  <a
-                    href={isAuthed ? appUrl("/dashboard") : appUrl("/register")}
+                  <Link
+                    to={isAuthed ? "/dashboard" : "/register"}
+                    onClick={() => setMobileMenuOpen(false)}
                     className="flex h-11 w-full items-center justify-center rounded-full bg-slate-900 text-xs font-bold uppercase tracking-wider text-white shadow-md"
                   >
                     {isAuthed ? "Перейти в гараж" : "Открыть гараж бесплатно"}
-                  </a>
+                  </Link>
                 </div>
               </div>
             </motion.div>
@@ -571,13 +570,13 @@ export function LandingPage() {
                 находите проверенные запчасти со ссылками на Автодок и держите регламент под контролем.
               </p>
               <div className="shrink-0">
-                <a
-                  href={isAuthed ? appUrl("/dashboard") : appUrl("/register")}
+                <Link
+                  to={isAuthed ? "/dashboard" : "/register"}
                   className="inline-flex h-14 items-center gap-3 rounded-full bg-slate-950 px-8 text-xs font-bold uppercase tracking-wider text-white transition-all duration-300 hover:bg-slate-800 active:scale-95 shadow-xl"
                 >
-                  <span>Начать бесплатно</span>
+                  <span>{isAuthed ? "В гараж" : "Начать бесплатно"}</span>
                   <ArrowRight className="h-4 w-4" />
-                </a>
+                </Link>
               </div>
             </FadeUp>
           </div>
@@ -1199,13 +1198,13 @@ export function LandingPage() {
                 </div>
 
                 <div className="mt-8 pt-6 border-t border-slate-100">
-                  <a
-                    href={isAuthed ? appUrl("/dashboard") : appUrl("/register")}
+                  <Link
+                    to={isAuthed ? "/dashboard" : "/register"}
                     className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-slate-950 text-xs font-extrabold uppercase tracking-wider text-white transition-transform hover:scale-[1.02] active:scale-95 shadow-md"
                   >
                     <span>Выбрать AutoNotes</span>
                     <ArrowRight className="h-4 w-4" />
-                  </a>
+                  </Link>
                 </div>
 
               </div>
@@ -1241,15 +1240,15 @@ export function LandingPage() {
               </FadeUp>
 
               <FadeUp delay={0.3} className="mt-10 flex flex-wrap items-center gap-4">
-                <a
-                  href={isAuthed ? appUrl("/dashboard") : appUrl("/register")}
+                <Link
+                  to={isAuthed ? "/dashboard" : "/register"}
                   className="group flex h-16 items-center gap-4 rounded-full bg-white px-9 text-xs sm:text-sm font-extrabold uppercase tracking-wider text-slate-950 transition-all hover:bg-slate-100 active:scale-95 shadow-2xl"
                 >
                   <span>{isAuthed ? "Перейти в гараж" : "Запустить гараж с Иванычем"}</span>
                   <div className="flex h-6 w-6 items-center justify-center rounded-full bg-slate-950 text-white transition-transform group-hover:rotate-45">
                     <Plus className="h-4 w-4" />
                   </div>
-                </a>
+                </Link>
               </FadeUp>
             </div>
 
