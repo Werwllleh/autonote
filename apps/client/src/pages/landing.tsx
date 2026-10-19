@@ -96,18 +96,18 @@ const caseProjects = [
     num: "01",
     tag: "БОЛЬШОЕ ТО / 160 000 КМ",
     car: "KIA Rio III (Рестайлинг) 1.6 MT",
-    headline: "Своевременный расчет интервала масла и заказ свечей NGK без переплат",
+    headline: "Расчет регламента ТО и заказ свечей NGK без переплат",
     savings: "14 500 ₽",
     metrics: [
       { label: "Точность подбора", value: "100%" },
       { label: "Экономия времени", value: "3 часа" },
       { label: "Артикулы Autodoc", value: "OEM Direct" },
     ],
-    badges: ["Рейтинг Рунета x1", "OEM Спецификация", "Autodoc Link"],
+    badges: ["Регламент 160 000 км", "OEM Спецификация", "Autodoc Direct"],
     dialog: {
       user: "Иваныч, пробег 159 400 км. Что по регламенту делать?",
       assistant:
-        "До замены моторного масла и фильтра осталось ровно 600 км. Также пора менять свечи зажигания (крайний раз меняли на 120 000 км). Подобрал оригинал Hyundai/Kia 18846-10060 и аналог NGK 1578. Кстати, фильтр Mann W81180 уже лежит у тебя в гараже — не покупай!",
+        "До замены моторного масла осталось 600 км. Пора менять свечи зажигания. Подобрал оригинал Hyundai/Kia 18846-10060 и аналог NGK 1578. Масляный фильтр Mann W81180 уже лежит на твоем складе в гараже!",
     },
     partLink: "https://www.autodoc.ru/man/647/part/1884610060",
   },
@@ -115,18 +115,18 @@ const caseProjects = [
     num: "02",
     tag: "НЕМЕЦКИЙ ДОПУСК / BMW LL-04",
     car: "BMW 320d G20 xDrive (B47)",
-    headline: "Строгий контроль допусков масел и подбор спортивных колодок Brembo",
+    headline: "Строгий контроль допусков масел и подбор колодок Brembo",
     savings: "28 000 ₽",
     metrics: [
       { label: "Допуск масла", value: "BMW LL-04" },
       { label: "Склад гаража", value: "1 фильтр в наличии" },
       { label: "Сохранность гарантии", value: "100%" },
     ],
-    badges: ["Tagline Awards x2", "Brembo Racing", "Гаражный склад"],
+    badges: ["Допуск BMW LL-04", "Brembo Ceramic", "Гаражный склад"],
     dialog: {
       user: "Какие передние колодки взять, чтобы не скрипели и не пылили?",
       assistant:
-        "Для твоих тормозов 348мм рекомендую комплект Brembo P06106 (с керамическим наполнителем) или оригинальные 34106888459. Датчик износа 34356870351 тоже добавь в заказ на Автодоке.",
+        "Для твоих тормозов 348мм рекомендую комплект Brembo P06106 с керамикой либо оригинальные 34106888459. Датчик износа 34356870351 тоже добавлен в быстрый заказ на Автодоке.",
     },
     partLink: "https://www.autodoc.ru/man/511/part/34106888459",
   },
@@ -134,18 +134,18 @@ const caseProjects = [
     num: "03",
     tag: "НОВЫЙ АВТО / ГАРАНТИЯ ДИЛЕРА",
     car: "Geely Monjaro 2.0T 4WD",
-    headline: "Скан заказ-нарядов с камеры и сохранение всех чеков в WebP",
+    headline: "Скан заказ-нарядов с камеры и сохранение чеков в WebP",
     savings: "19 200 ₽",
     metrics: [
       { label: "Оцифровка чека", value: "1.2 сек" },
       { label: "Формат фото", value: "WebP 1600px" },
       { label: "Статус при продаже", value: "+15% к цене" },
     ],
-    badges: ["Золотой сайт x1", "Безопасное хранилище", "WebP Фото"],
+    badges: ["Скан заказ-наряда", "Безопасное хранилище", "WebP Фото"],
     dialog: {
       user: "Зафиксируй нулевое ТО у дилера на 25 400 руб, прикрепил фото заказ-наряда",
       assistant:
-        "Расход успешно внесен: ТО-0 на 25 400 ₽. Фото заказ-наряда сжато в WebP без потери четкости печатей и привязано к истории. Одометр зафиксирован: 5 120 км.",
+        "Расход успешно внесен: ТО на 25 400 ₽. Фото заказ-наряда сжато в WebP без потери четкости печатей и привязано к истории авто. Одометр зафиксирован: 5 120 км.",
     },
     partLink: "https://www.autodoc.ru",
   },
@@ -588,22 +588,27 @@ export function LandingPage() {
               
               {/* Header inside showcase */}
               <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-6 border-b border-slate-100 gap-4">
-                <div className="flex items-center gap-3">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-slate-100 border border-slate-200 text-slate-800">
+                <div className="flex items-center gap-3 min-w-0">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-slate-100 border border-slate-200 text-slate-800 shrink-0">
                     <Sparkles className="h-5 w-5 text-amber-500" />
                   </div>
-                  <div>
-                    <div className="text-xs uppercase tracking-wider text-slate-500 font-mono font-semibold">
+                  <div className="min-w-0">
+                    <div className="text-[11px] sm:text-xs uppercase tracking-wider text-slate-500 font-mono font-semibold">
                       БОРТОВОЙ КОМПЬЮТЕР И ДИАЛОГ С ИВАНЫЧЕМ
                     </div>
-                    <div className="text-base sm:text-lg font-bold text-slate-950 flex items-center gap-2">
-                      <span>KIA Rio III Рестайлинг 1.6 MT</span>
-                      <span className="text-xs font-normal text-slate-400 font-mono">| Одометр: 159 400 км</span>
+                    <div className="mt-0.5 flex flex-wrap sm:flex-nowrap items-baseline gap-x-2.5 gap-y-1">
+                      <span className="text-sm sm:text-lg font-bold text-slate-950">
+                        KIA Rio III Рестайлинг 1.6 MT
+                      </span>
+                      <span className="text-xs font-semibold text-slate-500 font-mono whitespace-nowrap shrink-0">
+                        <span className="hidden sm:inline text-slate-300 mr-2">|</span>
+                        Одометр: 159&nbsp;400&nbsp;км
+                      </span>
                     </div>
                   </div>
                 </div>
 
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 shrink-0">
                   <span className="inline-flex items-center gap-2 rounded-full border border-emerald-300 bg-emerald-50 px-3 py-1 text-xs font-mono text-emerald-700 font-medium">
                     <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
                     РЕГЛАМЕНТ АКТИВЕН
@@ -619,19 +624,19 @@ export function LandingPage() {
                   
                   {/* Oil Gauge */}
                   <div className="rounded-2xl border border-slate-200 bg-slate-50/90 p-5 shadow-sm">
-                    <div className="flex items-center justify-between text-xs text-slate-700 mb-3">
-                      <span className="flex items-center gap-2 font-mono uppercase tracking-wider font-semibold">
-                        <Fuel className="h-4 w-4 text-amber-500" />
+                    <div className="flex items-center justify-between text-xs text-slate-700 mb-3 gap-2">
+                      <span className="flex items-center gap-2 font-mono uppercase tracking-wider font-semibold truncate">
+                        <Fuel className="h-4 w-4 text-amber-500 shrink-0" />
                         Моторное масло 5W-30
                       </span>
-                      <span className="font-mono text-amber-600 font-bold">Осталось 600 км</span>
+                      <span className="font-mono text-amber-600 font-bold whitespace-nowrap shrink-0">Осталось 600&nbsp;км</span>
                     </div>
                     <div className="h-2.5 w-full rounded-full bg-slate-200 overflow-hidden">
                       <div className="h-full bg-amber-500 rounded-full" style={{ width: "94%" }} />
                     </div>
                     <div className="flex justify-between text-[11px] text-slate-500 font-mono mt-2">
-                      <span>Замена: 150 000 км</span>
-                      <span>Регламент: 160 000 км</span>
+                      <span className="whitespace-nowrap">Замена: 150&nbsp;000&nbsp;км</span>
+                      <span className="whitespace-nowrap">Регламент: 160&nbsp;000&nbsp;км</span>
                     </div>
                   </div>
 
@@ -817,7 +822,7 @@ export function LandingPage() {
 
           <TextReveal delay={0.1}>
             <h2 className="text-3xl sm:text-5xl lg:text-7xl font-black tracking-[-0.04em] text-slate-950 uppercase max-w-5xl leading-[1.05]">
-              ОРИЕНТИРОВАНЫ НА РЕЗУЛЬТАТ И ДОКАЗЫВАЕМ ЭТО НА ВАШЕМ АВТО
+              РЕАЛЬНЫЕ СЦЕНАРИИ И ЭКОНОМИЯ НА ОБСЛУЖИВАНИИ АВТО
             </h2>
           </TextReveal>
 
@@ -829,55 +834,53 @@ export function LandingPage() {
           {/* Large Project Showcase Cards */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mt-16 sm:mt-20">
             {caseProjects.map((project, idx) => (
-              <FadeUp key={idx} delay={0.15 * idx} className="h-full">
-                <div className="group h-full flex flex-col justify-between rounded-3xl border border-slate-200/90 bg-white p-8 sm:p-10 transition-all duration-500 hover:border-slate-300 hover:shadow-[0_16px_40px_rgba(0,0,0,0.06)] shadow-sm">
+              <FadeUp key={idx} delay={0.15 * idx} className="h-full flex flex-col">
+                <div className="group h-full flex flex-col rounded-3xl border border-slate-200/90 bg-white p-7 sm:p-9 transition-all duration-500 hover:border-slate-300 hover:shadow-[0_16px_40px_rgba(0,0,0,0.06)] shadow-sm">
                   
-                  <div>
-                    {/* Top Row: Number & Tag */}
-                    <div className="flex items-center justify-between pb-6 border-b border-slate-100">
-                      <span className="font-mono text-2xl font-black text-slate-300 group-hover:text-slate-900 transition-colors">
-                        {project.num}
+                  {/* Top Row: Number & Tag */}
+                  <div className="flex items-center justify-between pb-5 border-b border-slate-100 shrink-0">
+                    <span className="font-mono text-2xl font-black text-slate-300 group-hover:text-slate-900 transition-colors">
+                      {project.num}
+                    </span>
+                    <span className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-[11px] font-mono text-slate-600 font-semibold">
+                      {project.tag}
+                    </span>
+                  </div>
+
+                  {/* Car Model & Headline (Strict min-height ensures identical start for badges) */}
+                  <div className="mt-5 min-h-[4.75rem] sm:min-h-[5.25rem] flex flex-col justify-start shrink-0">
+                    <div className="text-xs font-mono uppercase tracking-wider text-amber-600 font-bold">
+                      {project.car}
+                    </div>
+                    <h3 className="text-lg sm:text-xl font-bold text-slate-950 tracking-tight mt-1.5 leading-snug">
+                      {project.headline}
+                    </h3>
+                  </div>
+
+                  {/* Badges List (Consistent height aligns start of dialogue box) */}
+                  <div className="mt-4 min-h-[2.25rem] flex flex-wrap items-center gap-1.5 shrink-0">
+                    {project.badges.map((b, bIdx) => (
+                      <span
+                        key={bIdx}
+                        className="rounded-full bg-slate-50 border border-slate-200 px-3 py-1 text-[11px] font-mono text-slate-700 font-medium whitespace-nowrap"
+                      >
+                        {b}
                       </span>
-                      <span className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-[11px] font-mono text-slate-600 font-medium">
-                        {project.tag}
-                      </span>
-                    </div>
+                    ))}
+                  </div>
 
-                    {/* Car Model & Headline */}
-                    <div className="mt-6">
-                      <div className="text-xs font-mono uppercase tracking-wider text-amber-600 font-bold">
-                        {project.car}
-                      </div>
-                      <h3 className="text-xl sm:text-2xl font-bold text-slate-950 tracking-tight mt-2 leading-snug">
-                        {project.headline}
-                      </h3>
+                  {/* Dialog Sample (flex-1 expands evenly across all cards) */}
+                  <div className="mt-6 flex-1 rounded-2xl border border-slate-200 bg-slate-50 p-5 flex flex-col justify-between">
+                    <div className="text-xs text-slate-500 pb-3">
+                      <span className="font-bold text-slate-900">Владелец:</span> «{project.dialog.user}»
                     </div>
-
-                    {/* Badges List */}
-                    <div className="flex flex-wrap gap-2 mt-6">
-                      {project.badges.map((b, bIdx) => (
-                        <span
-                          key={bIdx}
-                          className="rounded-full bg-slate-50 border border-slate-200 px-3 py-1 text-xs text-slate-700 font-medium"
-                        >
-                          {b}
-                        </span>
-                      ))}
-                    </div>
-
-                    {/* Dialog Sample */}
-                    <div className="mt-8 rounded-2xl border border-slate-200 bg-slate-50 p-5 space-y-3">
-                      <div className="text-xs text-slate-500">
-                        <span className="font-bold text-slate-900">Владелец:</span> «{project.dialog.user}»
-                      </div>
-                      <div className="text-xs text-slate-800 leading-relaxed border-t border-slate-200/80 pt-3">
-                        <span className="font-bold text-amber-600">Иваныч:</span> {project.dialog.assistant}
-                      </div>
+                    <div className="text-xs text-slate-800 leading-relaxed border-t border-slate-200/80 pt-3">
+                      <span className="font-bold text-amber-600">Иваныч:</span> {project.dialog.assistant}
                     </div>
                   </div>
 
-                  {/* Bottom Metrics & Action */}
-                  <div className="mt-8 pt-6 border-t border-slate-100 flex items-center justify-between">
+                  {/* Bottom Metrics & Action (Anchored to footer line across all columns) */}
+                  <div className="mt-6 pt-5 border-t border-slate-100 flex items-center justify-between shrink-0">
                     <div>
                       <div className="text-[10px] uppercase font-mono text-slate-400 font-semibold">ЭКОНОМИЯ НА ТО</div>
                       <div className="text-2xl font-black font-mono text-emerald-600">{project.savings}</div>
@@ -886,7 +889,7 @@ export function LandingPage() {
                       href={project.partLink}
                       target="_blank"
                       rel="noreferrer"
-                      className="flex h-11 w-11 items-center justify-center rounded-full bg-slate-100 text-slate-700 transition-all group-hover:bg-slate-900 group-hover:text-white"
+                      className="flex h-11 w-11 items-center justify-center rounded-full bg-slate-100 text-slate-700 transition-all group-hover:bg-slate-900 group-hover:text-white shadow-2xs"
                       aria-label="Прямая ссылка"
                     >
                       <ArrowUpRight className="h-5 w-5" />
@@ -926,32 +929,32 @@ export function LandingPage() {
 
           {/* Metric Counters Grid */}
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 mt-16 sm:mt-20">
-            <FadeUp delay={0.1}>
-              <div className="rounded-3xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm">
+            <FadeUp delay={0.1} className="h-full flex flex-col">
+              <div className="h-full flex flex-col justify-between rounded-3xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm">
                 <div className="text-4xl sm:text-6xl font-black font-mono text-slate-950">24/7</div>
                 <div className="text-xs sm:text-sm text-slate-600 mt-3 font-medium">
                   Иваныч на связи без очередей, выходных и перерывов
                 </div>
               </div>
             </FadeUp>
-            <FadeUp delay={0.2}>
-              <div className="rounded-3xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm">
+            <FadeUp delay={0.2} className="h-full flex flex-col">
+              <div className="h-full flex flex-col justify-between rounded-3xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm">
                 <div className="text-4xl sm:text-6xl font-black font-mono text-slate-950">2 сек</div>
                 <div className="text-xs sm:text-sm text-slate-600 mt-3 font-medium">
                   На фиксацию заправки или сервиса одной строкой в чате
                 </div>
               </div>
             </FadeUp>
-            <FadeUp delay={0.3}>
-              <div className="rounded-3xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm">
+            <FadeUp delay={0.3} className="h-full flex flex-col">
+              <div className="h-full flex flex-col justify-between rounded-3xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm">
                 <div className="text-4xl sm:text-6xl font-black font-mono text-emerald-600">0 ₽</div>
                 <div className="text-xs sm:text-sm text-slate-600 mt-3 font-medium">
                   Переплат за ненужные навязанные работы в автосервисах
                 </div>
               </div>
             </FadeUp>
-            <FadeUp delay={0.4}>
-              <div className="rounded-3xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm">
+            <FadeUp delay={0.4} className="h-full flex flex-col">
+              <div className="h-full flex flex-col justify-between rounded-3xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm">
                 <div className="text-4xl sm:text-6xl font-black font-mono text-slate-950">100%</div>
                 <div className="text-xs sm:text-sm text-slate-600 mt-3 font-medium">
                   Конфиденциальность чеков и привязка к вашему гаражу
@@ -1117,7 +1120,7 @@ export function LandingPage() {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mt-16 sm:mt-24">
             
             {/* Card 1: Paper Notebook */}
-            <FadeUp delay={0.1}>
+            <FadeUp delay={0.1} className="h-full flex flex-col">
               <div className="h-full rounded-3xl border border-slate-200 bg-slate-50/90 p-8 flex flex-col justify-between opacity-85 hover:opacity-100 transition-opacity shadow-2xs">
                 <div>
                   <div className="flex items-center justify-between pb-6 border-b border-slate-200">
@@ -1137,14 +1140,14 @@ export function LandingPage() {
                     ))}
                   </div>
                 </div>
-                <div className="mt-8 pt-6 border-t border-slate-200 text-xs text-slate-500 font-mono">
+                <div className="mt-8 pt-6 border-t border-slate-200 min-h-[4.5rem] flex items-center text-xs text-slate-500 font-mono">
                   Итог: чеки выцветают, одометр забывается
                 </div>
               </div>
             </FadeUp>
 
             {/* Card 2: Excel Spreadsheet */}
-            <FadeUp delay={0.2}>
+            <FadeUp delay={0.2} className="h-full flex flex-col">
               <div className="h-full rounded-3xl border border-slate-200 bg-slate-50/90 p-8 flex flex-col justify-between opacity-85 hover:opacity-100 transition-opacity shadow-2xs">
                 <div>
                   <div className="flex items-center justify-between pb-6 border-b border-slate-200">
@@ -1164,14 +1167,14 @@ export function LandingPage() {
                     ))}
                   </div>
                 </div>
-                <div className="mt-8 pt-6 border-t border-slate-200 text-xs text-slate-500 font-mono">
+                <div className="mt-8 pt-6 border-t border-slate-200 min-h-[4.5rem] flex items-center text-xs text-slate-500 font-mono">
                   Итог: 80% водителей бросают вести через 2 месяца
                 </div>
               </div>
             </FadeUp>
 
             {/* Card 3: AutoNotes Dominator */}
-            <FadeUp delay={0.3}>
+            <FadeUp delay={0.3} className="h-full flex flex-col">
               <div className="h-full rounded-3xl border-2 border-slate-950 bg-white p-8 flex flex-col justify-between shadow-[0_20px_50px_rgba(0,0,0,0.08)] relative overflow-hidden">
                 <div>
                   <div className="flex items-center justify-between pb-6 border-b border-slate-100">
@@ -1197,7 +1200,7 @@ export function LandingPage() {
                   </div>
                 </div>
 
-                <div className="mt-8 pt-6 border-t border-slate-100">
+                <div className="mt-8 pt-6 border-t border-slate-100 min-h-[4.5rem] flex items-center">
                   <Link
                     to={isAuthed ? "/dashboard" : "/register"}
                     className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-slate-950 text-xs font-extrabold uppercase tracking-wider text-white transition-transform hover:scale-[1.02] active:scale-95 shadow-md"
