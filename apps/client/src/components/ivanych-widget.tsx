@@ -28,19 +28,45 @@ export function IvanychWidget({ vehicle }: IvanychWidgetProps) {
   const [isExpanded, setIsExpanded] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
+  const messagesContainerRef = useRef<HTMLDivElement>(null)
+  const prevOpenRef = useRef(false)
 
   const { data: messages = [], isLoading } = useAssistantMessages(vehicle.id)
   const sendMutation = useSendAssistantMessage(vehicle.id)
   const clearMutation = useClearAssistantMessages(vehicle.id)
 
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
+  const scrollToBottom = (instant = false) => {
+    if (messagesContainerRef.current) {
+      if (instant) {
+        messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight
+      } else {
+        messagesContainerRef.current.scrollTo({
+          top: messagesContainerRef.current.scrollHeight,
+          behavior: "smooth",
+        })
+      }
+    } else {
+      messagesEndRef.current?.scrollIntoView({ behavior: instant ? "instant" : "smooth" })
+    }
   }
 
   useEffect(() => {
     if (isOpen) {
-      scrollToBottom()
+      const isJustOpened = !prevOpenRef.current
+      prevOpenRef.current = true
+
+      if (isJustOpened) {
+        // Instant jump to the bottom so user immediately sees latest messages without animated scrolling down
+        scrollToBottom(true)
+        requestAnimationFrame(() => scrollToBottom(true))
+        setTimeout(() => scrollToBottom(true), 50)
+      } else {
+        // Smooth scroll for new incoming messages while dialog is already open
+        scrollToBottom(false)
+      }
       setTimeout(() => textareaRef.current?.focus(), 150)
+    } else {
+      prevOpenRef.current = false
     }
   }, [isOpen, messages, sendMutation.isPending])
 
@@ -124,13 +150,15 @@ export function IvanychWidget({ vehicle }: IvanychWidgetProps) {
           {/* Header */}
           <div className="flex items-center justify-between px-4 py-3 border-b bg-muted/40 backdrop-blur shrink-0">
             <div className="flex items-center gap-3">
-              <div className="relative h-10 w-10 shrink-0 rounded-full overflow-hidden border border-border">
-                <img
-                  src="/avatars/ivanych.webp"
-                  alt="Иваныч"
-                  className="h-full w-full object-cover"
-                />
-                <span className="absolute bottom-0 right-0 h-2.5 w-2.5 rounded-full bg-emerald-500 ring-1 ring-background" />
+              <div className="relative shrink-0">
+                <div className="h-10 w-10 rounded-full overflow-hidden border border-border bg-muted">
+                  <img
+                    src="/avatars/ivanych.webp"
+                    alt="Иваныч"
+                    className="h-full w-full object-cover"
+                  />
+                </div>
+                <span className="absolute bottom-0 right-0 h-3 w-3 rounded-full bg-emerald-500 border-2 border-background ring-1 ring-emerald-400" />
               </div>
               <div className="min-w-0">
                 <div className="flex items-center gap-1.5">
@@ -178,7 +206,7 @@ export function IvanychWidget({ vehicle }: IvanychWidgetProps) {
           </div>
 
           {/* Messages list */}
-          <div className="flex-1 overflow-y-auto p-4 space-y-4">
+          <div ref={messagesContainerRef} className="flex-1 overflow-y-auto p-4 space-y-4">
             {isLoading && (
               <div className="flex items-center justify-center py-10 text-xs text-muted-foreground">
                 Подключаем Иваныча...
@@ -330,13 +358,13 @@ export function IvanychWidget({ vehicle }: IvanychWidgetProps) {
           })()}
 
           {/* Input Box */}
-          <div className="p-3 border-t bg-background shrink-0">
+          <div className="p-3.5 border-t bg-background shrink-0">
             <form
               onSubmit={(e) => {
                 e.preventDefault()
                 handleSend()
               }}
-              className="flex items-end gap-2"
+              className="flex items-end gap-2.5"
             >
               <textarea
                 ref={textareaRef}
@@ -344,15 +372,16 @@ export function IvanychWidget({ vehicle }: IvanychWidgetProps) {
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={handleKeyDown}
                 placeholder="Спроси у Иваныча или 'Запиши заправку на 2500р'..."
-                rows={1}
+                rows={2}
                 disabled={sendMutation.isPending}
-                className="flex-1 min-h-[42px] max-h-24 resize-none rounded-xl border border-input bg-muted/30 px-3.5 py-2.5 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:opacity-50"
+                className="flex-1 min-h-[64px] max-h-36 resize-none rounded-2xl border border-input bg-muted/40 px-3.5 py-2.5 text-sm leading-relaxed placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:opacity-50"
               />
               <Button
                 type="submit"
                 size="icon"
                 disabled={!input.trim() || sendMutation.isPending}
-                className="h-10 w-10 shrink-0 rounded-xl"
+                className="h-11 w-11 shrink-0 rounded-2xl mb-1 shadow-sm"
+                title="Отправить сообщение"
               >
                 <Send className="h-4 w-4" />
               </Button>
