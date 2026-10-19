@@ -6,6 +6,7 @@ import { ProtectedRoute } from "@/components/protected-route"
 import { GuestRoute } from "@/components/guest-route"
 import { AdminRoute } from "@/components/admin-route"
 import { useTheme } from "@/hooks/use-theme"
+import { PwaInstallPrompt } from "@/components/pwa-install-prompt"
 
 const Layout = lazy(() => import("@/components/layout").then((m) => ({ default: m.Layout })))
 const LoginPage = lazy(() => import("@/pages/login").then((m) => ({ default: m.LoginPage })))
@@ -78,6 +79,7 @@ function App() {
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </Suspense>
+        <PwaInstallPrompt />
       </BrowserRouter>
     </QueryClientProvider>
   )
