@@ -152,7 +152,7 @@ export function VehicleAlerts({
           : "border-amber-500/40 bg-gradient-to-r from-amber-500/10 via-amber-500/5 to-transparent shadow-sm"
       }`}
     >
-      <CardContent className="p-5 sm:p-6 space-y-3">
+      <CardContent className="p-3.5 sm:p-5 space-y-2.5 sm:space-y-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <div

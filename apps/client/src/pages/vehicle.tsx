@@ -215,26 +215,26 @@ export function VehiclePage() {
     : null
 
   return (
-    <div className="space-y-8 pb-20 sm:pb-12">
+    <div className="space-y-4 sm:space-y-6 lg:space-y-8 pb-24 sm:pb-12">
       {/* 01 / Navigation bar */}
       <div className="flex items-center justify-between">
         <Link
           to="/dashboard"
-          className="inline-flex items-center gap-2 rounded-full border border-slate-200/90 dark:border-slate-800 bg-white dark:bg-slate-900 px-4 py-2 text-xs font-mono font-semibold text-slate-600 dark:text-slate-300 hover:text-slate-950 dark:hover:text-white hover:border-slate-300 dark:hover:border-slate-700 shadow-2xs transition-all"
+          className="inline-flex items-center gap-1.5 sm:gap-2 rounded-full border border-slate-200/90 dark:border-slate-800 bg-white dark:bg-slate-900 px-3 sm:px-4 py-1.5 sm:py-2 text-[11px] sm:text-xs font-mono font-semibold text-slate-600 dark:text-slate-300 hover:text-slate-950 dark:hover:text-white hover:border-slate-300 dark:hover:border-slate-700 shadow-2xs transition-all"
         >
           <ArrowLeft className="h-3.5 w-3.5" />
           <span>В ГАРАЖ</span>
         </Link>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5 sm:gap-2">
           <ShareReportDialog
             vehicleId={vehicle.id}
             trigger={
               <Button
                 variant="outline"
                 size="sm"
-                className="rounded-full border-slate-200 dark:border-slate-800 font-mono text-xs font-semibold px-4 py-2 h-9 shadow-2xs"
+                className="rounded-full border-slate-200 dark:border-slate-800 font-mono text-xs font-semibold px-3 sm:px-4 py-1.5 sm:py-2 h-8 sm:h-9 shadow-2xs"
               >
-                <Share2 className="mr-1.5 h-3.5 w-3.5 text-slate-500" />
+                <Share2 className="sm:mr-1.5 h-3.5 w-3.5 text-slate-500" />
                 <span className="hidden sm:inline">Поделиться</span>
               </Button>
             }
@@ -245,7 +245,7 @@ export function VehiclePage() {
               <Button
                 variant="outline"
                 size="icon"
-                className="h-9 w-9 rounded-full border-slate-200 dark:border-slate-800 shadow-2xs"
+                className="h-8 w-8 sm:h-9 sm:w-9 rounded-full border-slate-200 dark:border-slate-800 shadow-2xs"
                 title="Редактировать автомобиль"
               >
                 <Pencil className="h-3.5 w-3.5 text-slate-500" />
@@ -256,20 +256,20 @@ export function VehiclePage() {
             variant="outline"
             size="icon"
             onClick={handleDeleteVehicle}
-            className="h-9 w-9 rounded-full border-slate-200 dark:border-slate-800 hover:bg-rose-50 dark:hover:bg-rose-950/40 hover:text-rose-600 hover:border-rose-200 text-slate-400 transition-colors shadow-2xs"
+            className="h-8 w-8 sm:h-9 sm:w-9 rounded-full border-slate-200 dark:border-slate-800 hover:bg-rose-50 dark:hover:bg-rose-950/40 hover:text-rose-600 hover:border-rose-200 text-slate-400 transition-colors shadow-2xs"
             title="Удалить автомобиль"
           >
-            <Trash2 className="h-4 w-4" />
+            <Trash2 className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
           </Button>
         </div>
       </div>
 
       {/* 02 / Hero Showcase Card */}
-      <div className="rounded-3xl border border-slate-200/90 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 sm:p-8 shadow-sm relative overflow-hidden">
-        <div className="flex flex-col md:flex-row items-start md:items-center gap-6 relative z-10">
+      <div className="rounded-2xl sm:rounded-3xl border border-slate-200/90 dark:border-slate-800 bg-white dark:bg-slate-900 p-4 sm:p-6 lg:p-8 shadow-sm relative overflow-hidden">
+        <div className="flex flex-row items-center sm:items-start md:items-center gap-3.5 sm:gap-6 relative z-10">
           {/* Car Image with object-cover */}
           <div
-            className="relative group w-36 h-36 sm:w-48 sm:h-44 md:w-56 md:h-44 rounded-2xl bg-slate-100 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700/80 overflow-hidden shrink-0 flex items-center justify-center cursor-pointer shadow-2xs"
+            className="relative group w-20 h-20 sm:w-40 sm:h-36 md:w-52 md:h-44 rounded-xl sm:rounded-2xl bg-slate-100 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700/80 overflow-hidden shrink-0 flex items-center justify-center cursor-pointer shadow-2xs"
             onClick={() => photoRef.current?.click()}
             title="Нажмите, чтобы изменить фото автомобиля"
           >
@@ -280,11 +280,11 @@ export function VehiclePage() {
                 className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
               />
             ) : (
-              <Car className="h-14 w-14 sm:h-16 sm:w-16 text-slate-300 dark:text-slate-600" />
+              <Car className="h-8 w-8 sm:h-14 sm:w-14 md:h-16 md:w-16 text-slate-300 dark:text-slate-600" />
             )}
-            <div className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity text-white text-xs font-mono font-medium gap-1.5 backdrop-blur-[2px]">
-              <Camera className="h-5 w-5" />
-              <span>Сменить фото</span>
+            <div className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity text-white text-[10px] sm:text-xs font-mono font-medium gap-1 backdrop-blur-[2px]">
+              <Camera className="h-4 w-4 sm:h-5 sm:w-5" />
+              <span className="hidden sm:inline">Сменить фото</span>
             </div>
             <input
               ref={photoRef}
@@ -304,47 +304,47 @@ export function VehiclePage() {
           </div>
 
           {/* Vehicle Info & Telemetry */}
-          <div className="flex-1 min-w-0 space-y-3">
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="font-mono text-xs uppercase tracking-widest text-slate-400 font-semibold">
-                [ 01 / КАРТОЧКА АВТОМОБИЛЯ ]
+          <div className="flex-1 min-w-0 space-y-1.5 sm:space-y-3">
+            <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
+              <span className="font-mono text-[10px] sm:text-xs uppercase tracking-widest text-slate-400 font-semibold">
+                [ 01 / АВТОМОБИЛЬ ]
               </span>
-              <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-300 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-950/40 px-2.5 py-0.5 text-[10px] font-mono text-emerald-700 dark:text-emerald-400 font-semibold">
+              <span className="inline-flex items-center gap-1 sm:gap-1.5 rounded-full border border-emerald-300 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-950/40 px-2 sm:px-2.5 py-0.5 text-[9px] sm:text-[10px] font-mono text-emerald-700 dark:text-emerald-400 font-semibold">
                 <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                РЕГЛАМЕНТ АКТИВЕН
+                АКТИВЕН
               </span>
             </div>
 
-            <h1 className="text-2xl sm:text-4xl font-black uppercase tracking-tight text-slate-950 dark:text-white">
+            <h1 className="text-lg sm:text-3xl md:text-4xl font-black uppercase tracking-tight text-slate-950 dark:text-white truncate">
               {vehicle.brand} {vehicle.model}
             </h1>
 
-            <div className="flex flex-wrap items-center gap-2.5 pt-1">
-              <span className="inline-flex items-center gap-1.5 rounded-full border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/60 px-3 py-1 text-xs font-mono text-slate-700 dark:text-slate-300 font-semibold">
-                <Calendar className="h-3.5 w-3.5 text-slate-400" />
+            <div className="flex flex-wrap items-center gap-1.5 sm:gap-2.5 pt-0.5 sm:pt-1">
+              <span className="inline-flex items-center gap-1 sm:gap-1.5 rounded-full border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/60 px-2 sm:px-3 py-0.5 sm:py-1 text-[11px] sm:text-xs font-mono text-slate-700 dark:text-slate-300 font-semibold">
+                <Calendar className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-slate-400" />
                 {vehicle.year} г.в.
               </span>
-              <span className="inline-flex items-center gap-1.5 rounded-full border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/60 px-3 py-1 text-xs font-mono text-slate-700 dark:text-slate-300 font-semibold">
-                <Gauge className="h-3.5 w-3.5 text-slate-400" />
+              <span className="inline-flex items-center gap-1 sm:gap-1.5 rounded-full border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/60 px-2 sm:px-3 py-0.5 sm:py-1 text-[11px] sm:text-xs font-mono text-slate-700 dark:text-slate-300 font-semibold">
+                <Gauge className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-slate-400" />
                 {vehicle.mileage.toLocaleString("ru-RU")} км
               </span>
               {vehicle.licensePlate && (
-                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-md bg-white dark:bg-slate-950 border-2 border-slate-900 dark:border-slate-300 font-mono text-xs font-black tracking-widest text-slate-950 dark:text-white shadow-2xs">
+                <span className="inline-flex items-center gap-1 sm:gap-1.5 px-2 sm:px-2.5 py-0.5 rounded-md bg-white dark:bg-slate-950 border border-slate-900 dark:border-slate-300 font-mono text-[11px] sm:text-xs font-black tracking-widest text-slate-950 dark:text-white shadow-2xs">
                   <span>{vehicle.licensePlate.toUpperCase()}</span>
-                  <span className="text-[9px] font-normal border-l border-slate-400 dark:border-slate-600 pl-1.5 text-slate-500">RUS</span>
+                  <span className="text-[9px] font-normal border-l border-slate-400 dark:border-slate-600 pl-1 text-slate-500">RUS</span>
                 </span>
               )}
             </div>
           </div>
 
-          {/* Quick CTA Button */}
-          <div className="shrink-0 self-start md:self-center">
+          {/* Quick CTA Button (Desktop / Tablet) */}
+          <div className="hidden sm:block shrink-0 self-center">
             <ExpenseDialog
               vehicleId={vehicle.id}
               trigger={
                 <Button className="rounded-full bg-slate-950 dark:bg-white text-white dark:text-slate-950 hover:bg-slate-800 dark:hover:bg-slate-100 font-mono text-xs font-bold uppercase tracking-wider px-5 py-3 h-auto shadow-sm transition-all flex items-center gap-2">
                   <Plus className="h-4 w-4" />
-                  Добавить расход
+                  <span>Добавить расход</span>
                 </Button>
               }
             />
@@ -353,46 +353,46 @@ export function VehiclePage() {
 
         {/* Technical Passport / Metadata Drawer */}
         {hasMeta && (
-          <div className="mt-6 pt-5 border-t border-slate-100 dark:border-slate-800/80">
+          <div className="mt-4 sm:mt-6 pt-3 sm:pt-5 border-t border-slate-100 dark:border-slate-800/80">
             <button
               type="button"
-              className="flex items-center gap-2 text-xs font-mono uppercase tracking-wider text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white font-semibold transition-colors"
+              className="flex items-center gap-2 text-[11px] sm:text-xs font-mono uppercase tracking-wider text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white font-semibold transition-colors"
               onClick={() => setMetaOpen(!metaOpen)}
             >
               <Info className="h-3.5 w-3.5 text-slate-400" />
-              <span>ТЕХНИЧЕСКИЙ ПАСПОРТ И ДАННЫЕ АВТОМОБИЛЯ</span>
+              <span>ТЕХНИЧЕСКИЙ ПАСПОРТ И ДАННЫЕ</span>
               {metaOpen ? <ChevronDown className="h-3.5 w-3.5" /> : <ChevronRight className="h-3.5 w-3.5" />}
             </button>
             {metaOpen && (
-              <div className="mt-4 grid grid-cols-2 sm:grid-cols-4 gap-3">
+              <div className="mt-3 sm:mt-4 grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3">
                 {vehicle.vin && (
-                  <div className="rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-850 p-3">
-                    <span className="text-[10px] font-mono uppercase text-slate-400 font-semibold block">VIN КОД</span>
-                    <p className="font-mono text-xs font-bold text-slate-900 dark:text-slate-100 mt-1 select-all">{vehicle.vin}</p>
+                  <div className="rounded-xl sm:rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-850 p-2.5 sm:p-3">
+                    <span className="text-[9px] sm:text-[10px] font-mono uppercase text-slate-400 font-semibold block">VIN КОД</span>
+                    <p className="font-mono text-[11px] sm:text-xs font-bold text-slate-900 dark:text-slate-100 mt-0.5 sm:mt-1 select-all break-all">{vehicle.vin}</p>
                   </div>
                 )}
                 {vehicle.registrationNumber && (
-                  <div className="rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-850 p-3">
-                    <span className="text-[10px] font-mono uppercase text-slate-400 font-semibold block">СТС / ПТС</span>
-                    <p className="font-mono text-xs font-bold text-slate-900 dark:text-slate-100 mt-1 select-all">{vehicle.registrationNumber}</p>
+                  <div className="rounded-xl sm:rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-850 p-2.5 sm:p-3">
+                    <span className="text-[9px] sm:text-[10px] font-mono uppercase text-slate-400 font-semibold block">СТС / ПТС</span>
+                    <p className="font-mono text-[11px] sm:text-xs font-bold text-slate-900 dark:text-slate-100 mt-0.5 sm:mt-1 select-all break-all">{vehicle.registrationNumber}</p>
                   </div>
                 )}
                 {vehicle.purchaseDate && (
-                  <div className="rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-850 p-3">
-                    <span className="text-[10px] font-mono uppercase text-slate-400 font-semibold block">ДАТА ПОКУПКИ</span>
-                    <p className="text-xs font-bold text-slate-900 dark:text-slate-100 mt-1">{formatDate(vehicle.purchaseDate)}</p>
+                  <div className="rounded-xl sm:rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-850 p-2.5 sm:p-3">
+                    <span className="text-[9px] sm:text-[10px] font-mono uppercase text-slate-400 font-semibold block">ДАТА ПОКУПКИ</span>
+                    <p className="text-[11px] sm:text-xs font-bold text-slate-900 dark:text-slate-100 mt-0.5 sm:mt-1">{formatDate(vehicle.purchaseDate)}</p>
                   </div>
                 )}
                 {vehicle.purchasePrice && (
-                  <div className="rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-850 p-3">
-                    <span className="text-[10px] font-mono uppercase text-slate-400 font-semibold block">ЦЕНА ПОКУПКИ</span>
-                    <p className="text-xs font-bold text-slate-900 dark:text-slate-100 mt-1">{formatAmount(vehicle.purchasePrice)}</p>
+                  <div className="rounded-xl sm:rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-850 p-2.5 sm:p-3">
+                    <span className="text-[9px] sm:text-[10px] font-mono uppercase text-slate-400 font-semibold block">ЦЕНА ПОКУПКИ</span>
+                    <p className="text-[11px] sm:text-xs font-bold text-slate-900 dark:text-slate-100 mt-0.5 sm:mt-1">{formatAmount(vehicle.purchasePrice)}</p>
                   </div>
                 )}
                 {vehicle.notes && (
-                  <div className="col-span-2 sm:col-span-4 rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-850 p-3">
-                    <span className="text-[10px] font-mono uppercase text-slate-400 font-semibold block">ЗАМЕТКИ И ОСОБЕННОСТИ</span>
-                    <p className="text-xs text-slate-700 dark:text-slate-300 mt-1 whitespace-pre-line leading-relaxed">{vehicle.notes}</p>
+                  <div className="col-span-2 sm:col-span-4 rounded-xl sm:rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-850 p-2.5 sm:p-3">
+                    <span className="text-[9px] sm:text-[10px] font-mono uppercase text-slate-400 font-semibold block">ЗАМЕТКИ И ОСОБЕННОСТИ</span>
+                    <p className="text-[11px] sm:text-xs text-slate-700 dark:text-slate-300 mt-0.5 sm:mt-1 whitespace-pre-line leading-relaxed">{vehicle.notes}</p>
                   </div>
                 )}
               </div>
@@ -410,27 +410,27 @@ export function VehiclePage() {
       />
 
       {/* 04 / Summary Telemetry Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4 lg:gap-6">
         {/* Total Spent */}
-        <div className="rounded-3xl border border-slate-200/90 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-sm hover:shadow-md transition-shadow">
-          <div className="flex items-center justify-between text-xs font-mono uppercase tracking-wider text-slate-500 font-semibold">
-            <span>[ ВСЕГО ПОТРАЧЕНО ]</span>
-            <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-blue-50 dark:bg-blue-950/40 text-blue-600">
-              <Receipt className="h-4 w-4" />
+        <div className="rounded-2xl sm:rounded-3xl border border-slate-200/90 dark:border-slate-800 bg-white dark:bg-slate-900 p-3 sm:p-5 lg:p-6 shadow-sm hover:shadow-md transition-shadow">
+          <div className="flex items-center justify-between text-[10px] sm:text-xs font-mono uppercase tracking-wider text-slate-500 font-semibold">
+            <span className="truncate pr-1">[ ВСЕГО ]</span>
+            <div className="flex h-6 w-6 sm:h-8 sm:w-8 items-center justify-center rounded-lg sm:rounded-xl bg-blue-50 dark:bg-blue-950/40 text-blue-600 shrink-0">
+              <Receipt className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
             </div>
           </div>
-          <div className="mt-3">
-            <div className="text-2xl sm:text-3xl font-black tracking-tight text-slate-950 dark:text-white">
+          <div className="mt-2 sm:mt-3">
+            <div className="text-base sm:text-2xl lg:text-3xl font-black font-mono tracking-tight text-slate-950 dark:text-white truncate">
               {formatAmount(stats?.total ?? 0)}
             </div>
             {stats && stats.stockValue > 0 && (
-              <div className="mt-2 space-y-1 text-xs font-mono text-slate-500 border-t border-slate-100 dark:border-slate-800 pt-2">
+              <div className="mt-1.5 sm:mt-2 space-y-0.5 sm:space-y-1 text-[10px] sm:text-xs font-mono text-slate-500 border-t border-slate-100 dark:border-slate-800 pt-1.5 sm:pt-2">
                 <div className="flex justify-between">
-                  <span>Расходы:</span>
+                  <span>Расход:</span>
                   <span className="font-semibold text-slate-900 dark:text-white">{formatAmount(stats.expensesTotal)}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="flex items-center gap-1"><Package className="h-3 w-3 text-amber-500" />Склад:</span>
+                  <span className="flex items-center gap-1"><Package className="h-2.5 w-2.5 text-amber-500" />Склад:</span>
                   <span className="font-semibold text-slate-900 dark:text-white">{formatAmount(stats.stockValue)}</span>
                 </div>
               </div>
@@ -439,21 +439,21 @@ export function VehiclePage() {
         </div>
 
         {/* This Month */}
-        <div className="rounded-3xl border border-slate-200/90 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-sm hover:shadow-md transition-shadow">
-          <div className="flex items-center justify-between text-xs font-mono uppercase tracking-wider text-slate-500 font-semibold">
-            <span>[ В ЭТОМ МЕСЯЦЕ ]</span>
-            <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600">
-              <Calendar className="h-4 w-4" />
+        <div className="rounded-2xl sm:rounded-3xl border border-slate-200/90 dark:border-slate-800 bg-white dark:bg-slate-900 p-3 sm:p-5 lg:p-6 shadow-sm hover:shadow-md transition-shadow">
+          <div className="flex items-center justify-between text-[10px] sm:text-xs font-mono uppercase tracking-wider text-slate-500 font-semibold">
+            <span className="truncate pr-1">[ В МЕСЯЦ ]</span>
+            <div className="flex h-6 w-6 sm:h-8 sm:w-8 items-center justify-center rounded-lg sm:rounded-xl bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 shrink-0">
+              <Calendar className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
             </div>
           </div>
-          <div className="mt-3">
-            <div className="text-2xl sm:text-3xl font-black tracking-tight text-slate-950 dark:text-white">
+          <div className="mt-2 sm:mt-3">
+            <div className="text-base sm:text-2xl lg:text-3xl font-black font-mono tracking-tight text-slate-950 dark:text-white truncate">
               {formatAmount(stats?.currentMonthTotal ?? 0)}
             </div>
             {monthChange !== null && (
-              <div className={`flex items-center gap-1 text-xs font-mono mt-2 ${monthChange > 0 ? "text-rose-600 dark:text-rose-400" : "text-emerald-600 dark:text-emerald-400"}`}>
-                {monthChange > 0 ? <ArrowUpRight className="h-3.5 w-3.5" /> : <ArrowDownRight className="h-3.5 w-3.5" />}
-                <span className="font-semibold">{Math.abs(monthChange)}% к пред. месяцу</span>
+              <div className={`flex items-center gap-1 text-[10px] sm:text-xs font-mono mt-1 sm:mt-2 ${monthChange > 0 ? "text-rose-600 dark:text-rose-400" : "text-emerald-600 dark:text-emerald-400"}`}>
+                {monthChange > 0 ? <ArrowUpRight className="h-3 w-3 sm:h-3.5 sm:w-3.5 shrink-0" /> : <ArrowDownRight className="h-3 w-3 sm:h-3.5 sm:w-3.5 shrink-0" />}
+                <span className="font-semibold truncate">{Math.abs(monthChange)}% к прошл.</span>
               </div>
             )}
           </div>
@@ -461,21 +461,21 @@ export function VehiclePage() {
 
         {/* Fuel per 100km */}
         {stats?.avgFuelCostPer100km != null && (
-          <div className="rounded-3xl border border-slate-200/90 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-sm hover:shadow-md transition-shadow">
-            <div className="flex items-center justify-between text-xs font-mono uppercase tracking-wider text-slate-500 font-semibold">
-              <span>[ ТОПЛИВО / 100 КМ ]</span>
-              <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-amber-50 dark:bg-amber-950/40 text-amber-600">
-                <Fuel className="h-4 w-4" />
+          <div className="rounded-2xl sm:rounded-3xl border border-slate-200/90 dark:border-slate-800 bg-white dark:bg-slate-900 p-3 sm:p-5 lg:p-6 shadow-sm hover:shadow-md transition-shadow">
+            <div className="flex items-center justify-between text-[10px] sm:text-xs font-mono uppercase tracking-wider text-slate-500 font-semibold">
+              <span className="truncate pr-1">[ ТОПЛИВО / 100 КМ ]</span>
+              <div className="flex h-6 w-6 sm:h-8 sm:w-8 items-center justify-center rounded-lg sm:rounded-xl bg-amber-50 dark:bg-amber-950/40 text-amber-600 shrink-0">
+                <Fuel className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
               </div>
             </div>
-            <div className="mt-3">
-              <div className="text-2xl sm:text-3xl font-black tracking-tight text-slate-950 dark:text-white">
+            <div className="mt-2 sm:mt-3">
+              <div className="text-base sm:text-2xl lg:text-3xl font-black font-mono tracking-tight text-slate-950 dark:text-white truncate">
                 {formatAmount(stats.avgFuelCostPer100km)}
               </div>
               {stats.avgLitersPer100km != null && (
-                <div className="text-xs font-mono text-slate-500 mt-2 flex items-center gap-1">
-                  <Droplets className="h-3 w-3 text-amber-500" />
-                  <span>{stats.avgLitersPer100km} л на 100 км</span>
+                <div className="text-[10px] sm:text-xs font-mono text-slate-500 mt-1 sm:mt-2 flex items-center gap-1 truncate">
+                  <Droplets className="h-3 w-3 text-amber-500 shrink-0" />
+                  <span className="truncate">{stats.avgLitersPer100km} л / 100 км</span>
                 </div>
               )}
             </div>
@@ -484,18 +484,18 @@ export function VehiclePage() {
 
         {/* Cost per km */}
         {stats?.costPerKm != null && (
-          <div className="rounded-3xl border border-slate-200/90 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-sm hover:shadow-md transition-shadow">
-            <div className="flex items-center justify-between text-xs font-mono uppercase tracking-wider text-slate-500 font-semibold">
-              <span>[ СТОИМОСТЬ КМ ]</span>
-              <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-violet-50 dark:bg-violet-950/40 text-violet-600">
-                <Gauge className="h-4 w-4" />
+          <div className="rounded-2xl sm:rounded-3xl border border-slate-200/90 dark:border-slate-800 bg-white dark:bg-slate-900 p-3 sm:p-5 lg:p-6 shadow-sm hover:shadow-md transition-shadow">
+            <div className="flex items-center justify-between text-[10px] sm:text-xs font-mono uppercase tracking-wider text-slate-500 font-semibold">
+              <span className="truncate pr-1">[ СТОИМОСТЬ КМ ]</span>
+              <div className="flex h-6 w-6 sm:h-8 sm:w-8 items-center justify-center rounded-lg sm:rounded-xl bg-violet-50 dark:bg-violet-950/40 text-violet-600 shrink-0">
+                <Gauge className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
               </div>
             </div>
-            <div className="mt-3">
-              <div className="text-2xl sm:text-3xl font-black tracking-tight text-slate-950 dark:text-white">
+            <div className="mt-2 sm:mt-3">
+              <div className="text-base sm:text-2xl lg:text-3xl font-black font-mono tracking-tight text-slate-950 dark:text-white truncate">
                 {stats.costPerKm.toFixed(1)} ₽
               </div>
-              <div className="text-xs font-mono text-slate-400 mt-2">
+              <div className="text-[10px] sm:text-xs font-mono text-slate-400 mt-1 sm:mt-2 truncate">
                 С учетом всех затрат
               </div>
             </div>
@@ -504,18 +504,18 @@ export function VehiclePage() {
 
         {/* Yearly forecast */}
         {stats?.yearlyForecast != null && stats.yearlyForecast > 0 && (
-          <div className="rounded-3xl border border-slate-200/90 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-sm hover:shadow-md transition-shadow">
-            <div className="flex items-center justify-between text-xs font-mono uppercase tracking-wider text-slate-500 font-semibold">
-              <span>[ ПРОГНОЗ / ГОД ]</span>
-              <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-rose-50 dark:bg-rose-950/40 text-rose-600">
-                <TrendingUp className="h-4 w-4" />
+          <div className="rounded-2xl sm:rounded-3xl border border-slate-200/90 dark:border-slate-800 bg-white dark:bg-slate-900 p-3 sm:p-5 lg:p-6 shadow-sm hover:shadow-md transition-shadow">
+            <div className="flex items-center justify-between text-[10px] sm:text-xs font-mono uppercase tracking-wider text-slate-500 font-semibold">
+              <span className="truncate pr-1">[ ПРОГНОЗ / ГОД ]</span>
+              <div className="flex h-6 w-6 sm:h-8 sm:w-8 items-center justify-center rounded-lg sm:rounded-xl bg-rose-50 dark:bg-rose-950/40 text-rose-600 shrink-0">
+                <TrendingUp className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
               </div>
             </div>
-            <div className="mt-3">
-              <div className="text-2xl sm:text-3xl font-black tracking-tight text-slate-950 dark:text-white">
+            <div className="mt-2 sm:mt-3">
+              <div className="text-base sm:text-2xl lg:text-3xl font-black font-mono tracking-tight text-slate-950 dark:text-white truncate">
                 {formatAmount(stats.yearlyForecast)}
               </div>
-              <div className="text-xs font-mono text-slate-500 mt-2">
+              <div className="text-[10px] sm:text-xs font-mono text-slate-500 mt-1 sm:mt-2 truncate">
                 ~{formatAmount(stats.monthlyAvg)} / мес.
               </div>
             </div>
@@ -525,44 +525,44 @@ export function VehiclePage() {
 
       {/* 05 / Analytics Section */}
       {stats && Object.keys(stats.byCategory).length > 0 && (
-        <div className="rounded-3xl border border-slate-200/90 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 sm:p-7 shadow-sm">
+        <div className="rounded-2xl sm:rounded-3xl border border-slate-200/90 dark:border-slate-800 bg-white dark:bg-slate-900 p-4 sm:p-6 lg:p-7 shadow-sm">
           <button
             type="button"
             className="w-full flex items-center justify-between group text-left"
             onClick={() => setChartsOpen(!chartsOpen)}
           >
-            <div className="flex items-center gap-3">
-              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-violet-50 dark:bg-violet-950/40 text-violet-600">
-                <BarChart3 className="h-5 w-5" />
+            <div className="flex items-center gap-2.5 sm:gap-3">
+              <div className="flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center rounded-xl bg-violet-50 dark:bg-violet-950/40 text-violet-600 shrink-0">
+                <BarChart3 className="h-4 w-4 sm:h-5 sm:w-5" />
               </div>
               <div>
-                <span className="font-mono text-xs uppercase tracking-widest text-slate-400 font-semibold block">
+                <span className="font-mono text-[10px] sm:text-xs uppercase tracking-widest text-slate-400 font-semibold block">
                   [ 03 / АНАЛИТИКА ]
                 </span>
-                <h2 className="text-lg font-bold text-slate-950 dark:text-white">
+                <h2 className="text-base sm:text-lg font-bold text-slate-950 dark:text-white">
                   Структура и динамика затрат
                 </h2>
               </div>
             </div>
             <div className="flex items-center gap-2">
-              <span className="text-xs font-mono text-slate-400 group-hover:text-slate-600 dark:group-hover:text-slate-200 transition-colors">
+              <span className="text-[11px] sm:text-xs font-mono text-slate-400 group-hover:text-slate-600 dark:group-hover:text-slate-200 transition-colors">
                 {chartsOpen ? "СВЕРНУТЬ" : "РАЗВЕРНУТЬ"}
               </span>
-              <div className="h-8 w-8 rounded-full border border-slate-200 dark:border-slate-700 flex items-center justify-center text-slate-500 group-hover:border-slate-400 transition-colors">
-                {chartsOpen ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
+              <div className="h-7 w-7 sm:h-8 sm:w-8 rounded-full border border-slate-200 dark:border-slate-700 flex items-center justify-center text-slate-500 group-hover:border-slate-400 transition-colors">
+                {chartsOpen ? <ChevronDown className="h-3.5 w-3.5 sm:h-4 sm:w-4" /> : <ChevronRight className="h-3.5 w-3.5 sm:h-4 sm:w-4" />}
               </div>
             </div>
           </button>
           {chartsOpen && (
-            <div className="mt-6 pt-6 border-t border-slate-100 dark:border-slate-800 grid gap-6 md:grid-cols-2">
-              <div className="rounded-2xl border border-slate-200/70 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-850 p-5">
-                <h3 className="text-sm font-mono uppercase tracking-wider text-slate-500 font-semibold mb-4">
+            <div className="mt-4 sm:mt-6 pt-4 sm:pt-6 border-t border-slate-100 dark:border-slate-800 grid gap-4 sm:gap-6 md:grid-cols-2">
+              <div className="rounded-xl sm:rounded-2xl border border-slate-200/70 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-850 p-3.5 sm:p-5">
+                <h3 className="text-xs sm:text-sm font-mono uppercase tracking-wider text-slate-500 font-semibold mb-3 sm:mb-4">
                   По категориям
                 </h3>
                 <CategoryPieChart data={stats.byCategory} />
               </div>
-              <div className="rounded-2xl border border-slate-200/70 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-850 p-5">
-                <h3 className="text-sm font-mono uppercase tracking-wider text-slate-500 font-semibold mb-4">
+              <div className="rounded-xl sm:rounded-2xl border border-slate-200/70 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-850 p-3.5 sm:p-5">
+                <h3 className="text-xs sm:text-sm font-mono uppercase tracking-wider text-slate-500 font-semibold mb-3 sm:mb-4">
                   Динамика по месяцам
                 </h3>
                 <MonthlyLineChart data={stats.byMonth} />
@@ -573,37 +573,37 @@ export function VehiclePage() {
       )}
 
       {/* 04 / Service intervals */}
-      <div className="rounded-3xl border border-slate-200/90 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 sm:p-7 shadow-sm">
+      <div className="rounded-2xl sm:rounded-3xl border border-slate-200/90 dark:border-slate-800 bg-white dark:bg-slate-900 p-4 sm:p-6 lg:p-7 shadow-sm">
         <ServiceIntervals vehicleId={vehicle.id} currentMileage={vehicle.mileage} />
       </div>
 
       {/* 05 / Tires manager */}
-      <div className="rounded-3xl border border-slate-200/90 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 sm:p-7 shadow-sm">
+      <div className="rounded-2xl sm:rounded-3xl border border-slate-200/90 dark:border-slate-800 bg-white dark:bg-slate-900 p-4 sm:p-6 lg:p-7 shadow-sm">
         <TiresManager vehicleId={vehicle.id} currentMileage={vehicle.mileage} />
       </div>
 
       {/* 06 / Parts inventory */}
-      <div className="rounded-3xl border border-slate-200/90 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 sm:p-7 shadow-sm">
+      <div className="rounded-2xl sm:rounded-3xl border border-slate-200/90 dark:border-slate-800 bg-white dark:bg-slate-900 p-4 sm:p-6 lg:p-7 shadow-sm">
         <PartsInventory vehicleId={vehicle.id} />
       </div>
 
       {/* 07 / Expenses Journal Section */}
-      <div className="rounded-3xl border border-slate-200/90 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 sm:p-7 shadow-sm space-y-6">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-100 dark:border-slate-800">
+      <div className="rounded-2xl sm:rounded-3xl border border-slate-200/90 dark:border-slate-800 bg-white dark:bg-slate-900 p-4 sm:p-6 lg:p-7 shadow-sm space-y-4 sm:space-y-6">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 pb-3 sm:pb-4 border-b border-slate-100 dark:border-slate-800">
           <button
             type="button"
-            className="flex items-center gap-3 text-left group"
+            className="flex items-center gap-2.5 sm:gap-3 text-left group"
             onClick={() => setExpensesOpen(!expensesOpen)}
           >
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600">
-              <Receipt className="h-5 w-5" />
+            <div className="flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center rounded-xl bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 shrink-0">
+              <Receipt className="h-4 w-4 sm:h-5 sm:w-5" />
             </div>
             <div>
-              <div className="flex items-center gap-2">
-                <span className="font-mono text-xs uppercase tracking-widest text-slate-400 font-semibold">
-                  [ 07 / БОРТОВОЙ ЖУРНАЛ И ЧЕКИ ]
+              <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap">
+                <span className="font-mono text-[10px] sm:text-xs uppercase tracking-widest text-slate-400 font-semibold">
+                  [ 07 / БОРТОВОЙ ЖУРНАЛ ]
                 </span>
-                <span className="rounded-full border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-2 py-0.5 text-[10px] font-mono font-bold text-slate-700 dark:text-slate-300">
+                <span className="rounded-full border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-1.5 sm:px-2 py-0.5 text-[10px] font-mono font-bold text-slate-700 dark:text-slate-300">
                   {expenses.length}
                 </span>
                 {!expensesOpen && expenses.length > 0 && (
@@ -613,28 +613,28 @@ export function VehiclePage() {
                 )}
               </div>
               <div className="flex items-center gap-2 mt-0.5">
-                <h2 className="text-lg sm:text-xl font-black uppercase tracking-tight text-slate-950 dark:text-white">
+                <h2 className="text-base sm:text-xl font-black uppercase tracking-tight text-slate-950 dark:text-white">
                   Расходы и чеки
                 </h2>
-                <span className="text-xs font-mono text-slate-400">
-                  {expensesOpen ? "(нажмите, чтобы скрыть)" : "(нажмите, чтобы раскрыть)"}
+                <span className="text-[11px] sm:text-xs font-mono text-slate-400">
+                  {expensesOpen ? "(скрыть)" : "(раскрыть)"}
                 </span>
               </div>
             </div>
           </button>
 
           {/* Action buttons */}
-          <div className="flex flex-wrap items-center gap-2">
+          <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
             <ImportDialog
               vehicleId={vehicle.id}
               trigger={
                 <Button
                   variant="outline"
                   size="sm"
-                  className="rounded-full border-slate-200 dark:border-slate-800 font-mono text-xs font-semibold px-3.5 py-1.5 h-8 shadow-2xs"
+                  className="rounded-full border-slate-200 dark:border-slate-800 font-mono text-[11px] sm:text-xs font-semibold px-2.5 sm:px-3.5 py-1 sm:py-1.5 h-7 sm:h-8 shadow-2xs"
                 >
-                  <Download className="mr-1.5 h-3.5 w-3.5 text-slate-500 rotate-180" />
-                  Импорт
+                  <Download className="mr-1 sm:mr-1.5 h-3 sm:h-3.5 w-3 sm:w-3.5 text-slate-500 rotate-180" />
+                  <span>Импорт</span>
                 </Button>
               }
             />
@@ -642,10 +642,10 @@ export function VehiclePage() {
               variant="outline"
               size="sm"
               onClick={handleExportCsv}
-              className="rounded-full border-slate-200 dark:border-slate-800 font-mono text-xs font-semibold px-3.5 py-1.5 h-8"
+              className="rounded-full border-slate-200 dark:border-slate-800 font-mono text-[11px] sm:text-xs font-semibold px-2.5 sm:px-3.5 py-1 sm:py-1.5 h-7 sm:h-8"
             >
-              <Download className="mr-1.5 h-3.5 w-3.5 text-slate-500" />
-              CSV
+              <Download className="mr-1 sm:mr-1.5 h-3 sm:h-3.5 w-3 sm:w-3.5 text-slate-500" />
+              <span>CSV</span>
             </Button>
             <PdfReportDialog
               vehicle={vehicle}
@@ -656,19 +656,19 @@ export function VehiclePage() {
                 <Button
                   variant="outline"
                   size="sm"
-                  className="rounded-full border-slate-200 dark:border-slate-800 font-mono text-xs font-semibold px-3.5 py-1.5 h-8"
+                  className="rounded-full border-slate-200 dark:border-slate-800 font-mono text-[11px] sm:text-xs font-semibold px-2.5 sm:px-3.5 py-1 sm:py-1.5 h-7 sm:h-8"
                 >
-                  <Printer className="mr-1.5 h-3.5 w-3.5 text-slate-500" />
-                  PDF
+                  <Printer className="mr-1 sm:mr-1.5 h-3 sm:h-3.5 w-3 sm:w-3.5 text-slate-500" />
+                  <span>PDF</span>
                 </Button>
               }
             />
             <ExpenseDialog
               vehicleId={vehicle.id}
               trigger={
-                <Button className="rounded-full bg-slate-950 dark:bg-white text-white dark:text-slate-950 hover:bg-slate-800 dark:hover:bg-slate-100 font-mono text-xs font-bold uppercase tracking-wider px-4 py-1.5 h-8 shadow-xs">
-                  <Plus className="mr-1.5 h-3.5 w-3.5" />
-                  Добавить
+                <Button className="rounded-full bg-slate-950 dark:bg-white text-white dark:text-slate-950 hover:bg-slate-800 dark:hover:bg-slate-100 font-mono text-[11px] sm:text-xs font-bold uppercase tracking-wider px-3 sm:px-4 py-1 sm:py-1.5 h-7 sm:h-8 shadow-xs">
+                  <Plus className="mr-1 sm:mr-1.5 h-3 sm:h-3.5 w-3 sm:w-3.5" />
+                  <span>Добавить</span>
                 </Button>
               }
             />
@@ -678,50 +678,52 @@ export function VehiclePage() {
         {expensesOpen && (
           <>
             {/* Filter and Search Bar */}
-            <div className="flex flex-wrap items-center gap-3">
+            <div className="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center gap-2 sm:gap-3">
               <div className="relative flex-1 min-w-[200px]">
-                <Search className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                <Search className="absolute left-3.5 top-1/2 h-3.5 w-3.5 sm:h-4 sm:w-4 -translate-y-1/2 text-slate-400" />
                 <Input
                   placeholder="Поиск по описанию, категории..."
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
-                  className="pl-10 h-10 rounded-2xl border-slate-200 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-850 text-xs sm:text-sm font-medium focus-visible:ring-1"
+                  className="pl-9 sm:pl-10 h-9 sm:h-10 rounded-xl sm:rounded-2xl border-slate-200 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-850 text-xs sm:text-sm font-medium focus-visible:ring-1"
                 />
               </div>
-              <Select value={catFilter} onValueChange={setCatFilter}>
-                <SelectTrigger className="h-10 rounded-2xl border-slate-200 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-850 w-full sm:w-[180px] text-xs font-mono font-medium">
-                  <SelectValue placeholder="Категория" />
-                </SelectTrigger>
-                <SelectContent className="rounded-2xl">
-                  <SelectItem value="all">Все категории</SelectItem>
-                  {categories.map((cat) => (
-                    <SelectItem key={cat.slug} value={cat.slug}>
-                      {cat.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <Select
-                value={`${sortField}-${sortDir}`}
-                onValueChange={(v) => {
-                  const [f, d] = v.split("-") as [SortField, SortDir]
-                  setSortField(f)
-                  setSortDir(d)
-                }}
-              >
-                <SelectTrigger className="h-10 rounded-2xl border-slate-200 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-850 w-full sm:w-[200px] text-xs font-mono font-medium">
-                  <ArrowUpDown className="mr-2 h-3.5 w-3.5 text-slate-400" />
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent className="rounded-2xl">
-                  <SelectItem value="date-desc">Дата: новые</SelectItem>
-                  <SelectItem value="date-asc">Дата: старые</SelectItem>
-                  <SelectItem value="amount-desc">Сумма: больше</SelectItem>
-                  <SelectItem value="amount-asc">Сумма: меньше</SelectItem>
-                </SelectContent>
-              </Select>
+              <div className="flex items-center gap-2">
+                <Select value={catFilter} onValueChange={setCatFilter}>
+                  <SelectTrigger className="h-9 sm:h-10 rounded-xl sm:rounded-2xl border-slate-200 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-850 flex-1 sm:w-[180px] text-xs font-mono font-medium">
+                    <SelectValue placeholder="Категория" />
+                  </SelectTrigger>
+                  <SelectContent className="rounded-2xl">
+                    <SelectItem value="all">Все категории</SelectItem>
+                    {categories.map((cat) => (
+                      <SelectItem key={cat.slug} value={cat.slug}>
+                        {cat.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <Select
+                  value={`${sortField}-${sortDir}`}
+                  onValueChange={(v) => {
+                    const [f, d] = v.split("-") as [SortField, SortDir]
+                    setSortField(f)
+                    setSortDir(d)
+                  }}
+                >
+                  <SelectTrigger className="h-9 sm:h-10 rounded-xl sm:rounded-2xl border-slate-200 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-850 flex-1 sm:w-[190px] text-xs font-mono font-medium">
+                    <ArrowUpDown className="mr-1.5 h-3.5 w-3.5 text-slate-400" />
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent className="rounded-2xl">
+                    <SelectItem value="date-desc">Дата: новые</SelectItem>
+                    <SelectItem value="date-asc">Дата: старые</SelectItem>
+                    <SelectItem value="amount-desc">Сумма: больше</SelectItem>
+                    <SelectItem value="amount-asc">Сумма: меньше</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
               {catFilter !== "all" && (
-                <div className="rounded-full bg-slate-100 dark:bg-slate-800 px-3 py-1 text-xs font-mono font-semibold text-slate-700 dark:text-slate-300">
+                <div className="rounded-full bg-slate-100 dark:bg-slate-800 px-3 py-1 text-xs font-mono font-semibold text-slate-700 dark:text-slate-300 self-start sm:self-auto">
                   Итого: {formatAmount(totalFiltered)}
                 </div>
               )}
@@ -738,37 +740,37 @@ export function VehiclePage() {
                   <div key={group.key} className="space-y-2">
                     <button
                       type="button"
-                      className="flex w-full items-center justify-between rounded-2xl bg-slate-50 dark:bg-slate-850 border border-slate-200/80 dark:border-slate-800 px-4 py-3 text-sm hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                      className="flex w-full items-center justify-between rounded-xl sm:rounded-2xl bg-slate-50 dark:bg-slate-850 border border-slate-200/80 dark:border-slate-800 px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
                       onClick={() => toggleMonth(group.key)}
                     >
-                      <div className="flex items-center gap-2.5">
-                        <div className="h-6 w-6 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 flex items-center justify-center text-slate-500">
+                      <div className="flex items-center gap-2 sm:gap-2.5">
+                        <div className="h-5 w-5 sm:h-6 sm:w-6 rounded-md sm:rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 flex items-center justify-center text-slate-500 shrink-0">
                           {collapsedMonths.has(group.key) ? (
-                            <ChevronRight className="h-3.5 w-3.5" />
+                            <ChevronRight className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
                           ) : (
-                            <ChevronDown className="h-3.5 w-3.5" />
+                            <ChevronDown className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
                           )}
                         </div>
-                        <span className="font-bold uppercase font-mono tracking-tight text-slate-900 dark:text-white">
+                        <span className="font-bold uppercase font-mono tracking-tight text-slate-900 dark:text-white text-xs sm:text-sm">
                           {formatMonthHeader(group.key)}
                         </span>
-                        <span className="rounded-full border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-2 py-0.5 text-[10px] font-mono font-semibold text-slate-600 dark:text-slate-300">
+                        <span className="rounded-full border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-1.5 sm:px-2 py-0.5 text-[9px] sm:text-[10px] font-mono font-semibold text-slate-600 dark:text-slate-300">
                           {group.expenses.length}
                         </span>
                       </div>
-                      <span className="font-black font-mono text-slate-950 dark:text-white">
+                      <span className="font-black font-mono text-xs sm:text-base text-slate-950 dark:text-white">
                         {formatAmount(group.total)}
                       </span>
                     </button>
 
                     {!collapsedMonths.has(group.key) && (
-                      <div className="space-y-2 pl-1 sm:pl-2">
+                      <div className="space-y-1.5 sm:space-y-2 pl-0 sm:pl-2">
                         {group.expenses.map((expense) => (
                           <ExpenseDetailDialog key={expense.id} expense={expense}>
-                            <div className="flex items-center justify-between gap-3 sm:gap-4 rounded-2xl border border-slate-200/70 dark:border-slate-800/80 bg-white dark:bg-slate-900 px-4 py-3 hover:border-slate-300 dark:hover:border-slate-700 hover:shadow-2xs transition-all cursor-pointer">
+                            <div className="flex items-center justify-between gap-2.5 sm:gap-4 rounded-xl sm:rounded-2xl border border-slate-200/70 dark:border-slate-800/80 bg-white dark:bg-slate-900 px-3 sm:px-4 py-2 sm:py-3 hover:border-slate-300 dark:hover:border-slate-700 hover:shadow-2xs transition-all cursor-pointer">
                               <div className="flex-1 min-w-0">
-                                <div className="flex items-center gap-2 flex-wrap">
-                                  <span className="rounded-full border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-2.5 py-0.5 text-[11px] font-mono font-semibold text-slate-700 dark:text-slate-300">
+                                <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap">
+                                  <span className="rounded-full border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-2 sm:px-2.5 py-0.5 text-[10px] sm:text-[11px] font-mono font-semibold text-slate-700 dark:text-slate-300">
                                     {expense.category.name}
                                   </span>
                                   {expense.receiptPhoto && (
@@ -777,7 +779,7 @@ export function VehiclePage() {
                                     </span>
                                   )}
                                   {expense.serviceInterval && (
-                                    <span className="inline-flex items-center gap-1 rounded-full bg-blue-50 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-800 px-2 py-0.5 text-[10px] font-mono font-medium text-blue-700 dark:text-blue-300">
+                                    <span className="inline-flex items-center gap-1 rounded-full bg-blue-50 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-800 px-1.5 sm:px-2 py-0.5 text-[9px] sm:text-[10px] font-mono font-medium text-blue-700 dark:text-blue-300">
                                       <Wrench className="h-2.5 w-2.5" />
                                       {expense.serviceInterval.name}
                                     </span>
@@ -788,7 +790,7 @@ export function VehiclePage() {
                                     </span>
                                   )}
                                 </div>
-                                <div className="mt-1.5 flex items-center gap-3 text-xs font-mono text-slate-400 flex-wrap">
+                                <div className="mt-1 flex items-center gap-2 sm:gap-3 text-[10px] sm:text-xs font-mono text-slate-400 flex-wrap">
                                   <span className="flex items-center gap-1">
                                     <Calendar className="h-3 w-3" />
                                     {formatDate(expense.date)}
@@ -824,8 +826,8 @@ export function VehiclePage() {
                                   )}
                                 </div>
                               </div>
-                              <div className="flex items-center gap-1 sm:gap-2 shrink-0">
-                                <span className="font-black font-mono text-sm sm:text-base text-slate-950 dark:text-white">
+                              <div className="flex items-center gap-0.5 sm:gap-1.5 shrink-0">
+                                <span className="font-black font-mono text-xs sm:text-base text-slate-950 dark:text-white">
                                   {formatAmount(expense.amount)}
                                 </span>
                                 <ExpenseDialog
@@ -835,17 +837,17 @@ export function VehiclePage() {
                                     <Button
                                       variant="ghost"
                                       size="icon"
-                                      className="h-8 w-8 rounded-full text-slate-400 hover:text-slate-700 dark:hover:text-slate-200"
+                                      className="h-7 w-7 sm:h-8 sm:w-8 rounded-full text-slate-400 hover:text-slate-700 dark:hover:text-slate-200"
                                       onClick={(e) => e.stopPropagation()}
                                     >
-                                      <Pencil className="h-3.5 w-3.5" />
+                                      <Pencil className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
                                     </Button>
                                   }
                                 />
                                 <Button
                                   variant="ghost"
                                   size="icon"
-                                  className="h-8 w-8 rounded-full text-slate-400 hover:text-rose-600 dark:hover:text-rose-400"
+                                  className="h-7 w-7 sm:h-8 sm:w-8 rounded-full text-slate-400 hover:text-rose-600 dark:hover:text-rose-400"
                                   onClick={(e) => {
                                     e.stopPropagation()
                                     if (confirm("Удалить расход?")) {
@@ -853,7 +855,7 @@ export function VehiclePage() {
                                     }
                                   }}
                                 >
-                                  <Trash2 className="h-3.5 w-3.5" />
+                                  <Trash2 className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
                                 </Button>
                               </div>
                             </div>

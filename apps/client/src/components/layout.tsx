@@ -115,7 +115,7 @@ export function Layout() {
       </header>
 
       {/* Main Content Viewport */}
-      <main className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 py-6 sm:py-8">
+      <main className="relative z-10 mx-auto max-w-7xl px-3 sm:px-6 py-4 sm:py-8">
         <Outlet />
       </main>
     </div>
