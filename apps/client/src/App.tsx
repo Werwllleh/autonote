@@ -3,6 +3,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom"
 import { LandingPage } from "@/pages/landing"
 import { ProtectedRoute } from "@/components/protected-route"
+import { GuestRoute } from "@/components/guest-route"
 import { AdminRoute } from "@/components/admin-route"
 import { useTheme } from "@/hooks/use-theme"
 
@@ -43,8 +44,22 @@ function App() {
         <Suspense fallback={<PageFallback />}>
           <Routes>
             <Route path="/" element={<LandingPage />} />
-            <Route path="/login" element={<LoginPage />} />
-            <Route path="/register" element={<RegisterPage />} />
+            <Route
+              path="/login"
+              element={
+                <GuestRoute>
+                  <LoginPage />
+                </GuestRoute>
+              }
+            />
+            <Route
+              path="/register"
+              element={
+                <GuestRoute>
+                  <RegisterPage />
+                </GuestRoute>
+              }
+            />
             <Route path="/verify" element={<VerifyPage />} />
             <Route path="/report/:token" element={<PublicReportPage />} />
             <Route

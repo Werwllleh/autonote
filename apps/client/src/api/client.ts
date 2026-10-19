@@ -13,26 +13,53 @@ api.interceptors.request.use((config) => {
   return config
 })
 
+// Shared promise for concurrent 401 handling (Single-Flight Pattern)
+let refreshPromise: Promise<string> | null = null
+
 api.interceptors.response.use(
   (res) => res,
   async (error) => {
     const original = error.config
-    if (error.response?.status === 401 && !original._retry) {
+
+    if (
+      error.response?.status === 401 &&
+      original &&
+      !original._retry &&
+      !original.url?.includes("/auth/refresh") &&
+      !original.url?.includes("/auth/login")
+    ) {
       original._retry = true
       const refreshToken = useAuthStore.getState().refreshToken
-      if (refreshToken) {
-        try {
-          const { data } = await axios.post("/api/auth/refresh", {
-            refreshToken,
-          })
-          useAuthStore.getState().setTokens(data.accessToken, data.refreshToken)
-          original.headers.Authorization = `Bearer ${data.accessToken}`
-          return api(original)
-        } catch {
-          useAuthStore.getState().logout()
+
+      if (!refreshToken) {
+        useAuthStore.getState().logout()
+        return Promise.reject(error)
+      }
+
+      try {
+        if (!refreshPromise) {
+          refreshPromise = axios
+            .post<{ accessToken: string; refreshToken: string }>("/api/auth/refresh", {
+              refreshToken,
+            })
+            .then(({ data }) => {
+              useAuthStore.getState().setTokens(data.accessToken, data.refreshToken)
+              return data.accessToken
+            })
+            .finally(() => {
+              refreshPromise = null
+            })
         }
+
+        const newAccessToken = await refreshPromise
+        original.headers.Authorization = `Bearer ${newAccessToken}`
+        return api(original)
+      } catch (refreshErr) {
+        useAuthStore.getState().logout()
+        return Promise.reject(refreshErr)
       }
     }
+
     return Promise.reject(error)
   },
 )
