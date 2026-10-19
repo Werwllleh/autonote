@@ -15,6 +15,8 @@ export function useCreateExpense() {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["expenses"] })
       qc.invalidateQueries({ queryKey: ["stats"] })
+      qc.invalidateQueries({ queryKey: ["vehicles"] })
+      qc.invalidateQueries({ queryKey: ["service-intervals"] })
     },
   })
 }
@@ -34,6 +36,8 @@ interface UpdateExpensePayload {
   laborCost?: number | null
   dateFrom?: string | null
   dateTo?: string | null
+  receiptPhoto?: string | null
+  serviceIntervalId?: string | null
 }
 
 export function useUpdateExpense() {
@@ -44,6 +48,8 @@ export function useUpdateExpense() {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["expenses"] })
       qc.invalidateQueries({ queryKey: ["stats"] })
+      qc.invalidateQueries({ queryKey: ["vehicles"] })
+      qc.invalidateQueries({ queryKey: ["service-intervals"] })
     },
   })
 }
@@ -55,6 +61,8 @@ export function useDeleteExpense() {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["expenses"] })
       qc.invalidateQueries({ queryKey: ["stats"] })
+      qc.invalidateQueries({ queryKey: ["vehicles"] })
+      qc.invalidateQueries({ queryKey: ["service-intervals"] })
     },
   })
 }

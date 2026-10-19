@@ -13,6 +13,9 @@ import {
   UseInterceptors,
   UploadedFile,
   BadRequestException,
+  ParseFilePipe,
+  MaxFileSizeValidator,
+  FileTypeValidator,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import type { Response } from 'express';
@@ -97,6 +100,22 @@ export class ExpenseController {
       vehicleId,
       userId,
     );
+  }
+
+  @Post('upload-receipt')
+  @UseInterceptors(FileInterceptor('file'))
+  uploadReceipt(
+    @UploadedFile(
+      new ParseFilePipe({
+        validators: [
+          new MaxFileSizeValidator({ maxSize: 10 * 1024 * 1024 }),
+          new FileTypeValidator({ fileType: /^image\/(jpeg|png|webp|gif|heic|heif)$/ }),
+        ],
+      }),
+    )
+    file: Express.Multer.File,
+  ) {
+    return this.expenseService.uploadReceipt(file);
   }
 
   @Get()

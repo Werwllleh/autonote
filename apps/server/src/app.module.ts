@@ -17,6 +17,8 @@ import { AdminModule } from './admin/admin.module';
 import { MailModule } from './mail/mail.module';
 import { ReportModule } from './report/report.module';
 import { RemindersModule } from './reminders/reminders.module';
+import { AssistantModule } from './assistant/assistant.module';
+import { TireModule } from './tire/tire.module';
 
 @Module({
   imports: [
@@ -41,6 +43,8 @@ import { RemindersModule } from './reminders/reminders.module';
     MailModule,
     ReportModule,
     RemindersModule,
+    AssistantModule,
+    TireModule,
   ],
 })
 export class AppModule {}

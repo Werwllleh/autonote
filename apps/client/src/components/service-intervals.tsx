@@ -16,7 +16,8 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog"
-import { Plus, Trash2, Timer, ChevronDown, ChevronRight } from "lucide-react"
+import { Plus, Trash2, Timer, ChevronDown, ChevronRight, Receipt } from "lucide-react"
+import { ExpenseDialog } from "@/components/expense-dialog"
 
 interface Props {
   vehicleId: string
@@ -113,7 +114,11 @@ export function ServiceIntervals({ vehicleId, currentMileage }: Props) {
                     )}
                   </div>
                 </div>
-                <IntervalActions interval={si} currentMileage={currentMileage} />
+                <IntervalActions
+                  vehicleId={vehicleId}
+                  interval={si}
+                  currentMileage={currentMileage}
+                />
               </div>
             )
           })}
@@ -123,8 +128,20 @@ export function ServiceIntervals({ vehicleId, currentMileage }: Props) {
   )
 }
 
-function IntervalActions({ interval, currentMileage }: {
-  interval: { id: string; name: string; intervalKm: number | null; intervalMonths: number | null; lastServiceDate: string | null; lastServiceMileage: number | null }
+function IntervalActions({
+  vehicleId,
+  interval,
+  currentMileage,
+}: {
+  vehicleId: string
+  interval: {
+    id: string
+    name: string
+    intervalKm: number | null
+    intervalMonths: number | null
+    lastServiceDate: string | null
+    lastServiceMileage: number | null
+  }
   currentMileage: number
 }) {
   const del = useDeleteServiceInterval()
@@ -132,11 +149,26 @@ function IntervalActions({ interval, currentMileage }: {
 
   return (
     <div className="flex items-center gap-1 shrink-0">
+      <ExpenseDialog
+        vehicleId={vehicleId}
+        defaultCategorySlug="maintenance"
+        defaultServiceIntervalId={interval.id}
+        trigger={
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8 text-primary hover:text-primary hover:bg-primary/10"
+            title="Записать расход на это ТО"
+          >
+            <Receipt className="h-4 w-4" />
+          </Button>
+        }
+      />
       <Button
         variant="ghost"
         size="icon"
         className="h-8 w-8"
-        title="Отметить выполненным"
+        title="Отметить выполненным (без расхода)"
         onClick={() => {
           update.mutate({
             id: interval.id,

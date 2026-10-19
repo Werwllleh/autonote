@@ -5,6 +5,7 @@ import { vehiclesApi } from "@/api/vehicles"
 import { useExpenses, useDeleteExpense } from "@/hooks/use-expenses"
 import { useDeleteVehicle } from "@/hooks/use-vehicles"
 import { useVehicleStats } from "@/hooks/use-stats"
+import { useServiceIntervals } from "@/hooks/use-service-intervals"
 import { useAuthStore } from "@/lib/auth-store"
 import { ExpenseDialog } from "@/components/expense-dialog"
 import { ExpenseDetailDialog } from "@/components/expense-detail-dialog"
@@ -12,6 +13,11 @@ import { ImportDialog } from "@/components/import-dialog"
 import { EditVehicleDialog } from "@/components/edit-vehicle-dialog"
 import { ShareReportDialog } from "@/components/share-report-dialog"
 import { PartsInventory } from "@/components/parts-inventory"
+import { ServiceIntervals } from "@/components/service-intervals"
+import { TiresManager } from "@/components/tires-manager"
+import { VehicleAlerts } from "@/components/vehicle-alerts"
+import { IvanychWidget } from "@/components/ivanych-widget"
+import { PdfReportDialog } from "@/components/pdf-report-dialog"
 import { CategoryPieChart } from "@/components/charts/category-pie-chart"
 import { MonthlyLineChart } from "@/components/charts/monthly-line-chart"
 import { Badge } from "@/components/ui/badge"
@@ -43,6 +49,7 @@ import {
   BarChart3,
   Wrench,
   Camera,
+  Paperclip,
   TrendingUp,
   ArrowUpRight,
   ArrowDownRight,
@@ -50,6 +57,7 @@ import {
   Info,
   Package,
   Plus,
+  Printer,
 } from "lucide-react"
 
 function formatAmount(amount: number) {
@@ -97,6 +105,7 @@ export function VehiclePage() {
   })
 
   const { data: expenses = [], isLoading: expensesLoading } = useExpenses(id)
+  const { data: serviceIntervals = [] } = useServiceIntervals(id)
   const { data: stats } = useVehicleStats(id!)
   const deleteVehicle = useDeleteVehicle()
   const deleteExpense = useDeleteExpense()
@@ -323,6 +332,14 @@ export function VehiclePage() {
         </div>
       )}
 
+      {/* Maintenance & Insurance alerts */}
+      <VehicleAlerts
+        vehicleId={vehicle.id}
+        currentMileage={vehicle.mileage}
+        expenses={expenses}
+        serviceIntervals={serviceIntervals}
+      />
+
       {/* Summary cards */}
       <div className="grid grid-cols-2 gap-3 sm:gap-4 sm:grid-cols-4">
         <Card className="relative overflow-hidden">
@@ -473,8 +490,11 @@ export function VehiclePage() {
         </div>
       )}
 
-      {/* TODO: Service intervals hidden for now */}
-      {/* <ServiceIntervals vehicleId={vehicle.id} currentMileage={vehicle.mileage} /> */}
+      {/* Service intervals */}
+      <ServiceIntervals vehicleId={vehicle.id} currentMileage={vehicle.mileage} />
+
+      {/* Tires & wheels seasonal tracking */}
+      <TiresManager vehicleId={vehicle.id} currentMileage={vehicle.mileage} />
 
       {/* Parts inventory */}
       <PartsInventory vehicleId={vehicle.id} />
@@ -511,9 +531,26 @@ export function VehiclePage() {
               <Download className="mr-2 h-4 w-4" />
               CSV
             </Button>
-            <Button variant="outline" size="icon" onClick={handleExportCsv} className="sm:hidden h-8 w-8">
+            <Button variant="outline" size="icon" onClick={handleExportCsv} className="sm:hidden h-8 w-8" title="Экспорт CSV">
               <Download className="h-4 w-4" />
             </Button>
+            <PdfReportDialog
+              vehicle={vehicle}
+              expenses={expenses}
+              stats={stats}
+              serviceIntervals={serviceIntervals}
+              trigger={
+                <>
+                  <Button variant="outline" size="sm" className="hidden sm:flex">
+                    <Printer className="mr-2 h-4 w-4" />
+                    PDF
+                  </Button>
+                  <Button variant="outline" size="icon" className="sm:hidden h-8 w-8" title="PDF отчёт">
+                    <Printer className="h-4 w-4" />
+                  </Button>
+                </>
+              }
+            />
             <div className="hidden sm:block">
               <ExpenseDialog vehicleId={vehicle.id} />
             </div>
@@ -606,8 +643,19 @@ export function VehiclePage() {
                               className="flex items-center gap-3 sm:gap-4 rounded-lg border px-3 sm:px-4 py-3 hover:bg-muted/50 transition-colors"
                             >
                               <div className="flex-1 min-w-0">
-                                <div className="flex items-center gap-2">
+                                <div className="flex items-center gap-2 flex-wrap">
                                   <Badge variant="secondary">{expense.category.name}</Badge>
+                                  {expense.receiptPhoto && (
+                                    <span title="Чек прикреплен" className="inline-flex items-center text-primary/80">
+                                      <Paperclip className="h-3 w-3" />
+                                    </span>
+                                  )}
+                                  {expense.serviceInterval && (
+                                    <span className="inline-flex items-center gap-1 rounded bg-primary/10 px-1.5 py-0.5 text-[10px] font-medium text-primary">
+                                      <Wrench className="h-2.5 w-2.5" />
+                                      {expense.serviceInterval.name}
+                                    </span>
+                                  )}
                                   {expense.description && (
                                     <span className="text-sm text-muted-foreground truncate">
                                       {expense.description}
@@ -703,6 +751,9 @@ export function VehiclePage() {
           />
         </div>
       </div>
+
+      {/* Ivanych AI Assistant */}
+      <IvanychWidget vehicle={vehicle} />
     </div>
   )
 }

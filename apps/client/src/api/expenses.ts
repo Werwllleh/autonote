@@ -18,6 +18,9 @@ export interface Expense {
   bonuses: number | null
   parts: Part[] | null
   laborCost: number | null
+  receiptPhoto: string | null
+  serviceIntervalId: string | null
+  serviceInterval?: { id: string; name: string } | null
   dateFrom: string | null
   dateTo: string | null
   vehicleId: string
@@ -43,6 +46,8 @@ interface CreateExpensePayload {
   stockParts?: { partId: string; quantity: number }[]
   dateFrom?: string
   dateTo?: string
+  receiptPhoto?: string | null
+  serviceIntervalId?: string | null
 }
 
 export interface ImportResult {
@@ -62,6 +67,13 @@ export const expensesApi = {
   update: (id: string, data: Record<string, unknown>) =>
     api.put<Expense>(`/expenses/${id}`, data).then((r) => r.data),
   delete: (id: string) => api.delete(`/expenses/${id}`),
+  uploadReceipt: (file: File) => {
+    const form = new FormData()
+    form.append("file", file)
+    return api
+      .post<{ url: string }>("/expenses/upload-receipt", form)
+      .then((r) => r.data)
+  },
   importFile: (file: File, vehicleId: string) => {
     const form = new FormData()
     form.append("file", file)

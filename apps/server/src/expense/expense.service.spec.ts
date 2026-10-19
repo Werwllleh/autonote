@@ -3,15 +3,21 @@ import * as XLSX from 'xlsx';
 import { ExpenseService } from './expense.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { PartService } from '../part/part.service';
+import { UploadService } from '../upload/upload.service';
 
 describe('ExpenseService', () => {
   let service: ExpenseService;
   let prisma: {
     vehicle: { findFirst: jest.Mock; findUnique: jest.Mock; update: jest.Mock };
-    expense: { create: jest.Mock; createMany: jest.Mock };
+    expense: { create: jest.Mock; createMany: jest.Mock; findFirst: jest.Mock; update: jest.Mock; delete: jest.Mock };
     user: { update: jest.Mock };
     category: { findMany: jest.Mock };
+    serviceInterval: { update: jest.Mock };
     $transaction: jest.Mock;
+  };
+  let uploadService: {
+    processImage: jest.Mock;
+    removeImage: jest.Mock;
   };
 
   beforeEach(async () => {
@@ -21,10 +27,22 @@ describe('ExpenseService', () => {
         findUnique: jest.fn(),
         update: jest.fn(),
       },
-      expense: { create: jest.fn(), createMany: jest.fn() },
+      expense: {
+        create: jest.fn(),
+        createMany: jest.fn(),
+        findFirst: jest.fn(),
+        update: jest.fn(),
+        delete: jest.fn(),
+      },
       user: { update: jest.fn() },
       category: { findMany: jest.fn() },
+      serviceInterval: { update: jest.fn() },
       $transaction: jest.fn((cb: (tx: unknown) => unknown) => cb(prisma)),
+    };
+
+    uploadService = {
+      processImage: jest.fn(),
+      removeImage: jest.fn(),
     };
 
     const module = await Test.createTestingModule({
@@ -32,6 +50,7 @@ describe('ExpenseService', () => {
         ExpenseService,
         { provide: PrismaService, useValue: prisma },
         { provide: PartService, useValue: { deductStock: jest.fn() } },
+        { provide: UploadService, useValue: uploadService },
       ],
     }).compile();
 
@@ -85,6 +104,55 @@ describe('ExpenseService', () => {
       expect(prisma.vehicle.update).toHaveBeenCalledWith({
         where: { id: 'v1' },
         data: { mileage: 55000 },
+      });
+    });
+
+    it('updates service interval lastServiceDate and lastServiceMileage when serviceIntervalId is provided', async () => {
+      prisma.vehicle.findFirst.mockResolvedValue({
+        id: 'v1',
+        userId: 'u1',
+        mileage: 50000,
+      });
+      prisma.expense.create.mockResolvedValue({ id: 'e1' });
+
+      await service.create(
+        {
+          amount: 5000,
+          date: '2026-05-10',
+          vehicleId: 'v1',
+          categoryId: 'c1',
+          mileage: 52000,
+          serviceIntervalId: 'si-1',
+        } as any,
+        'u1',
+      );
+
+      expect(prisma.serviceInterval.update).toHaveBeenCalledWith({
+        where: { id: 'si-1' },
+        data: {
+          lastServiceDate: new Date('2026-05-10'),
+          lastServiceMileage: 52000,
+        },
+      });
+    });
+  });
+
+  describe('remove', () => {
+    it('deletes receipt photo from disk if present', async () => {
+      prisma.expense.findFirst.mockResolvedValue({
+        id: 'e1',
+        vehicle: { userId: 'u1' },
+        receiptPhoto: '/uploads/receipts/test.webp',
+      });
+      prisma.expense.delete.mockResolvedValue({ id: 'e1' });
+
+      await service.remove('e1', 'u1');
+
+      expect(uploadService.removeImage).toHaveBeenCalledWith(
+        '/uploads/receipts/test.webp',
+      );
+      expect(prisma.expense.delete).toHaveBeenCalledWith({
+        where: { id: 'e1' },
       });
     });
   });

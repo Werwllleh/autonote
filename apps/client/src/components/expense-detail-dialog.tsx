@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/dialog"
 import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
-import { Calendar, Gauge, Fuel, Wrench, Shield, Droplets } from "lucide-react"
+import { Calendar, Gauge, Fuel, Wrench, Shield, Droplets, Paperclip } from "lucide-react"
 
 function formatAmount(amount: number) {
   return amount.toLocaleString("ru-RU", {
@@ -73,6 +73,12 @@ export function ExpenseDetailDialog({ expense, children }: ExpenseDetailDialogPr
               <div className="flex items-center gap-2 text-muted-foreground">
                 <Gauge className="h-4 w-4 shrink-0" />
                 <span>{expense.mileage.toLocaleString("ru-RU")} км</span>
+              </div>
+            )}
+            {expense.serviceInterval && (
+              <div className="flex items-center gap-1.5 text-xs text-primary font-medium col-span-2 bg-primary/5 rounded-md px-2.5 py-1.5 border border-primary/10">
+                <Wrench className="h-3.5 w-3.5 shrink-0" />
+                <span>Регламент ТО: {expense.serviceInterval.name}</span>
               </div>
             )}
           </div>
@@ -202,6 +208,36 @@ export function ExpenseDetailDialog({ expense, children }: ExpenseDetailDialogPr
                     </div>
                   )}
                 </div>
+              </div>
+            </>
+          )}
+
+          {/* Receipt photo */}
+          {expense.receiptPhoto && (
+            <>
+              <Separator />
+              <div className="space-y-2">
+                <h4 className="text-sm font-medium flex items-center gap-2">
+                  <Paperclip className="h-4 w-4" />
+                  Прикрепленный чек / заказ-наряд
+                </h4>
+                <a
+                  href={expense.receiptPhoto}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="group block overflow-hidden rounded-lg border border-border bg-muted/20 hover:border-primary/50 transition-colors"
+                >
+                  <div className="p-2 flex items-center justify-center bg-black/5 dark:bg-white/5">
+                    <img
+                      src={expense.receiptPhoto}
+                      alt="Чек"
+                      className="max-h-72 rounded object-contain group-hover:scale-[1.01] transition-transform"
+                    />
+                  </div>
+                  <div className="p-2.5 text-center text-xs text-primary font-medium border-t border-border/50 bg-background/50">
+                    Открыть фото в полном размере ↗
+                  </div>
+                </a>
               </div>
             </>
           )}

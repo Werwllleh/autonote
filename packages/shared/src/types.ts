@@ -40,8 +40,37 @@ export interface Expense {
   bonuses: number | null
   parts: { article?: string; name: string; quantity: number; price: number }[] | null
   laborCost: number | null
+  receiptPhoto?: string | null
+  serviceIntervalId?: string | null
   vehicleId: string
   categoryId: string
+  createdAt: string
+  updatedAt: string
+}
+
+export interface AssistantMessage {
+  id: string
+  role: "user" | "model"
+  content: string
+  vehicleId: string
+  userId: string
+  createdAt: string
+}
+
+export interface TireSet {
+  id: string
+  name: string
+  season: "summer" | "winter_stud" | "winter_friction" | "all_season"
+  size: string | null
+  productionYear: number | null
+  treadDepth: number | null
+  isMounted: boolean
+  storageLocation: string | null
+  installedMileage: number | null
+  installedDate: string | null
+  totalMileage: number
+  notes: string | null
+  vehicleId: string
   createdAt: string
   updatedAt: string
 }

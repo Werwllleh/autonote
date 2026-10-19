@@ -1,9 +1,10 @@
-import { useState, useMemo, useRef, useCallback, type FormEvent, type ReactNode } from "react"
+import { useState, useMemo, useRef, useCallback, useEffect, type FormEvent, type ReactNode } from "react"
 import { useCreateExpense, useUpdateExpense } from "@/hooks/use-expenses"
 import { useCategories, useCreateCategory } from "@/hooks/use-categories"
 import { useParts } from "@/hooks/use-parts"
+import { useServiceIntervals } from "@/hooks/use-service-intervals"
 import { useQueryClient } from "@tanstack/react-query"
-import type { Expense } from "@/api/expenses"
+import { expensesApi, type Expense } from "@/api/expenses"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -24,7 +25,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog"
-import { Plus, Trash2, Package, X } from "lucide-react"
+import { Plus, Trash2, Package, X, Camera, Paperclip, Loader2 } from "lucide-react"
 
 interface PartRow {
   article: string
@@ -39,9 +40,17 @@ interface ExpenseDialogProps {
   vehicleId: string
   expense?: Expense
   trigger?: ReactNode
+  defaultCategorySlug?: string
+  defaultServiceIntervalId?: string
 }
 
-export function ExpenseDialog({ vehicleId, expense, trigger }: ExpenseDialogProps) {
+export function ExpenseDialog({
+  vehicleId,
+  expense,
+  trigger,
+  defaultCategorySlug,
+  defaultServiceIntervalId,
+}: ExpenseDialogProps) {
   const isEdit = !!expense
   const [open, setOpen] = useState(false)
   const [amount, setAmount] = useState("")
@@ -61,9 +70,15 @@ export function ExpenseDialog({ vehicleId, expense, trigger }: ExpenseDialogProp
   const [dateTo, setDateTo] = useState("")
   // Stock parts (picked from inventory)
   const [stockItems, setStockItems] = useState<{ partId: string; quantity: number }[]>([])
+  // Receipt photo & Service interval
+  const [receiptPhoto, setReceiptPhoto] = useState<string | null>(null)
+  const [uploadingReceipt, setUploadingReceipt] = useState(false)
+  const [serviceIntervalId, setServiceIntervalId] = useState<string | null>(null)
+  const receiptInputRef = useRef<HTMLInputElement>(null)
 
   const { data: categories = [] } = useCategories()
   const { data: stockParts = [] } = useParts(vehicleId)
+  const { data: serviceIntervals = [] } = useServiceIntervals(vehicleId)
   const qc = useQueryClient()
   const create = useCreateExpense()
   const update = useUpdateExpense()
@@ -90,6 +105,8 @@ export function ExpenseDialog({ vehicleId, expense, trigger }: ExpenseDialogProp
     setStockItems([])
     setDateFrom("")
     setDateTo("")
+    setReceiptPhoto(null)
+    setServiceIntervalId(null)
   }, [])
 
   const handleOpenChange = (newOpen: boolean) => {
@@ -103,6 +120,8 @@ export function ExpenseDialog({ vehicleId, expense, trigger }: ExpenseDialogProp
         setLiters(expense.liters ? String(expense.liters) : "")
         setPricePerLiter(expense.pricePerLiter ? String(expense.pricePerLiter) : "")
         setBonuses(expense.bonuses ? String(expense.bonuses) : "")
+        setReceiptPhoto(expense.receiptPhoto || null)
+        setServiceIntervalId(expense.serviceIntervalId || null)
         setParts(
           expense.parts?.length
             ? expense.parts.map((p) => ({
@@ -118,10 +137,29 @@ export function ExpenseDialog({ vehicleId, expense, trigger }: ExpenseDialogProp
         setDateTo(expense.dateTo?.slice(0, 10) || "")
       } else {
         reset()
+        if (defaultCategorySlug) {
+          const cat = categories.find((c) => c.slug === defaultCategorySlug)
+          if (cat) setCategoryId(cat.id)
+        }
+        if (defaultServiceIntervalId) {
+          setServiceIntervalId(defaultServiceIntervalId)
+        }
       }
     }
     setOpen(newOpen)
   }
+
+  useEffect(() => {
+    if (open && !expense) {
+      if (defaultCategorySlug && !categoryId) {
+        const cat = categories.find((c) => c.slug === defaultCategorySlug)
+        if (cat) setCategoryId(cat.id)
+      }
+      if (defaultServiceIntervalId && !serviceIntervalId) {
+        setServiceIntervalId(defaultServiceIntervalId)
+      }
+    }
+  }, [open, expense, defaultCategorySlug, defaultServiceIntervalId, categories, categoryId, serviceIntervalId])
 
   const selectedCategory = useMemo(
     () => categories.find((c) => c.id === categoryId),
@@ -249,6 +287,8 @@ export function ExpenseDialog({ vehicleId, expense, trigger }: ExpenseDialogProp
           laborCost: isMaintenance && laborCostNum > 0 ? laborCostNum : null,
           dateFrom: isInsurance && dateFrom ? dateFrom : null,
           dateTo: isInsurance && dateTo ? dateTo : null,
+          receiptPhoto: receiptPhoto ?? null,
+          serviceIntervalId: serviceIntervalId ?? null,
         },
         { onSuccess },
       )
@@ -294,9 +334,26 @@ export function ExpenseDialog({ vehicleId, expense, trigger }: ExpenseDialogProp
             ...(dateFrom && { dateFrom }),
             ...(dateTo && { dateTo }),
           }),
+          ...(receiptPhoto && { receiptPhoto }),
+          ...(serviceIntervalId && { serviceIntervalId }),
         },
         { onSuccess },
       )
+    }
+  }
+
+  const handleReceiptUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    try {
+      setUploadingReceipt(true)
+      const res = await expensesApi.uploadReceipt(file)
+      setReceiptPhoto(res.url)
+    } catch (err) {
+      console.error("Failed to upload receipt", err)
+    } finally {
+      setUploadingReceipt(false)
+      if (receiptInputRef.current) receiptInputRef.current.value = ""
     }
   }
 
@@ -678,6 +735,32 @@ export function ExpenseDialog({ vehicleId, expense, trigger }: ExpenseDialogProp
                     ) : null}
                   </div>
                 )}
+
+                {serviceIntervals.length > 0 && (
+                  <div className="space-y-1.5 pt-1">
+                    <Label>Привязать к регламенту ТО</Label>
+                    <Select
+                      value={serviceIntervalId || "none"}
+                      onValueChange={(val) => setServiceIntervalId(val === "none" ? null : val)}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Не привязывать" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="none">Не привязывать</SelectItem>
+                        {serviceIntervals.map((si) => (
+                          <SelectItem key={si.id} value={si.id}>
+                            {si.name}
+                            {si.intervalKm ? ` (${si.intervalKm.toLocaleString("ru-RU")} км)` : ""}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <p className="text-xs text-muted-foreground">
+                      Дата и пробег этого расхода автоматически обновят статус регламента
+                    </p>
+                  </div>
+                )}
               </>
             )}
 
@@ -789,6 +872,76 @@ export function ExpenseDialog({ vehicleId, expense, trigger }: ExpenseDialogProp
                 onChange={(e) => setMileage(e.target.value)}
                 placeholder="Текущий пробег"
               />
+            </div>
+
+            {/* Receipt photo upload */}
+            <div className="space-y-1.5 pt-1">
+              <Label className="flex items-center gap-1.5">
+                <Paperclip className="h-4 w-4 text-muted-foreground" />
+                Чек или заказ-наряд
+              </Label>
+              <input
+                ref={receiptInputRef}
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={handleReceiptUpload}
+              />
+              {receiptPhoto ? (
+                <div className="relative inline-flex items-center gap-3 rounded-lg border border-border p-2 bg-muted/30 w-full">
+                  <a
+                    href={receiptPhoto}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="relative h-14 w-14 overflow-hidden rounded-md border border-border bg-background shrink-0"
+                  >
+                    <img src={receiptPhoto} alt="Чек" className="h-full w-full object-cover hover:scale-105 transition-transform" />
+                  </a>
+                  <div className="space-y-0.5 text-xs min-w-0 flex-1">
+                    <div className="font-medium text-foreground truncate">Чек прикреплен</div>
+                    <a
+                      href={receiptPhoto}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-primary hover:underline text-[11px]"
+                    >
+                      Посмотреть фото ↗
+                    </a>
+                  </div>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    className="h-7 w-7 text-muted-foreground hover:text-destructive shrink-0"
+                    onClick={() => setReceiptPhoto(null)}
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                </div>
+              ) : (
+                <div>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    disabled={uploadingReceipt}
+                    onClick={() => receiptInputRef.current?.click()}
+                    className="gap-2"
+                  >
+                    {uploadingReceipt ? (
+                      <>
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                        Загрузка чека...
+                      </>
+                    ) : (
+                      <>
+                        <Camera className="h-4 w-4" />
+                        Прикрепить фото чека
+                      </>
+                    )}
+                  </Button>
+                </div>
+              )}
             </div>
           </fieldset>
           <Button type="submit" className="w-full" disabled={isPending || !canSubmit}>

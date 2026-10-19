@@ -7,6 +7,7 @@ import { Prisma } from '@prisma/client';
 import * as XLSX from 'xlsx';
 import { PrismaService } from '../prisma/prisma.service';
 import { PartService } from '../part/part.service';
+import { UploadService } from '../upload/upload.service';
 import { CreateExpenseDto } from './dto/create-expense.dto';
 import { UpdateExpenseDto } from './dto/update-expense.dto';
 
@@ -15,6 +16,7 @@ export class ExpenseService {
   constructor(
     private prisma: PrismaService,
     private partService: PartService,
+    private uploadService: UploadService,
   ) {}
 
   findAll(userId: string, vehicleId?: string) {
@@ -23,7 +25,7 @@ export class ExpenseService {
         vehicle: { userId },
         ...(vehicleId && { vehicleId }),
       },
-      include: { category: true, vehicle: true },
+      include: { category: true, vehicle: true, serviceInterval: true },
       orderBy: { date: 'desc' },
     });
   }
@@ -31,7 +33,7 @@ export class ExpenseService {
   async findOne(id: string, userId: string) {
     const expense = await this.prisma.expense.findFirst({
       where: { id, vehicle: { userId } },
-      include: { category: true, vehicle: true },
+      include: { category: true, vehicle: true, serviceInterval: true },
     });
     if (!expense) throw new NotFoundException('Expense not found');
     return expense;
@@ -67,14 +69,26 @@ export class ExpenseService {
           laborCost: dto.laborCost,
           dateFrom: dto.dateFrom ? new Date(dto.dateFrom) : undefined,
           dateTo: dto.dateTo ? new Date(dto.dateTo) : undefined,
+          receiptPhoto: dto.receiptPhoto,
+          serviceIntervalId: dto.serviceIntervalId,
         },
-        include: { category: true, vehicle: true },
+        include: { category: true, vehicle: true, serviceInterval: true },
       });
 
       if (dto.mileage && dto.mileage > vehicle.mileage) {
         await tx.vehicle.update({
           where: { id: vehicle.id },
           data: { mileage: dto.mileage },
+        });
+      }
+
+      if (dto.serviceIntervalId) {
+        await tx.serviceInterval.update({
+          where: { id: dto.serviceIntervalId },
+          data: {
+            lastServiceDate: new Date(dto.date),
+            ...(dto.mileage ? { lastServiceMileage: dto.mileage } : {}),
+          },
         });
       }
 
@@ -87,7 +101,7 @@ export class ExpenseService {
   }
 
   async update(id: string, dto: UpdateExpenseDto, userId: string) {
-    await this.findOne(id, userId);
+    const expense = await this.findOne(id, userId);
 
     const data: Prisma.ExpenseUncheckedUpdateInput = {
       date: dto.date ? new Date(dto.date) : undefined,
@@ -120,10 +134,28 @@ export class ExpenseService {
       data.dateTo = new Date(dto.dateTo);
     }
 
+    if (dto.receiptPhoto === null) {
+      if (expense.receiptPhoto) {
+        await this.uploadService.removeImage(expense.receiptPhoto);
+      }
+      data.receiptPhoto = null;
+    } else if (dto.receiptPhoto !== undefined) {
+      if (expense.receiptPhoto && expense.receiptPhoto !== dto.receiptPhoto) {
+        await this.uploadService.removeImage(expense.receiptPhoto);
+      }
+      data.receiptPhoto = dto.receiptPhoto;
+    }
+
+    if (dto.serviceIntervalId === null) {
+      data.serviceIntervalId = null;
+    } else if (dto.serviceIntervalId !== undefined) {
+      data.serviceIntervalId = dto.serviceIntervalId;
+    }
+
     const updated = await this.prisma.expense.update({
       where: { id },
       data,
-      include: { category: true, vehicle: true },
+      include: { category: true, vehicle: true, serviceInterval: true },
     });
 
     if (
@@ -137,12 +169,30 @@ export class ExpenseService {
       });
     }
 
+    if (dto.serviceIntervalId) {
+      await this.prisma.serviceInterval.update({
+        where: { id: dto.serviceIntervalId },
+        data: {
+          lastServiceDate: updated.date,
+          ...(updated.mileage ? { lastServiceMileage: updated.mileage } : {}),
+        },
+      });
+    }
+
     return updated;
   }
 
   async remove(id: string, userId: string) {
-    await this.findOne(id, userId);
+    const expense = await this.findOne(id, userId);
+    if (expense.receiptPhoto) {
+      await this.uploadService.removeImage(expense.receiptPhoto);
+    }
     return this.prisma.expense.delete({ where: { id } });
+  }
+
+  async uploadReceipt(file: Express.Multer.File) {
+    const url = await this.uploadService.processImage(file, 'receipts', 1600);
+    return { url };
   }
 
   async importFromFile(

@@ -80,4 +80,14 @@ export class UpdateExpenseDto {
   @ValidateIf((_, value) => value !== null)
   @IsDateString()
   dateTo?: string | null;
+
+  @IsOptional()
+  @ValidateIf((_, value) => value !== null)
+  @IsString()
+  receiptPhoto?: string | null;
+
+  @IsOptional()
+  @ValidateIf((_, value) => value !== null)
+  @IsUUID()
+  serviceIntervalId?: string | null;
 }

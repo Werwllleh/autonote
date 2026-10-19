@@ -99,4 +99,12 @@ export class CreateExpenseDto {
   @IsOptional()
   @IsDateString()
   dateTo?: string;
+
+  @IsOptional()
+  @IsString()
+  receiptPhoto?: string;
+
+  @IsOptional()
+  @IsUUID()
+  serviceIntervalId?: string;
 }
