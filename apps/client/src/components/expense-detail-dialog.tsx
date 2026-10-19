@@ -53,30 +53,32 @@ export function ExpenseDetailDialog({ expense, children }: ExpenseDetailDialogPr
       >
         {children}
       </div>
-      <DialogContent className="max-h-[85vh] overflow-y-auto sm:max-w-md max-sm:!top-auto max-sm:!bottom-0 max-sm:!translate-y-0 max-sm:!translate-x-[-50%] max-sm:rounded-b-none max-sm:rounded-t-2xl max-sm:data-[state=open]:slide-in-from-bottom max-sm:data-[state=closed]:slide-out-to-bottom max-sm:data-[state=open]:zoom-in-100 max-sm:data-[state=closed]:zoom-out-100">
+      <DialogContent className="max-h-[85vh] overflow-y-auto sm:max-w-md">
         <DialogHeader>
-          <div className="flex items-center gap-2">
-            <Badge>{expense.category.name}</Badge>
-            <span className="text-2xl font-bold">{formatAmount(expense.amount)}</span>
+          <div className="flex items-center gap-2.5">
+            <Badge variant="secondary">{expense.category.name}</Badge>
+            <span className="text-2xl font-black font-mono tracking-tight text-slate-950 dark:text-white">
+              {formatAmount(expense.amount)}
+            </span>
           </div>
           <DialogTitle className="sr-only">Детали расхода</DialogTitle>
         </DialogHeader>
 
         <div className="space-y-4">
           {/* Basic info */}
-          <div className="grid grid-cols-2 gap-3 text-sm">
-            <div className="flex items-center gap-2 text-muted-foreground">
-              <Calendar className="h-4 w-4 shrink-0" />
+          <div className="grid grid-cols-2 gap-3 text-xs font-mono">
+            <div className="flex items-center gap-2 text-slate-500">
+              <Calendar className="h-4 w-4 shrink-0 text-slate-400" />
               <span>{formatDate(expense.date)}</span>
             </div>
             {expense.mileage && (
-              <div className="flex items-center gap-2 text-muted-foreground">
-                <Gauge className="h-4 w-4 shrink-0" />
+              <div className="flex items-center gap-2 text-slate-500">
+                <Gauge className="h-4 w-4 shrink-0 text-slate-400" />
                 <span>{expense.mileage.toLocaleString("ru-RU")} км</span>
               </div>
             )}
             {expense.serviceInterval && (
-              <div className="flex items-center gap-1.5 text-xs text-primary font-medium col-span-2 bg-primary/5 rounded-md px-2.5 py-1.5 border border-primary/10">
+              <div className="flex items-center gap-1.5 text-xs text-blue-700 dark:text-blue-300 font-mono font-medium col-span-2 bg-blue-50 dark:bg-blue-950/40 rounded-xl px-3 py-2 border border-blue-200 dark:border-blue-800">
                 <Wrench className="h-3.5 w-3.5 shrink-0" />
                 <span>Регламент ТО: {expense.serviceInterval.name}</span>
               </div>
@@ -84,7 +86,9 @@ export function ExpenseDetailDialog({ expense, children }: ExpenseDetailDialogPr
           </div>
 
           {expense.description && (
-            <p className="text-sm">{expense.description}</p>
+            <p className="text-sm text-slate-800 dark:text-slate-200 leading-relaxed font-medium">
+              {expense.description}
+            </p>
           )}
 
           {/* Fuel details */}
@@ -92,11 +96,11 @@ export function ExpenseDetailDialog({ expense, children }: ExpenseDetailDialogPr
             <>
               <Separator />
               <div className="space-y-2">
-                <h4 className="text-sm font-medium flex items-center gap-2">
-                  <Fuel className="h-4 w-4" />
+                <h4 className="text-xs font-mono uppercase tracking-wider text-slate-500 font-semibold flex items-center gap-2">
+                  <Fuel className="h-4 w-4 text-amber-500" />
                   Топливо
                 </h4>
-                <div className="rounded-lg bg-muted p-3 space-y-1.5 text-sm">
+                <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-850 p-4 space-y-2 text-xs font-mono">
                   <div className="flex justify-between">
                     <span className="text-muted-foreground flex items-center gap-1">
                       <Droplets className="h-3.5 w-3.5" />
@@ -135,31 +139,31 @@ export function ExpenseDetailDialog({ expense, children }: ExpenseDetailDialogPr
             <>
               <Separator />
               <div className="space-y-2">
-                <h4 className="text-sm font-medium flex items-center gap-2">
-                  <Wrench className="h-4 w-4" />
+                <h4 className="text-xs font-mono uppercase tracking-wider text-slate-500 font-semibold flex items-center gap-2">
+                  <Wrench className="h-4 w-4 text-slate-400" />
                   ТО
                 </h4>
-                <div className="rounded-lg bg-muted p-3 space-y-2 text-sm">
+                <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-850 p-4 space-y-2.5 text-xs font-mono">
                   {expense.parts && expense.parts.length > 0 && (
                     <div className="space-y-1.5">
-                      <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                      <span className="text-[10px] font-mono text-slate-400 uppercase tracking-wider font-semibold">
                         Запчасти
                       </span>
                       {expense.parts.map((part, i) => (
                         <div key={i} className="flex justify-between">
-                          <span className="text-muted-foreground">
+                          <span className="text-slate-600 dark:text-slate-400">
                             {part.article && (
-                              <span className="font-mono text-xs mr-1">{part.article}</span>
+                              <span className="font-mono text-[11px] mr-1 text-slate-400 font-bold">{part.article}</span>
                             )}
                             {part.name}
                             {part.quantity > 1 && ` × ${part.quantity}`}
                           </span>
-                          <span className="shrink-0 ml-2">{formatAmount(part.quantity * part.price)}</span>
+                          <span className="shrink-0 ml-2 font-bold text-slate-900 dark:text-slate-100">{formatAmount(part.quantity * part.price)}</span>
                         </div>
                       ))}
                       {expense.parts.length > 1 && (
-                        <div className="flex justify-between font-medium pt-1 border-t border-border/50">
-                          <span className="text-muted-foreground">Запчасти итого</span>
+                        <div className="flex justify-between font-bold pt-1.5 border-t border-slate-200 dark:border-slate-700">
+                          <span className="text-slate-500">Запчасти итого</span>
                           <span>{formatAmount(partsSum)}</span>
                         </div>
                       )}
@@ -167,14 +171,14 @@ export function ExpenseDetailDialog({ expense, children }: ExpenseDetailDialogPr
                   )}
                   {expense.laborCost != null && expense.laborCost > 0 && (
                     <div className="flex justify-between">
-                      <span className="text-muted-foreground">Работа</span>
-                      <span>{formatAmount(expense.laborCost)}</span>
+                      <span className="text-slate-500">Работа</span>
+                      <span className="font-bold text-slate-900 dark:text-slate-100">{formatAmount(expense.laborCost)}</span>
                     </div>
                   )}
                   {expense.parts && expense.parts.length > 0 && expense.laborCost != null && expense.laborCost > 0 && (
                     <>
                       <Separator />
-                      <div className="flex justify-between font-semibold">
+                      <div className="flex justify-between font-black text-sm">
                         <span>Итого</span>
                         <span>{formatAmount(expense.amount)}</span>
                       </div>
@@ -190,21 +194,21 @@ export function ExpenseDetailDialog({ expense, children }: ExpenseDetailDialogPr
             <>
               <Separator />
               <div className="space-y-2">
-                <h4 className="text-sm font-medium flex items-center gap-2">
-                  <Shield className="h-4 w-4" />
+                <h4 className="text-xs font-mono uppercase tracking-wider text-slate-500 font-semibold flex items-center gap-2">
+                  <Shield className="h-4 w-4 text-blue-500" />
                   Полис
                 </h4>
-                <div className="rounded-lg bg-muted p-3 space-y-1.5 text-sm">
+                <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-850 p-4 space-y-2 text-xs font-mono">
                   {expense.dateFrom && (
                     <div className="flex justify-between">
-                      <span className="text-muted-foreground">Начало</span>
-                      <span>{formatDate(expense.dateFrom)}</span>
+                      <span className="text-slate-500">Начало</span>
+                      <span className="font-bold text-slate-900 dark:text-slate-100">{formatDate(expense.dateFrom)}</span>
                     </div>
                   )}
                   {expense.dateTo && (
                     <div className="flex justify-between">
-                      <span className="text-muted-foreground">Окончание</span>
-                      <span>{formatDate(expense.dateTo)}</span>
+                      <span className="text-slate-500">Окончание</span>
+                      <span className="font-bold text-slate-900 dark:text-slate-100">{formatDate(expense.dateTo)}</span>
                     </div>
                   )}
                 </div>
@@ -217,24 +221,24 @@ export function ExpenseDetailDialog({ expense, children }: ExpenseDetailDialogPr
             <>
               <Separator />
               <div className="space-y-2">
-                <h4 className="text-sm font-medium flex items-center gap-2">
-                  <Paperclip className="h-4 w-4" />
+                <h4 className="text-xs font-mono uppercase tracking-wider text-slate-500 font-semibold flex items-center gap-2">
+                  <Paperclip className="h-4 w-4 text-emerald-500" />
                   Прикрепленный чек / заказ-наряд
                 </h4>
                 <a
                   href={expense.receiptPhoto}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="group block overflow-hidden rounded-lg border border-border bg-muted/20 hover:border-primary/50 transition-colors"
+                  className="group block overflow-hidden rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-850 hover:border-slate-300 dark:hover:border-slate-700 transition-colors"
                 >
                   <div className="p-2 flex items-center justify-center bg-black/5 dark:bg-white/5">
                     <img
                       src={expense.receiptPhoto}
                       alt="Чек"
-                      className="max-h-72 rounded object-contain group-hover:scale-[1.01] transition-transform"
+                      className="max-h-72 rounded-xl object-contain group-hover:scale-[1.01] transition-transform"
                     />
                   </div>
-                  <div className="p-2.5 text-center text-xs text-primary font-medium border-t border-border/50 bg-background/50">
+                  <div className="p-2.5 text-center text-xs font-mono text-slate-600 dark:text-slate-300 font-medium border-t border-slate-200 dark:border-slate-800">
                     Открыть фото в полном размере ↗
                   </div>
                 </a>

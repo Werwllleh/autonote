@@ -58,17 +58,21 @@ export function QuickAddExpense({ vehicles }: Props) {
               <button
                 key={v.id}
                 type="button"
-                className={`flex w-full items-center gap-3 rounded-lg border px-4 py-3 text-left transition-colors hover:bg-accent ${v.id === selectedId ? "border-primary bg-accent/50" : ""}`}
+                className={`flex w-full items-center gap-3 rounded-2xl border px-4 py-3 text-left transition-all ${
+                  v.id === selectedId
+                    ? "border-slate-950 dark:border-white bg-slate-50 dark:bg-slate-800 font-semibold"
+                    : "border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 hover:border-slate-300 dark:hover:border-slate-700"
+                }`}
                 onClick={() => {
                   setSelectedId(v.id)
                   setPickerOpen(false)
                 }}
               >
-                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-muted overflow-hidden">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 overflow-hidden">
                   {v.photo ? (
                     <img src={`/api${v.photo}`} alt="" className="h-full w-full object-cover" />
                   ) : (
-                    <Car className="h-4 w-4 text-muted-foreground" />
+                    <Car className="h-4 w-4 text-slate-400" />
                   )}
                 </div>
                 <div>

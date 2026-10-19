@@ -55,6 +55,7 @@ import {
   Package,
   Plus,
   Printer,
+  Share2,
 } from "lucide-react"
 
 function formatAmount(amount: number) {
@@ -225,13 +226,37 @@ export function VehiclePage() {
           <span>В ГАРАЖ</span>
         </Link>
         <div className="flex items-center gap-2">
-          <ShareReportDialog vehicleId={vehicle.id} />
-          <EditVehicleDialog vehicle={vehicle} />
+          <ShareReportDialog
+            vehicleId={vehicle.id}
+            trigger={
+              <Button
+                variant="outline"
+                size="sm"
+                className="rounded-full border-slate-200 dark:border-slate-800 font-mono text-xs font-semibold px-4 py-2 h-9 shadow-2xs"
+              >
+                <Share2 className="mr-1.5 h-3.5 w-3.5 text-slate-500" />
+                <span className="hidden sm:inline">Поделиться</span>
+              </Button>
+            }
+          />
+          <EditVehicleDialog
+            vehicle={vehicle}
+            trigger={
+              <Button
+                variant="outline"
+                size="icon"
+                className="h-9 w-9 rounded-full border-slate-200 dark:border-slate-800 shadow-2xs"
+                title="Редактировать автомобиль"
+              >
+                <Pencil className="h-3.5 w-3.5 text-slate-500" />
+              </Button>
+            }
+          />
           <Button
             variant="outline"
             size="icon"
             onClick={handleDeleteVehicle}
-            className="h-9 w-9 rounded-full border-slate-200 dark:border-slate-800 hover:bg-rose-50 dark:hover:bg-rose-950/40 hover:text-rose-600 hover:border-rose-200 text-slate-400 transition-colors"
+            className="h-9 w-9 rounded-full border-slate-200 dark:border-slate-800 hover:bg-rose-50 dark:hover:bg-rose-950/40 hover:text-rose-600 hover:border-rose-200 text-slate-400 transition-colors shadow-2xs"
             title="Удалить автомобиль"
           >
             <Trash2 className="h-4 w-4" />
@@ -242,25 +267,18 @@ export function VehiclePage() {
       {/* 02 / Hero Showcase Card */}
       <div className="rounded-3xl border border-slate-200/90 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 sm:p-8 shadow-sm relative overflow-hidden">
         <div className="flex flex-col md:flex-row items-start md:items-center gap-6 relative z-10">
-          {/* Car Image with uncropped ambient presentation */}
+          {/* Car Image with object-cover */}
           <div
             className="relative group w-36 h-36 sm:w-48 sm:h-44 md:w-56 md:h-44 rounded-2xl bg-slate-100 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700/80 overflow-hidden shrink-0 flex items-center justify-center cursor-pointer shadow-2xs"
             onClick={() => photoRef.current?.click()}
             title="Нажмите, чтобы изменить фото автомобиля"
           >
             {vehicle.photo ? (
-              <>
-                <img
-                  src={`/api${vehicle.photo}`}
-                  alt=""
-                  className="absolute inset-0 h-full w-full object-cover blur-xl opacity-30 scale-125 pointer-events-none"
-                />
-                <img
-                  src={`/api${vehicle.photo}`}
-                  alt={`${vehicle.brand} ${vehicle.model}`}
-                  className="relative z-10 max-h-full max-w-full object-contain p-2 transition-transform duration-300 group-hover:scale-105"
-                />
-              </>
+              <img
+                src={`/api${vehicle.photo}`}
+                alt={`${vehicle.brand} ${vehicle.model}`}
+                className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+              />
             ) : (
               <Car className="h-14 w-14 sm:h-16 sm:w-16 text-slate-300 dark:text-slate-600" />
             )}
@@ -289,7 +307,7 @@ export function VehiclePage() {
           <div className="flex-1 min-w-0 space-y-3">
             <div className="flex flex-wrap items-center gap-2">
               <span className="font-mono text-xs uppercase tracking-widest text-slate-400 font-semibold">
-                [ БОРТОВОЙ ЖУРНАЛ #{vehicle.id.slice(0, 6).toUpperCase()} ]
+                [ 01 / КАРТОЧКА АВТОМОБИЛЯ ]
               </span>
               <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-300 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-950/40 px-2.5 py-0.5 text-[10px] font-mono text-emerald-700 dark:text-emerald-400 font-semibold">
                 <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
@@ -519,7 +537,7 @@ export function VehiclePage() {
               </div>
               <div>
                 <span className="font-mono text-xs uppercase tracking-widest text-slate-400 font-semibold block">
-                  [ 05 / АНАЛИТИКА ]
+                  [ 03 / АНАЛИТИКА ]
                 </span>
                 <h2 className="text-lg font-bold text-slate-950 dark:text-white">
                   Структура и динамика затрат
@@ -554,15 +572,17 @@ export function VehiclePage() {
         </div>
       )}
 
-      {/* 06 / Fleet Modules */}
+      {/* 04 / Service intervals */}
       <div className="rounded-3xl border border-slate-200/90 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 sm:p-7 shadow-sm">
         <ServiceIntervals vehicleId={vehicle.id} currentMileage={vehicle.mileage} />
       </div>
 
+      {/* 05 / Tires manager */}
       <div className="rounded-3xl border border-slate-200/90 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 sm:p-7 shadow-sm">
         <TiresManager vehicleId={vehicle.id} currentMileage={vehicle.mileage} />
       </div>
 
+      {/* 06 / Parts inventory */}
       <div className="rounded-3xl border border-slate-200/90 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 sm:p-7 shadow-sm">
         <PartsInventory vehicleId={vehicle.id} />
       </div>
@@ -581,7 +601,7 @@ export function VehiclePage() {
             <div>
               <div className="flex items-center gap-2">
                 <span className="font-mono text-xs uppercase tracking-widest text-slate-400 font-semibold">
-                  [ 07 / БОРТОВОЙ ЖУРНАЛ ]
+                  [ 07 / БОРТОВОЙ ЖУРНАЛ И ЧЕКИ ]
                 </span>
                 <span className="rounded-full border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-2 py-0.5 text-[10px] font-mono font-bold text-slate-700 dark:text-slate-300">
                   {expenses.length}
@@ -605,7 +625,19 @@ export function VehiclePage() {
 
           {/* Action buttons */}
           <div className="flex flex-wrap items-center gap-2">
-            <ImportDialog vehicleId={vehicle.id} />
+            <ImportDialog
+              vehicleId={vehicle.id}
+              trigger={
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="rounded-full border-slate-200 dark:border-slate-800 font-mono text-xs font-semibold px-3.5 py-1.5 h-8 shadow-2xs"
+                >
+                  <Download className="mr-1.5 h-3.5 w-3.5 text-slate-500 rotate-180" />
+                  Импорт
+                </Button>
+              }
+            />
             <Button
               variant="outline"
               size="sm"

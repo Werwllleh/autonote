@@ -13,9 +13,10 @@ import { reportsApi } from "@/api/reports"
 
 interface ShareReportDialogProps {
   vehicleId: string
+  trigger?: React.ReactNode
 }
 
-export function ShareReportDialog({ vehicleId }: ShareReportDialogProps) {
+export function ShareReportDialog({ vehicleId, trigger }: ShareReportDialogProps) {
   const [open, setOpen] = useState(false)
   const [loading, setLoading] = useState(false)
   const [url, setUrl] = useState("")
@@ -51,10 +52,12 @@ export function ShareReportDialog({ vehicleId }: ShareReportDialogProps) {
   return (
     <Dialog open={open} onOpenChange={handleOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline" size="sm">
-          <Share2 className="mr-1.5 h-4 w-4" />
-          <span className="hidden sm:inline">Поделиться</span>
-        </Button>
+        {trigger || (
+          <Button variant="outline" size="sm">
+            <Share2 className="mr-1.5 h-3.5 w-3.5" />
+            <span className="hidden sm:inline">Поделиться</span>
+          </Button>
+        )}
       </DialogTrigger>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>

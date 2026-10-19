@@ -15,9 +15,10 @@ import type { ImportResult } from "@/api/expenses"
 
 interface Props {
   vehicleId: string
+  trigger?: React.ReactNode
 }
 
-export function ImportDialog({ vehicleId }: Props) {
+export function ImportDialog({ vehicleId, trigger }: Props) {
   const [open, setOpen] = useState(false)
   const [file, setFile] = useState<File | null>(null)
   const [result, setResult] = useState<ImportResult | null>(null)
@@ -89,17 +90,23 @@ export function ImportDialog({ vehicleId }: Props) {
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogTrigger asChild>
-        <Button variant="outline" size="sm" className="hidden sm:flex">
-          <Upload className="mr-2 h-4 w-4" />
-          Импорт
-        </Button>
-      </DialogTrigger>
-      <DialogTrigger asChild>
-        <Button variant="outline" size="icon" className="sm:hidden h-8 w-8">
-          <Upload className="h-4 w-4" />
-        </Button>
-      </DialogTrigger>
+      {trigger ? (
+        <DialogTrigger asChild>{trigger}</DialogTrigger>
+      ) : (
+        <>
+          <DialogTrigger asChild>
+            <Button variant="outline" size="sm" className="hidden sm:flex">
+              <Upload className="mr-1.5 h-3.5 w-3.5" />
+              Импорт
+            </Button>
+          </DialogTrigger>
+          <DialogTrigger asChild>
+            <Button variant="outline" size="icon" className="sm:hidden">
+              <Upload className="h-4 w-4" />
+            </Button>
+          </DialogTrigger>
+        </>
+      )}
 
       <DialogContent className="sm:max-w-md">
         <DialogHeader>

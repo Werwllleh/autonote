@@ -533,7 +533,7 @@ export function ExpenseDialog({
                   />
                 </div>
                 {fuelTotal > 0 && (
-                  <div className="rounded-md bg-muted px-3 py-2 text-sm space-y-1">
+                  <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-850 p-3.5 text-sm space-y-1.5">
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">Полная стоимость:</span>
                       <span>{fuelTotal.toFixed(2)} руб.</span>
@@ -567,7 +567,7 @@ export function ExpenseDialog({
                     </Button>
                   </div>
                   {parts.map((part, i) => (
-                    <div key={i} className="space-y-2 rounded-md border p-3">
+                    <div key={i} className="space-y-2.5 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-850 p-4">
                       <div className="flex items-center justify-between">
                         <span className="text-xs text-muted-foreground">Запчасть {i + 1}</span>
                         <Button
@@ -656,7 +656,7 @@ export function ExpenseDialog({
                       const sp = stockParts.find((p) => p.id === item.partId)
                       if (!sp) return null
                       return (
-                        <div key={item.partId} className="rounded-md border border-dashed px-3 py-2 space-y-1.5">
+                        <div key={item.partId} className="rounded-2xl border border-dashed border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-850 p-3 space-y-2">
                           <div className="flex items-center justify-between gap-2">
                             <div className="min-w-0">
                               <div className="text-sm font-medium truncate">{sp.name}</div>
@@ -708,7 +708,7 @@ export function ExpenseDialog({
                   />
                 </div>
                 {maintenanceTotal > 0 && (
-                  <div className="rounded-md bg-muted px-3 py-2 text-sm space-y-1">
+                  <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-850 p-3.5 text-sm space-y-1.5">
                     {partsTotal > 0 && (
                       <div className="flex justify-between">
                         <span className="text-muted-foreground">Запчасти (ручные):</span>
@@ -888,12 +888,12 @@ export function ExpenseDialog({
                 onChange={handleReceiptUpload}
               />
               {receiptPhoto ? (
-                <div className="relative inline-flex items-center gap-3 rounded-lg border border-border p-2 bg-muted/30 w-full">
+                <div className="relative inline-flex items-center gap-3 rounded-2xl border border-slate-200 dark:border-slate-800 p-2.5 bg-slate-50 dark:bg-slate-850 w-full">
                   <a
                     href={receiptPhoto}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="relative h-14 w-14 overflow-hidden rounded-md border border-border bg-background shrink-0"
+                    className="relative h-14 w-14 overflow-hidden rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 shrink-0"
                   >
                     <img src={receiptPhoto} alt="Чек" className="h-full w-full object-cover hover:scale-105 transition-transform" />
                   </a>

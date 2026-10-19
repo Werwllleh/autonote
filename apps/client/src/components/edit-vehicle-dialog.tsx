@@ -16,9 +16,10 @@ import { Pencil } from "lucide-react"
 
 interface Props {
   vehicle: Vehicle
+  trigger?: React.ReactNode
 }
 
-export function EditVehicleDialog({ vehicle }: Props) {
+export function EditVehicleDialog({ vehicle, trigger }: Props) {
   const [open, setOpen] = useState(false)
   const [brand, setBrand] = useState("")
   const [model, setModel] = useState("")
@@ -78,9 +79,11 @@ export function EditVehicleDialog({ vehicle }: Props) {
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
-        <Button variant="outline" size="icon" className="h-8 w-8 sm:h-9 sm:w-9">
-          <Pencil className="h-4 w-4" />
-        </Button>
+        {trigger || (
+          <Button variant="outline" size="icon">
+            <Pencil className="h-3.5 w-3.5" />
+          </Button>
+        )}
       </DialogTrigger>
       <DialogContent className="max-h-[90vh] overflow-y-auto">
         <DialogHeader>
