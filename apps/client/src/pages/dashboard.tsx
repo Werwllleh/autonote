@@ -181,7 +181,7 @@ export function DashboardPage() {
           <div className="flex items-start sm:items-center gap-4">
             <div className="relative shrink-0">
               <img
-                src="/avatars/ivanych.png"
+                src="/avatars/ivanych.webp"
                 alt="Иваныч"
                 className="h-14 w-14 sm:h-16 sm:w-16 rounded-2xl object-cover border border-slate-200 dark:border-slate-700 shadow-2xs"
                 onError={(e) => {

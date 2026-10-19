@@ -145,7 +145,7 @@ export function RegisterPage() {
           {/* Ivanych Speech Bubble */}
           <div className="mt-5 rounded-2xl border border-slate-200/90 bg-slate-50/80 p-3.5 flex items-start gap-3">
             <img
-              src="/avatars/ivanych.png"
+              src="/avatars/ivanych.webp"
               alt="Иваныч"
               className="h-10 w-10 rounded-xl object-cover shrink-0 border border-slate-200 shadow-2xs"
               onError={(e) => {

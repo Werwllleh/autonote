@@ -46,13 +46,20 @@ export function VehicleCard({ vehicle, costPerKm, view }: Props) {
       <div className="h-full rounded-3xl border border-slate-200/90 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-sm transition-all duration-300 hover:border-slate-300 dark:hover:border-slate-700 hover:shadow-[0_16px_40px_rgba(0,0,0,0.06)] flex flex-col justify-between">
         <div>
           {photo ? (
-            <div className="w-full h-44 rounded-2xl overflow-hidden mb-5 relative bg-slate-100 dark:bg-slate-800">
+            <div className="w-full h-48 sm:h-52 rounded-2xl overflow-hidden mb-5 relative bg-slate-100 dark:bg-slate-800 flex items-center justify-center">
+              {/* Ambient blurred backdrop so there is never awkward empty space */}
+              <img
+                src={photo}
+                alt=""
+                className="absolute inset-0 h-full w-full object-cover blur-xl opacity-35 dark:opacity-40 scale-110 pointer-events-none"
+              />
+              {/* Crisp uncropped full car image */}
               <img
                 src={photo}
                 alt={`${vehicle.brand} ${vehicle.model}`}
-                className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                className="relative z-10 max-h-full max-w-full object-contain p-2 transition-transform duration-500 group-hover:scale-105"
               />
-              <div className="absolute top-3 right-3 rounded-full bg-slate-950/70 backdrop-blur-md px-3 py-1 text-[11px] font-mono text-white">
+              <div className="absolute top-3 right-3 z-20 rounded-full bg-slate-950/75 backdrop-blur-md px-3 py-1 text-[11px] font-mono text-white shadow-xs">
                 {vehicle.year}
               </div>
             </div>
