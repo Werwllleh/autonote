@@ -27,6 +27,7 @@ interface CreateVehiclePayload {
   model: string
   year: number
   mileage?: number
+  vin?: string
 }
 
 interface UpdateVehiclePayload {

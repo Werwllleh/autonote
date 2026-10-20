@@ -6,6 +6,7 @@ import {
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { ExpenseService } from '../expense/expense.service';
+import { decodeVin, normalizeVin } from './vin-decoder.util';
 import * as fs from 'fs';
 
 interface GeminiPart {
@@ -107,6 +108,22 @@ const ASSISTANT_TOOLS = [
           required: ['expenseId'],
         },
       },
+      {
+        name: 'save_vehicle_vin',
+        description:
+          'Сохранить или обновить VIN-номер автомобиля в базе данных AutoNotes. Вызывать СРАЗУ, когда пользователь присылает свой VIN-номер (17 знаков) в чат или просит записать/привязать его в карточку авто.',
+        parameters: {
+          type: 'OBJECT',
+          properties: {
+            vin: {
+              type: 'STRING',
+              description:
+                '17-значный VIN-номер автомобиля (латинские буквы и цифры, например WBAJN11090BK39459)',
+            },
+          },
+          required: ['vin'],
+        },
+      },
     ],
   },
 ];
@@ -206,7 +223,7 @@ export class AssistantService {
     const systemPrompt = this.buildSystemPrompt(vehicleContext);
 
     // 4. Request Gemini API (Turn 1 with tools)
-    let actionTaken: 'created' | 'deleted' | null = null;
+    let actionTaken: 'created' | 'deleted' | 'vin_saved' | null = null;
     let replyText = '';
 
     const turn1 = await this.callGeminiTurn(
@@ -380,7 +397,7 @@ export class AssistantService {
   ): Promise<{
     success: boolean;
     message: string;
-    actionTaken: 'created' | 'deleted' | null;
+    actionTaken: 'created' | 'deleted' | 'vin_saved' | null;
   }> {
     if (call.name === 'create_expense') {
       const args = call.args || {};
@@ -464,6 +481,51 @@ export class AssistantService {
       };
     }
 
+    if (call.name === 'save_vehicle_vin') {
+      const args = call.args || {};
+      const rawVin = normalizeVin(String(args.vin || ''));
+
+      if (!rawVin || rawVin.length < 11 || rawVin.length > 17) {
+        return {
+          success: false,
+          message:
+            'VIN-номер должен состоять из корректных латинских букв и цифр (обычно 17 знаков). Проверь СТС или шильдик под стеклом.',
+          actionTaken: null,
+        };
+      }
+
+      const vehicle = await this.prisma.vehicle.findFirst({
+        where: { id: vehicleId, userId },
+      });
+
+      if (!vehicle) {
+        return {
+          success: false,
+          message: 'Автомобиль не найден.',
+          actionTaken: null,
+        };
+      }
+
+      const updated = await this.prisma.vehicle.update({
+        where: { id: vehicleId },
+        data: { vin: rawVin },
+      });
+
+      const decoded = decodeVin(
+        rawVin,
+        updated.brand,
+        updated.model,
+        updated.year,
+      );
+      const specDesc = decoded ? ` (${decoded.summary})` : '';
+
+      return {
+        success: true,
+        message: `VIN-номер ${rawVin} успешно записан и сохранён в карточку твоего автомобиля!${specDesc} Теперь я точно знаю твою модификацию и больше никогда не буду переспрашивать VIN.`,
+        actionTaken: 'vin_saved',
+      };
+    }
+
     return {
       success: false,
       message: `Неизвестная функция: ${call.name}`,
@@ -542,7 +604,18 @@ export class AssistantService {
 ${vehicleContext}
 
 ТВОИ КЛЮЧЕВЫЕ ОБЯЗАННОСТИ:
-1. РЕГЛАМЕНТ ТО И РЕКОМЕНДАЦИИ:
+1. ПРАВИЛА РАБОТЫ С VIN И ХАРАКТЕРИСТИКАМИ АВТОМОБИЛЯ:
+   - ЕСЛИ VIN УКАЗАН В ДАННЫХ АВТОМОБИЛЯ (см. блок "ДАННЫЕ АВТОМОБИЛЯ ПОЛЬЗОВАТЕЛЯ"):
+     * КАТЕГОРИЧЕСКИ ЗАПРЕЩЕНО просить пользователя скинуть VIN, назвать точный код мотора или тип коробки!
+     * Ты, как опытный моторист, УЖЕ знаешь точную спецификацию автомобиля (кузов, точный индекс мотора, мощность, трансмиссию, привод).
+     * Сразу отвечай, опираясь на этот конкретный мотор и коробку, называй точные OEM-артикулы и допуски.
+   - ЕСЛИ VIN НЕ УКАЗАН В ДАННЫХ АВТОМОБИЛЯ:
+     * Если пользователь спрашивает про конкретные запчасти (свечи, масло, форсунки, фильтры, колодки, ГРМ):
+       1) Дай ТОЛЬКО ОБЩИЙ ориентировочный ответ.
+       2) ОБЯЗАТЕЛЬНО ПРЕДУПРЕДИ, что без VIN возможны неточности, так как на эту модель ставилось несколько разных двигателей и модификаций.
+       3) Попроси пользователя прислать VIN: "Скинь мне 17-значный VIN из СТС — я запишу его в гараж и точно определю мотор, коробку и каталожные номера деталей".
+     * Когда пользователь пришлёт свой VIN в чат — СРАЗУ вызывай функцию save_vehicle_vin, чтобы навсегда сохранить его в карточку авто! После сохранения подтверди точную модификацию и больше никогда не переспрашивай VIN.
+2. РЕГЛАМЕНТ ТО И РЕКОМЕНДАЦИИ:
    - Если пользователь спрашивает, что пора менять, когда ТО, какие работы предстоят:
      - Опирайся на текущий одометр, даты и регламент ТО из переданного контекста.
      - Учитывай заводские регламенты и слабые места именно этой марки/модели/мотора (по VIN и году).
@@ -606,7 +679,43 @@ ${vehicleContext}
       `• Автомобиль: ${vehicle.brand} ${vehicle.model} (${vehicle.year} г.в.)`,
     );
     lines.push(`• Текущий пробег: ${vehicle.mileage?.toLocaleString('ru-RU')} км`);
-    if (vehicle.vin) lines.push(`• VIN-номер: ${vehicle.vin}`);
+
+    if (vehicle.vin) {
+      lines.push(`• VIN-номер: ${vehicle.vin}`);
+      const decoded = decodeVin(
+        vehicle.vin,
+        vehicle.brand,
+        vehicle.model,
+        vehicle.year,
+      );
+      if (decoded) {
+        lines.push(`• ПАСПОРТНАЯ СПЕЦИФИКАЦИЯ ПО VIN:`);
+        lines.push(`  - Модификация и кузов: ${decoded.summary}`);
+        if (decoded.engineSpecs)
+          lines.push(`  - Двигатель: ${decoded.engineSpecs}`);
+        if (decoded.transmission)
+          lines.push(`  - Трансмиссия/КПП: ${decoded.transmission}`);
+        if (decoded.driveType)
+          lines.push(`  - Привод: ${decoded.driveType}`);
+      }
+    } else {
+      lines.push(`\n[ВНИМАНИЕ: VIN-НОМЕР НЕ УКАЗАН В КАРТОЧКЕ АВТОМОБИЛЯ]`);
+      lines.push(`• В гараже для этого автомобиля пока не заполнен VIN.`);
+      lines.push(
+        `• Если пользователь спрашивает про точные запчасти, свечи, масло, форсунки, фильтры:`,
+      );
+      lines.push(`  - Дай ТОЛЬКО ОБЩИЙ ориентировочный ответ.`);
+      lines.push(
+        `  - ПРЯМО ПРЕДУПРЕДИ, что без VIN возможны неточности (у одной модели бывают разные двигатели и коробки).`,
+      );
+      lines.push(
+        `  - Попроси пользователя прислать 17-значный VIN-номер из СТС, чтобы ты записал его в карточку авто.`,
+      );
+      lines.push(
+        `• Когда пользователь пришлёт VIN в чате — СРАЗУ вызови функцию save_vehicle_vin, чтобы навсегда сохранить его в базу!`,
+      );
+    }
+
     if (vehicle.licensePlate) lines.push(`• Госномер: ${vehicle.licensePlate}`);
     if (vehicle.registrationNumber)
       lines.push(`• Номер СТС: ${vehicle.registrationNumber}`);

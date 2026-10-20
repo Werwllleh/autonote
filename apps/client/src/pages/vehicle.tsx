@@ -366,31 +366,31 @@ export function VehiclePage() {
             {metaOpen && (
               <div className="mt-3 sm:mt-4 grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3">
                 {vehicle.vin && (
-                  <div className="rounded-xl sm:rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-850 p-2.5 sm:p-3">
+                  <div className="rounded-xl sm:rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-900 p-2.5 sm:p-3">
                     <span className="text-[9px] sm:text-[10px] font-mono uppercase text-slate-400 font-semibold block">VIN КОД</span>
                     <p className="font-mono text-[11px] sm:text-xs font-bold text-slate-900 dark:text-slate-100 mt-0.5 sm:mt-1 select-all break-all">{vehicle.vin}</p>
                   </div>
                 )}
                 {vehicle.registrationNumber && (
-                  <div className="rounded-xl sm:rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-850 p-2.5 sm:p-3">
+                  <div className="rounded-xl sm:rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-900 p-2.5 sm:p-3">
                     <span className="text-[9px] sm:text-[10px] font-mono uppercase text-slate-400 font-semibold block">СТС / ПТС</span>
                     <p className="font-mono text-[11px] sm:text-xs font-bold text-slate-900 dark:text-slate-100 mt-0.5 sm:mt-1 select-all break-all">{vehicle.registrationNumber}</p>
                   </div>
                 )}
                 {vehicle.purchaseDate && (
-                  <div className="rounded-xl sm:rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-850 p-2.5 sm:p-3">
+                  <div className="rounded-xl sm:rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-900 p-2.5 sm:p-3">
                     <span className="text-[9px] sm:text-[10px] font-mono uppercase text-slate-400 font-semibold block">ДАТА ПОКУПКИ</span>
                     <p className="text-[11px] sm:text-xs font-bold text-slate-900 dark:text-slate-100 mt-0.5 sm:mt-1">{formatDate(vehicle.purchaseDate)}</p>
                   </div>
                 )}
                 {vehicle.purchasePrice && (
-                  <div className="rounded-xl sm:rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-850 p-2.5 sm:p-3">
+                  <div className="rounded-xl sm:rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-900 p-2.5 sm:p-3">
                     <span className="text-[9px] sm:text-[10px] font-mono uppercase text-slate-400 font-semibold block">ЦЕНА ПОКУПКИ</span>
                     <p className="text-[11px] sm:text-xs font-bold text-slate-900 dark:text-slate-100 mt-0.5 sm:mt-1">{formatAmount(vehicle.purchasePrice)}</p>
                   </div>
                 )}
                 {vehicle.notes && (
-                  <div className="col-span-2 sm:col-span-4 rounded-xl sm:rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-850 p-2.5 sm:p-3">
+                  <div className="col-span-2 sm:col-span-4 rounded-xl sm:rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-900 p-2.5 sm:p-3">
                     <span className="text-[9px] sm:text-[10px] font-mono uppercase text-slate-400 font-semibold block">ЗАМЕТКИ И ОСОБЕННОСТИ</span>
                     <p className="text-[11px] sm:text-xs text-slate-700 dark:text-slate-300 mt-0.5 sm:mt-1 whitespace-pre-line leading-relaxed">{vehicle.notes}</p>
                   </div>
@@ -555,13 +555,13 @@ export function VehiclePage() {
           </button>
           {chartsOpen && (
             <div className="mt-4 sm:mt-6 pt-4 sm:pt-6 border-t border-slate-100 dark:border-slate-800 grid gap-4 sm:gap-6 md:grid-cols-2">
-              <div className="rounded-xl sm:rounded-2xl border border-slate-200/70 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-850 p-3.5 sm:p-5">
+              <div className="rounded-xl sm:rounded-2xl border border-slate-200/70 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900 p-3.5 sm:p-5">
                 <h3 className="text-xs sm:text-sm font-mono uppercase tracking-wider text-slate-500 font-semibold mb-3 sm:mb-4">
                   По категориям
                 </h3>
                 <CategoryPieChart data={stats.byCategory} />
               </div>
-              <div className="rounded-xl sm:rounded-2xl border border-slate-200/70 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-850 p-3.5 sm:p-5">
+              <div className="rounded-xl sm:rounded-2xl border border-slate-200/70 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900 p-3.5 sm:p-5">
                 <h3 className="text-xs sm:text-sm font-mono uppercase tracking-wider text-slate-500 font-semibold mb-3 sm:mb-4">
                   Динамика по месяцам
                 </h3>
@@ -666,7 +666,7 @@ export function VehiclePage() {
             <ExpenseDialog
               vehicleId={vehicle.id}
               trigger={
-                <Button className="rounded-full bg-slate-950 dark:bg-white text-white dark:text-slate-950 hover:bg-slate-800 dark:hover:bg-slate-100 font-mono text-[11px] sm:text-xs font-bold uppercase tracking-wider px-3 sm:px-4 py-1 sm:py-1.5 h-7 sm:h-8 shadow-xs">
+                <Button className="rounded-full bg-slate-900 hover:bg-slate-800 text-white dark:bg-slate-800 dark:hover:bg-slate-700 dark:text-slate-100 dark:border dark:border-slate-700 font-mono text-[11px] sm:text-xs font-bold uppercase tracking-wider px-3 sm:px-4 py-1 sm:py-1.5 h-7 sm:h-8 shadow-xs inline-flex items-center gap-1 sm:gap-1.5 transition-all">
                   <Plus className="mr-1 sm:mr-1.5 h-3 sm:h-3.5 w-3 sm:w-3.5" />
                   <span>Добавить</span>
                 </Button>
@@ -685,12 +685,12 @@ export function VehiclePage() {
                   placeholder="Поиск по описанию, категории..."
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
-                  className="pl-9 sm:pl-10 h-9 sm:h-10 rounded-xl sm:rounded-2xl border-slate-200 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-850 text-xs sm:text-sm font-medium focus-visible:ring-1"
+                  className="pl-9 sm:pl-10 h-9 sm:h-10 rounded-xl sm:rounded-2xl border-slate-200 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-900 text-xs sm:text-sm font-medium focus-visible:ring-1"
                 />
               </div>
               <div className="flex items-center gap-2">
                 <Select value={catFilter} onValueChange={setCatFilter}>
-                  <SelectTrigger className="h-9 sm:h-10 rounded-xl sm:rounded-2xl border-slate-200 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-850 flex-1 sm:w-[180px] text-xs font-mono font-medium">
+                  <SelectTrigger className="h-9 sm:h-10 rounded-xl sm:rounded-2xl border-slate-200 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-900 flex-1 sm:w-[180px] text-xs font-mono font-medium">
                     <SelectValue placeholder="Категория" />
                   </SelectTrigger>
                   <SelectContent className="rounded-2xl">
@@ -710,7 +710,7 @@ export function VehiclePage() {
                     setSortDir(d)
                   }}
                 >
-                  <SelectTrigger className="h-9 sm:h-10 rounded-xl sm:rounded-2xl border-slate-200 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-850 flex-1 sm:w-[190px] text-xs font-mono font-medium">
+                  <SelectTrigger className="h-9 sm:h-10 rounded-xl sm:rounded-2xl border-slate-200 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-900 flex-1 sm:w-[190px] text-xs font-mono font-medium">
                     <ArrowUpDown className="mr-1.5 h-3.5 w-3.5 text-slate-400" />
                     <SelectValue />
                   </SelectTrigger>
@@ -740,11 +740,11 @@ export function VehiclePage() {
                   <div key={group.key} className="space-y-2">
                     <button
                       type="button"
-                      className="flex w-full items-center justify-between rounded-xl sm:rounded-2xl bg-slate-50 dark:bg-slate-850 border border-slate-200/80 dark:border-slate-800 px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                      className="flex w-full items-center justify-between rounded-xl sm:rounded-2xl bg-slate-50 dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors shadow-2xs"
                       onClick={() => toggleMonth(group.key)}
                     >
                       <div className="flex items-center gap-2 sm:gap-2.5">
-                        <div className="h-5 w-5 sm:h-6 sm:w-6 rounded-md sm:rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 flex items-center justify-center text-slate-500 shrink-0">
+                        <div className="h-5 w-5 sm:h-6 sm:w-6 rounded-md sm:rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center text-slate-500 dark:text-slate-300 shrink-0">
                           {collapsedMonths.has(group.key) ? (
                             <ChevronRight className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
                           ) : (
@@ -754,7 +754,7 @@ export function VehiclePage() {
                         <span className="font-bold uppercase font-mono tracking-tight text-slate-900 dark:text-white text-xs sm:text-sm">
                           {formatMonthHeader(group.key)}
                         </span>
-                        <span className="rounded-full border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-1.5 sm:px-2 py-0.5 text-[9px] sm:text-[10px] font-mono font-semibold text-slate-600 dark:text-slate-300">
+                        <span className="rounded-full border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-1.5 sm:px-2 py-0.5 text-[9px] sm:text-[10px] font-mono font-semibold text-slate-600 dark:text-slate-300">
                           {group.expenses.length}
                         </span>
                       </div>

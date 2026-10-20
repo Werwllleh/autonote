@@ -16,4 +16,8 @@ export class CreateVehicleDto {
   @IsInt()
   @Min(0)
   mileage?: number;
+
+  @IsOptional()
+  @IsString()
+  vin?: string;
 }

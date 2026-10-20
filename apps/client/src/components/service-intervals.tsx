@@ -233,9 +233,9 @@ function AddIntervalDialog({ vehicleId, currentMileage }: { vehicleId: string; c
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline" size="sm">
-          <Plus className="mr-1 h-3 w-3" />
-          Добавить
+        <Button className="rounded-full bg-slate-900 hover:bg-slate-800 text-white dark:bg-slate-800 dark:hover:bg-slate-700 dark:text-slate-100 dark:border dark:border-slate-700 font-mono text-[11px] sm:text-xs font-bold uppercase tracking-wider px-3 sm:px-4 py-1 sm:py-1.5 h-7 sm:h-8 shadow-xs inline-flex items-center gap-1 sm:gap-1.5 transition-all">
+          <Plus className="mr-1 sm:mr-1.5 h-3 sm:h-3.5 w-3 sm:w-3.5" />
+          <span>Добавить</span>
         </Button>
       </DialogTrigger>
       <DialogContent>

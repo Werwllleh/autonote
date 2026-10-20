@@ -7,7 +7,7 @@ import { NotFoundException } from '@nestjs/common';
 describe('AssistantService', () => {
   let service: AssistantService;
   let prisma: {
-    vehicle: { findFirst: jest.Mock };
+    vehicle: { findFirst: jest.Mock; update: jest.Mock };
     category: { findMany: jest.Mock };
     expense: { findFirst: jest.Mock };
     assistantMessage: {
@@ -25,6 +25,7 @@ describe('AssistantService', () => {
     prisma = {
       vehicle: {
         findFirst: jest.fn(),
+        update: jest.fn(),
       },
       category: {
         findMany: jest.fn().mockResolvedValue([
@@ -318,6 +319,89 @@ describe('AssistantService', () => {
       expect(expenseService.remove).toHaveBeenCalledWith('exp-99', 'user-1');
       expect(res.actionTaken).toBe('deleted');
       expect(res.modelMessage.content).toBe('Удалил расход на мойку 600 ₽.');
+    });
+
+    it('executes save_vehicle_vin when model calls save_vehicle_vin tool', async () => {
+      prisma.vehicle.findFirst.mockResolvedValue({
+        id: 'v-1',
+        brand: 'BMW',
+        model: '5',
+        year: 2019,
+        mileage: 184400,
+        vin: null,
+      });
+
+      prisma.vehicle.update.mockResolvedValue({
+        id: 'v-1',
+        brand: 'BMW',
+        model: '5',
+        year: 2019,
+        mileage: 184400,
+        vin: 'WBAJN11090BK39459',
+      });
+
+      prisma.assistantMessage.create
+        .mockResolvedValueOnce({
+          id: 'msg-u',
+          role: 'user',
+          content: 'Мой вин WBAJN11090BK39459',
+        })
+        .mockResolvedValueOnce({
+          id: 'msg-m',
+          role: 'model',
+          content: 'Записал твой VIN в карточку!',
+        });
+
+      prisma.assistantMessage.findMany.mockResolvedValueOnce([]);
+
+      const mockFetch = jest
+        .fn()
+        // Turn 1: model calls save_vehicle_vin
+        .mockResolvedValueOnce({
+          json: jest.fn().mockResolvedValue({
+            candidates: [
+              {
+                content: {
+                  parts: [
+                    {
+                      functionCall: {
+                        name: 'save_vehicle_vin',
+                        args: { vin: 'WBAJN11090BK39459' },
+                      },
+                    },
+                  ],
+                },
+              },
+            ],
+          }),
+        } as any)
+        // Turn 2: verbal reply
+        .mockResolvedValueOnce({
+          json: jest.fn().mockResolvedValue({
+            candidates: [
+              {
+                content: {
+                  parts: [{ text: 'Записал твой VIN в карточку!' }],
+                },
+              },
+            ],
+          }),
+        } as any);
+
+      global.fetch = mockFetch;
+
+      const res = await service.chat(
+        'user-1',
+        'v-1',
+        'Мой вин WBAJN11090BK39459',
+      );
+
+      expect(prisma.vehicle.update).toHaveBeenCalledWith({
+        where: { id: 'v-1' },
+        data: { vin: 'WBAJN11090BK39459' },
+      });
+      expect(res.actionTaken).toBe('vin_saved');
+      expect(res.modelMessage.content).toBe('Записал твой VIN в карточку!');
     });
   });
 });

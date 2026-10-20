@@ -27,18 +27,26 @@ export class VehicleService {
   }
 
   create(dto: CreateVehicleDto, userId: string) {
+    const vin = dto.vin ? dto.vin.trim().toUpperCase() : undefined;
     return this.prisma.vehicle.create({
-      data: { ...dto, initialMileage: dto.mileage ?? 0, userId },
+      data: {
+        ...dto,
+        ...(vin !== undefined ? { vin: vin || null } : {}),
+        initialMileage: dto.mileage ?? 0,
+        userId,
+      },
     });
   }
 
   async update(id: string, dto: UpdateVehicleDto, userId: string) {
     await this.findOne(id, userId);
-    const { purchaseDate, ...rest } = dto;
+    const { purchaseDate, vin, ...rest } = dto;
+    const formattedVin = vin !== undefined ? (vin ? vin.trim().toUpperCase() : null) : undefined;
     return this.prisma.vehicle.update({
       where: { id },
       data: {
         ...rest,
+        ...(formattedVin !== undefined && { vin: formattedVin }),
         ...(purchaseDate !== undefined && {
           purchaseDate: purchaseDate ? new Date(purchaseDate) : null,
         }),

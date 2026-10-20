@@ -18,6 +18,7 @@ export function AddVehicleDialog() {
   const [model, setModel] = useState("")
   const [year, setYear] = useState("")
   const [mileage, setMileage] = useState("")
+  const [vin, setVin] = useState("")
   const create = useCreateVehicle()
 
   const reset = () => {
@@ -25,6 +26,7 @@ export function AddVehicleDialog() {
     setModel("")
     setYear("")
     setMileage("")
+    setVin("")
   }
 
   const handleSubmit = (e: FormEvent) => {
@@ -35,6 +37,7 @@ export function AddVehicleDialog() {
         model,
         year: Number(year),
         mileage: mileage ? Number(mileage) : undefined,
+        vin: vin.trim() ? vin.trim().toUpperCase() : undefined,
       },
       {
         onSuccess: () => {
@@ -77,6 +80,22 @@ export function AddVehicleDialog() {
               <Label>Пробег (км)</Label>
               <Input type="number" min={0} value={mileage} onChange={(e) => setMileage(e.target.value)} placeholder="0" />
             </div>
+          </div>
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <Label>VIN-номер</Label>
+              <span className="text-[11px] text-muted-foreground font-normal">Необязательно</span>
+            </div>
+            <Input
+              value={vin}
+              onChange={(e) => setVin(e.target.value.toUpperCase())}
+              placeholder="WBAJN11090BK39459"
+              maxLength={17}
+              className="uppercase font-mono tracking-wider"
+            />
+            <p className="text-[11px] text-muted-foreground">
+              Нужен Иванычу для мгновенного подбора точных OEM-запчастей и регламентов ТО.
+            </p>
           </div>
           <Button type="submit" className="w-full" disabled={create.isPending}>
             {create.isPending ? "Создание..." : "Создать"}
