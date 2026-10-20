@@ -109,7 +109,7 @@ export function DashboardPage() {
 
         <div className="space-y-3">
           <div className="inline-flex items-center gap-2 rounded-full border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 px-3.5 py-1 text-xs font-mono text-slate-500 font-semibold shadow-2xs">
-            [ 01 / СТАРТ ГАРАЖА ]
+            [ СТАРТ ГАРАЖА ]
           </div>
           <h1 className="text-3xl sm:text-4xl font-black uppercase tracking-tight text-slate-950 dark:text-white">
             {getGreeting()}{user?.name ? `, ${user.name}` : ""}!
@@ -145,12 +145,12 @@ export function DashboardPage() {
   return (
     <div className="space-y-8 pb-16">
       
-      {/* 01 / Header Telemetry Bar */}
+      {/* Header Telemetry Bar */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between pb-6 border-b border-slate-200/80 dark:border-slate-800">
         <div>
           <div className="flex items-center gap-2 mb-2">
             <span className="font-mono text-xs uppercase tracking-widest text-slate-400 font-semibold">
-              [ 01 / МОЙ ГАРАЖ ]
+              [ МОЙ ГАРАЖ ]
             </span>
             <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-300 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-950/40 px-2.5 py-0.5 text-[10px] font-mono text-emerald-700 dark:text-emerald-400 font-semibold">
               <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
@@ -175,7 +175,7 @@ export function DashboardPage() {
         </div>
       </div>
 
-      {/* 02 / Cockpit HUD: Ivanych Online Presence Banner */}
+      {/* Cockpit HUD: Ivanych Online Presence Banner */}
       <div className="rounded-3xl border border-slate-200/90 dark:border-slate-800 bg-white dark:bg-slate-900 p-5 sm:p-7 shadow-sm relative overflow-hidden">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 relative z-10">
           <div className="flex items-start sm:items-center gap-4">
@@ -218,7 +218,7 @@ export function DashboardPage() {
         </div>
       </div>
 
-      {/* 03 / Critical Reminders Banner */}
+      {/* Critical Reminders Banner */}
       {reminders.length > 0 && (
         <div className="rounded-3xl border border-amber-300/80 dark:border-amber-800 bg-amber-50/80 dark:bg-amber-950/20 p-5 shadow-sm">
           <div className="flex items-start gap-4">
@@ -251,7 +251,7 @@ export function DashboardPage() {
         </div>
       )}
 
-      {/* 04 / Telemetry Stats Grid (Exact Landing Scale) */}
+      {/* Telemetry Stats Grid (Exact Landing Scale) */}
       {stats && stats.count > 0 && (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
           
@@ -346,12 +346,12 @@ export function DashboardPage() {
         </div>
       )}
 
-      {/* 05 / Vehicles Grid */}
+      {/* Vehicles Grid */}
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <span className="font-mono text-xs uppercase tracking-widest text-slate-400 font-semibold">
-              [ 02 / АВТОМОБИЛИ ]
+              [ АВТОМОБИЛИ ]
             </span>
             <span className="text-xs font-mono font-bold text-slate-600 dark:text-slate-400">
               ({sorted.length})
@@ -377,13 +377,13 @@ export function DashboardPage() {
         )}
       </div>
 
-      {/* 06 / Recent Expenses List */}
+      {/* Recent Expenses List */}
       {recentExpenses.length > 0 && (
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <span className="font-mono text-xs uppercase tracking-widest text-slate-400 font-semibold">
-                [ 03 / ПОСЛЕДНИЕ РАСХОДЫ ]
+                [ ПОСЛЕДНИЕ РАСХОДЫ ]
               </span>
             </div>
           </div>

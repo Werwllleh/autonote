@@ -216,7 +216,7 @@ export function VehiclePage() {
 
   return (
     <div className="space-y-4 sm:space-y-6 lg:space-y-8 pb-24 sm:pb-12">
-      {/* 01 / Navigation bar */}
+      {/* Navigation bar */}
       <div className="flex items-center justify-between">
         <Link
           to="/dashboard"
@@ -264,7 +264,7 @@ export function VehiclePage() {
         </div>
       </div>
 
-      {/* 02 / Hero Showcase Card */}
+      {/* Hero Showcase Card */}
       <div className="rounded-2xl sm:rounded-3xl border border-slate-200/90 dark:border-slate-800 bg-white dark:bg-slate-900 p-4 sm:p-6 lg:p-8 shadow-sm relative overflow-hidden">
         <div className="flex flex-row items-center sm:items-start md:items-center gap-3.5 sm:gap-6 relative z-10">
           {/* Car Image with object-cover */}
@@ -307,7 +307,7 @@ export function VehiclePage() {
           <div className="flex-1 min-w-0 space-y-1.5 sm:space-y-3">
             <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
               <span className="font-mono text-[10px] sm:text-xs uppercase tracking-widest text-slate-400 font-semibold">
-                [ 01 / АВТОМОБИЛЬ ]
+                [ АВТОМОБИЛЬ ]
               </span>
               <span className="inline-flex items-center gap-1 sm:gap-1.5 rounded-full border border-emerald-300 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-950/40 px-2 sm:px-2.5 py-0.5 text-[9px] sm:text-[10px] font-mono text-emerald-700 dark:text-emerald-400 font-semibold">
                 <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
@@ -401,7 +401,7 @@ export function VehiclePage() {
         )}
       </div>
 
-      {/* 03 / Maintenance & Insurance Alerts */}
+      {/* Maintenance & Insurance Alerts */}
       <VehicleAlerts
         vehicleId={vehicle.id}
         currentMileage={vehicle.mileage}
@@ -409,7 +409,7 @@ export function VehiclePage() {
         serviceIntervals={serviceIntervals}
       />
 
-      {/* 04 / Summary Telemetry Cards */}
+      {/* Summary Telemetry Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4 lg:gap-6">
         {/* Total Spent */}
         <div className="rounded-2xl sm:rounded-3xl border border-slate-200/90 dark:border-slate-800 bg-white dark:bg-slate-900 p-3 sm:p-5 lg:p-6 shadow-sm hover:shadow-md transition-shadow">
@@ -523,7 +523,7 @@ export function VehiclePage() {
         )}
       </div>
 
-      {/* 05 / Analytics Section */}
+      {/* Analytics Section */}
       {stats && Object.keys(stats.byCategory).length > 0 && (
         <div className="rounded-2xl sm:rounded-3xl border border-slate-200/90 dark:border-slate-800 bg-white dark:bg-slate-900 p-4 sm:p-6 lg:p-7 shadow-sm">
           <button
@@ -537,7 +537,7 @@ export function VehiclePage() {
               </div>
               <div>
                 <span className="font-mono text-[10px] sm:text-xs uppercase tracking-widest text-slate-400 font-semibold block">
-                  [ 03 / АНАЛИТИКА ]
+                  [ АНАЛИТИКА ]
                 </span>
                 <h2 className="text-base sm:text-lg font-bold text-slate-950 dark:text-white">
                   Структура и динамика затрат
@@ -572,22 +572,22 @@ export function VehiclePage() {
         </div>
       )}
 
-      {/* 04 / Service intervals */}
+      {/* Service intervals */}
       <div className="rounded-2xl sm:rounded-3xl border border-slate-200/90 dark:border-slate-800 bg-white dark:bg-slate-900 p-4 sm:p-6 lg:p-7 shadow-sm">
         <ServiceIntervals vehicleId={vehicle.id} currentMileage={vehicle.mileage} />
       </div>
 
-      {/* 05 / Tires manager */}
+      {/* Tires manager */}
       <div className="rounded-2xl sm:rounded-3xl border border-slate-200/90 dark:border-slate-800 bg-white dark:bg-slate-900 p-4 sm:p-6 lg:p-7 shadow-sm">
         <TiresManager vehicleId={vehicle.id} currentMileage={vehicle.mileage} />
       </div>
 
-      {/* 06 / Parts inventory */}
+      {/* Parts inventory */}
       <div className="rounded-2xl sm:rounded-3xl border border-slate-200/90 dark:border-slate-800 bg-white dark:bg-slate-900 p-4 sm:p-6 lg:p-7 shadow-sm">
         <PartsInventory vehicleId={vehicle.id} />
       </div>
 
-      {/* 07 / Expenses Journal Section */}
+      {/* Expenses Journal Section */}
       <div className="rounded-2xl sm:rounded-3xl border border-slate-200/90 dark:border-slate-800 bg-white dark:bg-slate-900 p-4 sm:p-6 lg:p-7 shadow-sm space-y-4 sm:space-y-6">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 pb-3 sm:pb-4 border-b border-slate-100 dark:border-slate-800">
           <button
@@ -601,7 +601,7 @@ export function VehiclePage() {
             <div>
               <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap">
                 <span className="font-mono text-[10px] sm:text-xs uppercase tracking-widest text-slate-400 font-semibold">
-                  [ 07 / БОРТОВОЙ ЖУРНАЛ ]
+                  [ БОРТОВОЙ ЖУРНАЛ ]
                 </span>
                 <span className="rounded-full border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-1.5 sm:px-2 py-0.5 text-[10px] font-mono font-bold text-slate-700 dark:text-slate-300">
                   {expenses.length}

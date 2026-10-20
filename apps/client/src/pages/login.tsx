@@ -91,7 +91,7 @@ export function LoginPage() {
           <div className="space-y-1.5">
             <div className="flex items-center justify-between">
               <span className="font-mono text-xs uppercase tracking-widest text-slate-400 font-semibold">
-                [ 01 / АВТОРИЗАЦИЯ ]
+                [ АВТОРИЗАЦИЯ ]
               </span>
               <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-300 bg-emerald-50 px-2.5 py-0.5 text-[10px] font-mono text-emerald-700 font-semibold">
                 <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
