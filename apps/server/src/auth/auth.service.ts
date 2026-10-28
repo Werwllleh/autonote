@@ -12,6 +12,8 @@ import { PrismaService } from '../prisma/prisma.service';
 import { MailService } from '../mail/mail.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
+import { ForgotPasswordDto } from './dto/forgot-password.dto';
+import { ResetPasswordDto } from './dto/reset-password.dto';
 
 @Injectable()
 export class AuthService {
@@ -79,6 +81,100 @@ export class AuthService {
 
     await this.mail.sendVerification(email, verifyToken);
     return { message: 'Письмо отправлено повторно' };
+  }
+
+  async forgotPassword(dto: ForgotPasswordDto) {
+    const email = dto.email.trim().toLowerCase();
+    const user = await this.prisma.user.findUnique({
+      where: { email },
+    });
+
+    if (user) {
+      const resetPasswordToken = randomUUID();
+      const resetPasswordExpires = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
+
+      await this.prisma.user.update({
+        where: { id: user.id },
+        data: {
+          resetPasswordToken,
+          resetPasswordExpires,
+        },
+      });
+
+      this.mail
+        .sendPasswordReset(user.email, resetPasswordToken)
+        .catch((err: unknown) => {
+          const msg = err instanceof Error ? err.message : String(err);
+          console.error('Failed to send password reset email:', msg);
+        });
+    }
+
+    return {
+      message:
+        'Если указанный email зарегистрирован, ссылка для восстановления пароля отправлена.',
+    };
+  }
+
+  async validateResetToken(token: string) {
+    if (!token) {
+      throw new BadRequestException('Токен сброса пароля не указан');
+    }
+
+    const user = await this.prisma.user.findUnique({
+      where: { resetPasswordToken: token },
+      select: { id: true, resetPasswordExpires: true },
+    });
+
+    if (
+      !user ||
+      !user.resetPasswordExpires ||
+      user.resetPasswordExpires < new Date()
+    ) {
+      throw new BadRequestException(
+        'Неверная или просроченная ссылка для сброса пароля',
+      );
+    }
+
+    return { valid: true };
+  }
+
+  async resetPassword(dto: ResetPasswordDto) {
+    const user = await this.prisma.user.findUnique({
+      where: { resetPasswordToken: dto.token },
+    });
+
+    if (
+      !user ||
+      !user.resetPasswordExpires ||
+      user.resetPasswordExpires < new Date()
+    ) {
+      throw new BadRequestException(
+        'Неверная или просроченная ссылка для сброса пароля',
+      );
+    }
+
+    const hash = await bcrypt.hash(dto.password, 10);
+
+    const updatedUser = await this.prisma.user.update({
+      where: { id: user.id },
+      data: {
+        password: hash,
+        resetPasswordToken: null,
+        resetPasswordExpires: null,
+        emailVerified: true,
+      },
+    });
+
+    const tokens = this.generateTokens(
+      updatedUser.id,
+      updatedUser.email,
+      updatedUser.role,
+    );
+
+    return {
+      message: 'Пароль успешно изменён',
+      ...tokens,
+    };
   }
 
   async login(dto: LoginDto) {

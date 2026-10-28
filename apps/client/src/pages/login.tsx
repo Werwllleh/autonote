@@ -141,9 +141,17 @@ export function LoginPage() {
             </div>
 
             <div className="space-y-1.5">
-              <label htmlFor="password" className="block text-xs font-mono uppercase tracking-wider text-slate-600 font-semibold">
-                Пароль
-              </label>
+              <div className="flex items-center justify-between">
+                <label htmlFor="password" className="block text-xs font-mono uppercase tracking-wider text-slate-600 font-semibold">
+                  Пароль
+                </label>
+                <Link
+                  to="/forgot-password"
+                  className="text-xs font-semibold text-slate-500 hover:text-slate-950 transition-colors"
+                >
+                  Забыли пароль?
+                </Link>
+              </div>
               <input
                 id="password"
                 type="password"

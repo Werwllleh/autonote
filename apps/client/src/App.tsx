@@ -11,6 +11,8 @@ import { PwaInstallPrompt } from "@/components/pwa-install-prompt"
 const Layout = lazy(() => import("@/components/layout").then((m) => ({ default: m.Layout })))
 const LoginPage = lazy(() => import("@/pages/login").then((m) => ({ default: m.LoginPage })))
 const RegisterPage = lazy(() => import("@/pages/register").then((m) => ({ default: m.RegisterPage })))
+const ForgotPasswordPage = lazy(() => import("@/pages/forgot-password").then((m) => ({ default: m.ForgotPasswordPage })))
+const ResetPasswordPage = lazy(() => import("@/pages/reset-password").then((m) => ({ default: m.ResetPasswordPage })))
 const DashboardPage = lazy(() => import("@/pages/dashboard").then((m) => ({ default: m.DashboardPage })))
 const VehiclePage = lazy(() => import("@/pages/vehicle").then((m) => ({ default: m.VehiclePage })))
 const ProfilePage = lazy(() => import("@/pages/profile").then((m) => ({ default: m.ProfilePage })))
@@ -61,6 +63,15 @@ function App() {
                 </GuestRoute>
               }
             />
+            <Route
+              path="/forgot-password"
+              element={
+                <GuestRoute>
+                  <ForgotPasswordPage />
+                </GuestRoute>
+              }
+            />
+            <Route path="/reset-password" element={<ResetPasswordPage />} />
             <Route path="/verify" element={<VerifyPage />} />
             <Route path="/report/:token" element={<PublicReportPage />} />
             <Route

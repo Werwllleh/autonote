@@ -25,6 +25,12 @@ export const authApi = {
     api.get<AuthTokens>("/auth/verify", { params: { token } }).then((r) => r.data),
   resendVerification: (email: string) =>
     api.post<{ message: string }>("/auth/resend-verification", { email }).then((r) => r.data),
+  forgotPassword: (email: string) =>
+    api.post<{ message: string }>("/auth/forgot-password", { email }).then((r) => r.data),
+  validateResetToken: (token: string) =>
+    api.get<{ valid: boolean }>("/auth/reset-password/validate", { params: { token } }).then((r) => r.data),
+  resetPassword: (data: { token: string; password: string }) =>
+    api.post<AuthTokens & { message: string }>("/auth/reset-password", data).then((r) => r.data),
   me: () =>
     api.get<{ id: string; email: string; name: string | null; avatar: string | null; role: string }>("/auth/me").then((r) => r.data),
 }

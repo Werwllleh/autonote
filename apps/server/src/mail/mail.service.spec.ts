@@ -47,4 +47,16 @@ describe('MailService reminders', () => {
       }),
     );
   });
+
+  it('sendPasswordReset emails the reset password link to the given address', async () => {
+    await service.sendPasswordReset('user@test.com', 'reset-tok-456');
+
+    expect(sendMailMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        to: 'user@test.com',
+        subject: expect.stringContaining('Сброс пароля'),
+        html: expect.stringContaining('reset-tok-456'),
+      }),
+    );
+  });
 });
