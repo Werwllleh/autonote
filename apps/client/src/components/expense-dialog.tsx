@@ -166,8 +166,13 @@ export function ExpenseDialog({
     [categories, categoryId],
   )
   const isFuel = selectedCategory?.slug === "fuel"
-  const isMaintenance = selectedCategory?.slug === "maintenance"
   const isInsurance = selectedCategory?.slug === "insurance"
+  const isServiceCategory = Boolean(
+    selectedCategory && (
+      ["maintenance", "repair", "service", "шиномонтаж"].includes(selectedCategory.slug.toLowerCase()) ||
+      /сервис|ремонт|шин|масл|то|тюнинг|установк/i.test(selectedCategory.name)
+    )
+  )
 
   // Fuel calculations
   const fuelTotal = useMemo(() => {
@@ -242,7 +247,7 @@ export function ExpenseDialog({
     let finalAmount: number
     if (isFuel) {
       finalAmount = fuelFinal
-    } else if (isMaintenance && (hasParts || laborCostNum > 0)) {
+    } else if (isServiceCategory && (hasParts || hasStockParts || laborCostNum > 0)) {
       finalAmount = maintenanceTotal
     } else {
       finalAmount = Number(amount)
@@ -274,7 +279,7 @@ export function ExpenseDialog({
           liters: isFuel ? parseFloat(liters) : null,
           pricePerLiter: isFuel ? parseFloat(pricePerLiter) : null,
           bonuses: isFuel && bonuses ? parseFloat(bonuses) : null,
-          parts: isMaintenance && hasParts
+          parts: isServiceCategory && hasParts
             ? parts
                 .filter((p) => p.name && parseFloat(p.price) > 0)
                 .map((p) => ({
@@ -284,7 +289,7 @@ export function ExpenseDialog({
                   price: Number(p.price),
                 }))
             : null,
-          laborCost: isMaintenance && laborCostNum > 0 ? laborCostNum : null,
+          laborCost: isServiceCategory && laborCostNum > 0 ? laborCostNum : null,
           dateFrom: isInsurance && dateFrom ? dateFrom : null,
           dateTo: isInsurance && dateTo ? dateTo : null,
           receiptPhoto: receiptPhoto ?? null,
@@ -325,7 +330,7 @@ export function ExpenseDialog({
             pricePerLiter: parseFloat(pricePerLiter),
             bonuses: bonuses ? parseFloat(bonuses) : undefined,
           }),
-          ...(isMaintenance && {
+          ...(isServiceCategory && {
             ...(allParts.length > 0 && { parts: allParts }),
             ...(laborCostNum > 0 && { laborCost: laborCostNum }),
             ...(stockItems.length > 0 && { stockParts: stockItems }),
@@ -362,7 +367,7 @@ export function ExpenseDialog({
   let canSubmit = !!categoryId
   if (isFuel) {
     canSubmit = canSubmit && fuelTotal > 0
-  } else if (isMaintenance) {
+  } else if (isServiceCategory) {
     canSubmit = canSubmit && (maintenanceTotal > 0 || Number(amount) > 0)
   } else {
     canSubmit = canSubmit && Number(amount) > 0
@@ -376,8 +381,8 @@ export function ExpenseDialog({
     </Button>
   )
 
-  // Should show manual amount field for maintenance?
-  const showManualAmount = isMaintenance && !hasParts && !hasStockParts && laborCostNum === 0
+  // Should show manual amount field for service categories?
+  const showManualAmount = isServiceCategory && !hasParts && !hasStockParts && laborCostNum === 0
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
@@ -555,8 +560,8 @@ export function ExpenseDialog({
               </>
             )}
 
-            {/* === MAINTENANCE === */}
-            {isMaintenance && (
+            {/* === SERVICE / MAINTENANCE === */}
+            {isServiceCategory && (
               <>
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
@@ -794,7 +799,7 @@ export function ExpenseDialog({
             )}
 
             {/* === DEFAULT / MANUAL AMOUNT === */}
-            {!isFuel && !isMaintenance && (
+            {!isFuel && !isServiceCategory && (
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label>Сумма (руб.)</Label>
@@ -834,8 +839,8 @@ export function ExpenseDialog({
               </div>
             )}
 
-            {/* Date for fuel/maintenance */}
-            {(isFuel || isMaintenance) && (
+            {/* Date for fuel/service */}
+            {(isFuel || isServiceCategory) && (
               <div className="space-y-2">
                 <Label>Дата</Label>
                 <Input
@@ -855,8 +860,8 @@ export function ExpenseDialog({
                 placeholder={
                   isFuel
                     ? "АИ-95, Лукойл"
-                    : isMaintenance
-                      ? "Замена масла, фильтров"
+                    : isServiceCategory
+                      ? "Замена масла, фильтров, шиномонтаж"
                       : isInsurance
                         ? "ОСАГО, КАСКО, Ингосстрах"
                         : "Описание расхода"

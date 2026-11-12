@@ -584,7 +584,7 @@ export function VehiclePage() {
 
       {/* Parts inventory */}
       <div className="rounded-2xl sm:rounded-3xl border border-slate-200/90 dark:border-slate-800 bg-white dark:bg-slate-900 p-4 sm:p-6 lg:p-7 shadow-sm">
-        <PartsInventory vehicleId={vehicle.id} />
+        <PartsInventory vehicleId={vehicle.id} currentMileage={vehicle.mileage} />
       </div>
 
       {/* Expenses Journal Section */}

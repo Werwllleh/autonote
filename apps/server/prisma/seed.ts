@@ -6,6 +6,7 @@ const categories = [
   { name: 'Топливо', slug: 'fuel' },
   { name: 'ТО', slug: 'maintenance' },
   { name: 'Ремонт', slug: 'repair' },
+  { name: 'Сервис', slug: 'service' },
   { name: 'Страховка', slug: 'insurance' },
   { name: 'Штрафы', slug: 'fines' },
   { name: 'Мойка', slug: 'wash' },

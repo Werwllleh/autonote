@@ -1,6 +1,7 @@
 import { useState, useMemo, type FormEvent } from "react"
 import { useParts, useCreatePart, useUpdatePart, useDeletePart } from "@/hooks/use-parts"
 import { PartDetailDialog } from "@/components/part-detail-dialog"
+import { InstallPartDialog } from "@/components/install-part-dialog"
 import type { Part } from "@/api/parts"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -17,6 +18,7 @@ import { Plus, Pencil, Trash2, Package, ChevronDown, ChevronRight, Search } from
 
 interface PartsInventoryProps {
   vehicleId: string
+  currentMileage?: number
 }
 
 function PartFormDialog({
@@ -78,7 +80,7 @@ function PartFormDialog({
     e.preventDefault()
     const onSuccess = () => setOpen(false)
 
-    const finalName = existingMatch ? existingMatch.name : name
+    const finalName = name.trim() || (existingMatch ? existingMatch.name : "")
 
     if (isEdit) {
       update.mutate(
@@ -143,18 +145,20 @@ function PartFormDialog({
                 </div>
               )}
             </div>
-            {/* Hide name if article matches existing part */}
-            {(isEdit || !existingMatch) && (
-              <div className="space-y-2">
-                <Label>Название</Label>
-                <Input
-                  required={!existingMatch}
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  placeholder="Масляный фильтр"
-                />
-              </div>
-            )}
+            <div className="space-y-2">
+              <Label>Название</Label>
+              <Input
+                required
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder={existingMatch ? existingMatch.name : "Масляный фильтр"}
+              />
+              {existingMatch && !name && (
+                <p className="text-[11px] text-muted-foreground">
+                  Совпадение по артикулу: {existingMatch.name}. Можете оставить своё название или использовать найденное.
+                </p>
+              )}
+            </div>
             <div className="space-y-2">
               <Label>Где лежит</Label>
               <Input
@@ -217,10 +221,12 @@ interface PartGroup {
 function PartGroupRow({
   group,
   vehicleId,
+  currentMileage,
   allParts,
 }: {
   group: PartGroup
   vehicleId: string
+  currentMileage?: number
   allParts: Part[]
 }) {
   const [expanded, setExpanded] = useState(false)
@@ -278,6 +284,13 @@ function PartGroupRow({
                   </div>
                 </div>
                 <div className="flex items-center gap-1 shrink-0">
+                  {part.quantity > 0 && (
+                    <InstallPartDialog
+                      part={part}
+                      vehicleId={vehicleId}
+                      currentMileage={currentMileage}
+                    />
+                  )}
                   <PartFormDialog
                     vehicleId={vehicleId}
                     part={part}
@@ -313,10 +326,12 @@ function PartGroupRow({
 function SinglePartRow({
   part,
   vehicleId,
+  currentMileage,
   allParts,
 }: {
   part: Part
   vehicleId: string
+  currentMileage?: number
   allParts: Part[]
 }) {
   const deletePart = useDeletePart()
@@ -340,13 +355,20 @@ function SinglePartRow({
             </span>
           </div>
         </div>
-        <div className="flex items-center gap-1 shrink-0">
+        <div className="flex items-center gap-1 sm:gap-1.5 shrink-0">
           <Badge
             variant={part.quantity > 0 ? "secondary" : "destructive"}
             className="text-xs"
           >
             {part.quantity} шт.
           </Badge>
+          {part.quantity > 0 && (
+            <InstallPartDialog
+              part={part}
+              vehicleId={vehicleId}
+              currentMileage={currentMileage}
+            />
+          )}
           <PartFormDialog
             vehicleId={vehicleId}
             part={part}
@@ -375,7 +397,7 @@ function SinglePartRow({
   )
 }
 
-export function PartsInventory({ vehicleId }: PartsInventoryProps) {
+export function PartsInventory({ vehicleId, currentMileage }: PartsInventoryProps) {
   const { data: parts = [], isLoading } = useParts(vehicleId)
   const [inventoryOpen, setInventoryOpen] = useState(false)
   const [search, setSearch] = useState("")
@@ -397,7 +419,8 @@ export function PartsInventory({ vehicleId }: PartsInventoryProps) {
 
   for (const part of filteredParts) {
     if (part.article) {
-      const key = part.article.toUpperCase()
+      // Group ONLY when both article and normalized name match
+      const key = `${part.article.trim().toUpperCase()}:::${part.name.trim().toLowerCase()}`
       const arr = articleMap.get(key) || []
       arr.push(part)
       articleMap.set(key, arr)
@@ -409,12 +432,12 @@ export function PartsInventory({ vehicleId }: PartsInventoryProps) {
   const groups: PartGroup[] = []
   const soloFromArticle: Part[] = []
 
-  for (const [article, items] of articleMap) {
+  for (const [, items] of articleMap) {
     if (items.length === 1) {
       soloFromArticle.push(items[0])
     } else {
       groups.push({
-        article,
+        article: items[0].article || "",
         name: items[0].name,
         items,
         totalQty: items.reduce((s, p) => s + p.quantity, 0),
@@ -490,9 +513,10 @@ export function PartsInventory({ vehicleId }: PartsInventoryProps) {
                 <div className="space-y-2">
                   {groups.map((group) => (
                     <PartGroupRow
-                      key={group.article}
+                      key={`${group.article}:::${group.name}`}
                       group={group}
                       vehicleId={vehicleId}
+                      currentMileage={currentMileage}
                       allParts={parts}
                     />
                   ))}
@@ -501,6 +525,7 @@ export function PartsInventory({ vehicleId }: PartsInventoryProps) {
                       key={part.id}
                       part={part}
                       vehicleId={vehicleId}
+                      currentMileage={currentMileage}
                       allParts={parts}
                     />
                   ))}

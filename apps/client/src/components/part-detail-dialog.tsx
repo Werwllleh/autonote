@@ -7,7 +7,9 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 import { Badge } from "@/components/ui/badge"
-import { Package } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { Package, Wrench } from "lucide-react"
+import { InstallPartDialog } from "@/components/install-part-dialog"
 
 function formatAmount(amount: number) {
   return amount.toLocaleString("ru-RU", {
@@ -85,6 +87,19 @@ export function PartDetailDialog({ part, children }: PartDetailDialogProps) {
               <span>{formatAmount(totalValue)}</span>
             </div>
           </div>
+
+          {part.quantity > 0 && (
+            <InstallPartDialog
+              part={part}
+              vehicleId={part.vehicleId}
+              trigger={
+                <Button className="w-full gap-2 font-semibold bg-emerald-600 hover:bg-emerald-700 text-white">
+                  <Wrench className="h-4 w-4" />
+                  Установить на автомобиль
+                </Button>
+              }
+            />
+          )}
 
           <div className="text-xs text-muted-foreground">
             Добавлено: {formatDate(part.createdAt)}

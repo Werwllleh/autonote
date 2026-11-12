@@ -35,7 +35,6 @@ export function ExpenseDetailDialog({ expense, children }: ExpenseDetailDialogPr
   const [open, setOpen] = useState(false)
 
   const isFuel = expense.category.slug === "fuel"
-  const isMaintenance = expense.category.slug === "maintenance"
   const isInsurance = expense.category.slug === "insurance"
 
   const partsSum = expense.parts?.reduce((s, p) => s + p.quantity * p.price, 0) ?? 0
@@ -134,14 +133,14 @@ export function ExpenseDetailDialog({ expense, children }: ExpenseDetailDialogPr
             </>
           )}
 
-          {/* Maintenance details */}
-          {isMaintenance && (expense.parts?.length || expense.laborCost) && (
+          {/* Parts & Labor details */}
+          {((expense.parts?.length ?? 0) > 0 || (expense.laborCost != null && expense.laborCost > 0)) && (
             <>
               <Separator />
               <div className="space-y-2">
                 <h4 className="text-xs font-mono uppercase tracking-wider text-slate-500 font-semibold flex items-center gap-2">
                   <Wrench className="h-4 w-4 text-slate-400" />
-                  ТО
+                  {expense.category.name}
                 </h4>
                 <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-850 p-4 space-y-2.5 text-xs font-mono">
                   {expense.parts && expense.parts.length > 0 && (

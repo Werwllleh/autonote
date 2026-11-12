@@ -63,7 +63,7 @@ function formatShortDate(dateStr: string) {
 
 function CategoryIcon({ slug }: { slug: string }) {
   if (slug === "fuel") return <Fuel className="h-3.5 w-3.5" />
-  if (slug === "maintenance" || slug === "repair") return <Wrench className="h-3.5 w-3.5" />
+  if (slug === "maintenance" || slug === "repair" || slug === "service" || slug === "шиномонтаж") return <Wrench className="h-3.5 w-3.5" />
   if (slug === "insurance") return <Shield className="h-3.5 w-3.5" />
   return <Receipt className="h-3.5 w-3.5" />
 }
