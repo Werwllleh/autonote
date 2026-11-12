@@ -271,6 +271,30 @@ export function ExpenseDialog({
       mileage: mileage ? Number(mileage) : undefined,
     }
 
+    // Combine manual parts + stock parts into single parts array
+    const manualParts = hasParts
+      ? parts
+          .filter((p) => p.name && parseFloat(p.price) > 0)
+          .map((p) => ({
+            article: p.article || undefined,
+            name: p.name,
+            quantity: Number(p.quantity) || 1,
+            price: Number(p.price),
+          }))
+      : []
+
+    const stockPartsMapped = stockItems.map((item) => {
+      const sp = stockParts.find((p) => p.id === item.partId)!
+      return {
+        article: sp.article || undefined,
+        name: sp.name,
+        quantity: item.quantity,
+        price: sp.price,
+      }
+    })
+
+    const allParts = [...manualParts, ...stockPartsMapped]
+
     if (isEdit) {
       update.mutate(
         {
@@ -279,17 +303,9 @@ export function ExpenseDialog({
           liters: isFuel ? parseFloat(liters) : null,
           pricePerLiter: isFuel ? parseFloat(pricePerLiter) : null,
           bonuses: isFuel && bonuses ? parseFloat(bonuses) : null,
-          parts: isServiceCategory && hasParts
-            ? parts
-                .filter((p) => p.name && parseFloat(p.price) > 0)
-                .map((p) => ({
-                  article: p.article || undefined,
-                  name: p.name,
-                  quantity: Number(p.quantity) || 1,
-                  price: Number(p.price),
-                }))
-            : null,
+          parts: isServiceCategory && allParts.length > 0 ? allParts : null,
           laborCost: isServiceCategory && laborCostNum > 0 ? laborCostNum : null,
+          stockParts: isServiceCategory && stockItems.length > 0 ? stockItems : undefined,
           dateFrom: isInsurance && dateFrom ? dateFrom : null,
           dateTo: isInsurance && dateTo ? dateTo : null,
           receiptPhoto: receiptPhoto ?? null,
@@ -298,30 +314,6 @@ export function ExpenseDialog({
         { onSuccess },
       )
     } else {
-      // Combine manual parts + stock parts into single parts array
-      const manualParts = hasParts
-        ? parts
-            .filter((p) => p.name && parseFloat(p.price) > 0)
-            .map((p) => ({
-              article: p.article || undefined,
-              name: p.name,
-              quantity: Number(p.quantity) || 1,
-              price: Number(p.price),
-            }))
-        : []
-
-      const stockPartsMapped = stockItems.map((item) => {
-        const sp = stockParts.find((p) => p.id === item.partId)!
-        return {
-          article: sp.article || undefined,
-          name: sp.name,
-          quantity: item.quantity,
-          price: sp.price,
-        }
-      })
-
-      const allParts = [...manualParts, ...stockPartsMapped]
-
       create.mutate(
         {
           ...base,

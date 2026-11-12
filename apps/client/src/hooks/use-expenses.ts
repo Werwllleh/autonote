@@ -17,6 +17,7 @@ export function useCreateExpense() {
       qc.invalidateQueries({ queryKey: ["stats"] })
       qc.invalidateQueries({ queryKey: ["vehicles"] })
       qc.invalidateQueries({ queryKey: ["service-intervals"] })
+      qc.invalidateQueries({ queryKey: ["parts"] })
     },
   })
 }
@@ -34,6 +35,7 @@ interface UpdateExpensePayload {
   bonuses?: number | null
   parts?: { article?: string; name: string; quantity: number; price: number }[] | null
   laborCost?: number | null
+  stockParts?: { partId: string; quantity: number }[]
   dateFrom?: string | null
   dateTo?: string | null
   receiptPhoto?: string | null
@@ -50,6 +52,7 @@ export function useUpdateExpense() {
       qc.invalidateQueries({ queryKey: ["stats"] })
       qc.invalidateQueries({ queryKey: ["vehicles"] })
       qc.invalidateQueries({ queryKey: ["service-intervals"] })
+      qc.invalidateQueries({ queryKey: ["parts"] })
     },
   })
 }
@@ -63,6 +66,7 @@ export function useDeleteExpense() {
       qc.invalidateQueries({ queryKey: ["stats"] })
       qc.invalidateQueries({ queryKey: ["vehicles"] })
       qc.invalidateQueries({ queryKey: ["service-intervals"] })
+      qc.invalidateQueries({ queryKey: ["parts"] })
     },
   })
 }

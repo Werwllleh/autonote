@@ -11,7 +11,7 @@ import {
   ValidateIf,
 } from 'class-validator';
 import { Type } from 'class-transformer';
-import { PartDto } from './create-expense.dto';
+import { PartDto, StockPartDto } from './create-expense.dto';
 
 export class UpdateExpenseDto {
   @IsOptional()
@@ -64,6 +64,12 @@ export class UpdateExpenseDto {
   @ValidateNested({ each: true })
   @Type(() => PartDto)
   parts?: PartDto[] | null;
+
+  @IsOptional()
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => StockPartDto)
+  stockParts?: StockPartDto[];
 
   @IsOptional()
   @ValidateIf((_, value) => value !== null)

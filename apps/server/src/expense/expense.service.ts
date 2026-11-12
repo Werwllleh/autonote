@@ -152,32 +152,40 @@ export class ExpenseService {
       data.serviceIntervalId = dto.serviceIntervalId;
     }
 
-    const updated = await this.prisma.expense.update({
-      where: { id },
-      data,
-      include: { category: true, vehicle: true, serviceInterval: true },
+    const updated = await this.prisma.$transaction(async (tx) => {
+      if (dto.stockParts?.length) {
+        await this.partService.deductStock(dto.stockParts, userId, tx);
+      }
+
+      const res = await tx.expense.update({
+        where: { id },
+        data,
+        include: { category: true, vehicle: true, serviceInterval: true },
+      });
+
+      if (
+        dto.mileage &&
+        res.vehicle &&
+        dto.mileage > res.vehicle.mileage
+      ) {
+        await tx.vehicle.update({
+          where: { id: res.vehicleId },
+          data: { mileage: dto.mileage },
+        });
+      }
+
+      if (dto.serviceIntervalId) {
+        await tx.serviceInterval.update({
+          where: { id: dto.serviceIntervalId },
+          data: {
+            lastServiceDate: res.date,
+            ...(res.mileage ? { lastServiceMileage: res.mileage } : {}),
+          },
+        });
+      }
+
+      return res;
     });
-
-    if (
-      dto.mileage &&
-      updated.vehicle &&
-      dto.mileage > updated.vehicle.mileage
-    ) {
-      await this.prisma.vehicle.update({
-        where: { id: updated.vehicleId },
-        data: { mileage: dto.mileage },
-      });
-    }
-
-    if (dto.serviceIntervalId) {
-      await this.prisma.serviceInterval.update({
-        where: { id: dto.serviceIntervalId },
-        data: {
-          lastServiceDate: updated.date,
-          ...(updated.mileage ? { lastServiceMileage: updated.mileage } : {}),
-        },
-      });
-    }
 
     return updated;
   }

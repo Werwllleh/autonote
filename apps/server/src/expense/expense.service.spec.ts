@@ -15,6 +15,9 @@ describe('ExpenseService', () => {
     serviceInterval: { update: jest.Mock };
     $transaction: jest.Mock;
   };
+  let partService: {
+    deductStock: jest.Mock;
+  };
   let uploadService: {
     processImage: jest.Mock;
     removeImage: jest.Mock;
@@ -45,11 +48,15 @@ describe('ExpenseService', () => {
       removeImage: jest.fn(),
     };
 
+    partService = {
+      deductStock: jest.fn(),
+    };
+
     const module = await Test.createTestingModule({
       providers: [
         ExpenseService,
         { provide: PrismaService, useValue: prisma },
-        { provide: PartService, useValue: { deductStock: jest.fn() } },
+        { provide: PartService, useValue: partService },
         { provide: UploadService, useValue: uploadService },
       ],
     }).compile();
@@ -134,6 +141,42 @@ describe('ExpenseService', () => {
           lastServiceMileage: 52000,
         },
       });
+    });
+  });
+
+  describe('update', () => {
+    it('deducts stock parts when stockParts is provided in update', async () => {
+      prisma.expense.findFirst.mockResolvedValue({
+        id: 'e1',
+        vehicle: { id: 'v1', userId: 'u1', mileage: 50000 },
+      });
+      prisma.expense.update.mockResolvedValue({
+        id: 'e1',
+        vehicleId: 'v1',
+        vehicle: { id: 'v1', mileage: 50000 },
+      });
+
+      const stockParts = [{ partId: 'p1', quantity: 2 }];
+      await service.update(
+        'e1',
+        {
+          amount: 15000,
+          stockParts,
+        } as any,
+        'u1',
+      );
+
+      expect(partService.deductStock).toHaveBeenCalledWith(
+        stockParts,
+        'u1',
+        expect.anything(),
+      );
+      expect(prisma.expense.update).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: { id: 'e1' },
+          data: expect.objectContaining({ amount: 15000 }),
+        }),
+      );
     });
   });
 
