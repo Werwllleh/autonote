@@ -379,7 +379,10 @@ export function ExpenseDialog({
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>{trigger || defaultTrigger}</DialogTrigger>
-      <DialogContent className="max-h-[90vh] overflow-y-auto overflow-x-hidden p-4 sm:p-6">
+      <DialogContent
+        className="max-h-[90vh] overflow-y-auto overflow-x-hidden p-4 sm:p-6"
+        onCloseAutoFocus={(e) => e.preventDefault()}
+      >
         <DialogHeader>
           <DialogTitle>{isEdit ? "Редактировать расход" : "Новый расход"}</DialogTitle>
         </DialogHeader>

@@ -5,6 +5,7 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogTrigger,
 } from "@/components/ui/dialog"
 import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
@@ -41,17 +42,9 @@ export function ExpenseDetailDialog({ expense, children }: ExpenseDetailDialogPr
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <div
-        className="cursor-pointer"
-        onClick={(e) => {
-          const target = e.target as HTMLElement
-          if (target.closest("button")) return
-          if (target.closest('[role="dialog"]')) return
-          setOpen(true)
-        }}
-      >
+      <DialogTrigger asChild>
         {children}
-      </div>
+      </DialogTrigger>
       <DialogContent className="max-h-[85vh] overflow-y-auto sm:max-w-md">
         <DialogHeader>
           <div className="flex items-center gap-2.5">

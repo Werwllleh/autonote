@@ -766,100 +766,105 @@ export function VehiclePage() {
                     {!collapsedMonths.has(group.key) && (
                       <div className="space-y-1.5 sm:space-y-2 pl-0 sm:pl-2">
                         {group.expenses.map((expense) => (
-                          <ExpenseDetailDialog key={expense.id} expense={expense}>
-                            <div className="flex items-center justify-between gap-2.5 sm:gap-4 rounded-xl sm:rounded-2xl border border-slate-200/70 dark:border-slate-800/80 bg-white dark:bg-slate-900 px-3 sm:px-4 py-2 sm:py-3 hover:border-slate-300 dark:hover:border-slate-700 hover:shadow-2xs transition-all cursor-pointer">
-                              <div className="flex-1 min-w-0">
-                                <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap">
-                                  <span className="rounded-full border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-2 sm:px-2.5 py-0.5 text-[10px] sm:text-[11px] font-mono font-semibold text-slate-700 dark:text-slate-300">
-                                    {expense.category.name}
-                                  </span>
-                                  {expense.receiptPhoto && (
-                                    <span title="Чек прикреплен" className="inline-flex items-center text-emerald-600">
-                                      <Paperclip className="h-3 w-3" />
+                          <div
+                            key={expense.id}
+                            className="flex items-center justify-between gap-2.5 sm:gap-4 rounded-xl sm:rounded-2xl border border-slate-200/70 dark:border-slate-800/80 bg-white dark:bg-slate-900 px-3 sm:px-4 py-2 sm:py-3 hover:border-slate-300 dark:hover:border-slate-700 hover:shadow-2xs transition-all"
+                          >
+                            <ExpenseDetailDialog expense={expense}>
+                              <div className="flex-1 min-w-0 flex items-center justify-between gap-2.5 sm:gap-4 cursor-pointer">
+                                <div className="min-w-0">
+                                  <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap">
+                                    <span className="rounded-full border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-2 sm:px-2.5 py-0.5 text-[10px] sm:text-[11px] font-mono font-semibold text-slate-700 dark:text-slate-300">
+                                      {expense.category.name}
                                     </span>
-                                  )}
-                                  {expense.serviceInterval && (
-                                    <span className="inline-flex items-center gap-1 rounded-full bg-blue-50 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-800 px-1.5 sm:px-2 py-0.5 text-[9px] sm:text-[10px] font-mono font-medium text-blue-700 dark:text-blue-300">
-                                      <Wrench className="h-2.5 w-2.5" />
-                                      {expense.serviceInterval.name}
-                                    </span>
-                                  )}
-                                  {expense.description && (
-                                    <span className="text-xs sm:text-sm font-medium text-slate-700 dark:text-slate-300 truncate">
-                                      {expense.description}
-                                    </span>
-                                  )}
-                                </div>
-                                <div className="mt-1 flex items-center gap-2 sm:gap-3 text-[10px] sm:text-xs font-mono text-slate-400 flex-wrap">
-                                  <span className="flex items-center gap-1">
-                                    <Calendar className="h-3 w-3" />
-                                    {formatDate(expense.date)}
-                                  </span>
-                                  {expense.mileage && (
+                                    {expense.receiptPhoto && (
+                                      <span title="Чек прикреплен" className="inline-flex items-center text-emerald-600">
+                                        <Paperclip className="h-3 w-3" />
+                                      </span>
+                                    )}
+                                    {expense.serviceInterval && (
+                                      <span className="inline-flex items-center gap-1 rounded-full bg-blue-50 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-800 px-1.5 sm:px-2 py-0.5 text-[9px] sm:text-[10px] font-mono font-medium text-blue-700 dark:text-blue-300">
+                                        <Wrench className="h-2.5 w-2.5" />
+                                        {expense.serviceInterval.name}
+                                      </span>
+                                    )}
+                                    {expense.description && (
+                                      <span className="text-xs sm:text-sm font-medium text-slate-700 dark:text-slate-300 truncate">
+                                        {expense.description}
+                                      </span>
+                                    )}
+                                  </div>
+                                  <div className="mt-1 flex items-center gap-2 sm:gap-3 text-[10px] sm:text-xs font-mono text-slate-400 flex-wrap">
                                     <span className="flex items-center gap-1">
-                                      <Gauge className="h-3 w-3" />
-                                      {expense.mileage.toLocaleString("ru-RU")} км
+                                      <Calendar className="h-3 w-3" />
+                                      {formatDate(expense.date)}
                                     </span>
-                                  )}
-                                  {expense.liters && expense.pricePerLiter && (
-                                    <span className="flex items-center gap-1">
-                                      <Fuel className="h-3 w-3" />
-                                      {expense.liters} л × {expense.pricePerLiter} ₽
-                                      {expense.bonuses ? ` (-${expense.bonuses} бонусы)` : ""}
-                                    </span>
-                                  )}
-                                  {expense.parts && expense.parts.length > 0 && (() => {
-                                    const partsSum = expense.parts.reduce((s, p) => s + p.quantity * p.price, 0)
-                                    return (
+                                    {expense.mileage && (
+                                      <span className="flex items-center gap-1">
+                                        <Gauge className="h-3 w-3" />
+                                        {expense.mileage.toLocaleString("ru-RU")} км
+                                      </span>
+                                    )}
+                                    {expense.liters && expense.pricePerLiter && (
+                                      <span className="flex items-center gap-1">
+                                        <Fuel className="h-3 w-3" />
+                                        {expense.liters} л × {expense.pricePerLiter} ₽
+                                        {expense.bonuses ? ` (-${expense.bonuses} бонусы)` : ""}
+                                      </span>
+                                    )}
+                                    {expense.parts && expense.parts.length > 0 && (() => {
+                                      const partsSum = expense.parts.reduce((s, p) => s + p.quantity * p.price, 0)
+                                      return (
+                                        <span className="flex items-center gap-1">
+                                          <Wrench className="h-3 w-3" />
+                                          запчасти {formatAmount(partsSum)}
+                                          {expense.laborCost ? ` · работа ${formatAmount(expense.laborCost)}` : ""}
+                                        </span>
+                                      )
+                                    })()}
+                                    {!expense.parts?.length && expense.laborCost && (
                                       <span className="flex items-center gap-1">
                                         <Wrench className="h-3 w-3" />
-                                        запчасти {formatAmount(partsSum)}
-                                        {expense.laborCost ? ` · работа ${formatAmount(expense.laborCost)}` : ""}
+                                        работа {formatAmount(expense.laborCost)}
                                       </span>
-                                    )
-                                  })()}
-                                  {!expense.parts?.length && expense.laborCost && (
-                                    <span className="flex items-center gap-1">
-                                      <Wrench className="h-3 w-3" />
-                                      работа {formatAmount(expense.laborCost)}
-                                    </span>
-                                  )}
+                                    )}
+                                  </div>
                                 </div>
-                              </div>
-                              <div className="flex items-center gap-0.5 sm:gap-1.5 shrink-0">
-                                <span className="font-black font-mono text-xs sm:text-base text-slate-950 dark:text-white">
+                                <span className="font-black font-mono text-xs sm:text-base text-slate-950 dark:text-white shrink-0">
                                   {formatAmount(expense.amount)}
                                 </span>
-                                <ExpenseDialog
-                                  vehicleId={vehicle.id}
-                                  expense={expense}
-                                  trigger={
-                                    <Button
-                                      variant="ghost"
-                                      size="icon"
-                                      className="h-7 w-7 sm:h-8 sm:w-8 rounded-full text-slate-400 hover:text-slate-700 dark:hover:text-slate-200"
-                                      onClick={(e) => e.stopPropagation()}
-                                    >
-                                      <Pencil className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
-                                    </Button>
-                                  }
-                                />
-                                <Button
-                                  variant="ghost"
-                                  size="icon"
-                                  className="h-7 w-7 sm:h-8 sm:w-8 rounded-full text-slate-400 hover:text-rose-600 dark:hover:text-rose-400"
-                                  onClick={(e) => {
-                                    e.stopPropagation()
-                                    if (confirm("Удалить расход?")) {
-                                      deleteExpense.mutate(expense.id)
-                                    }
-                                  }}
-                                >
-                                  <Trash2 className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
-                                </Button>
                               </div>
+                            </ExpenseDetailDialog>
+                            <div className="flex items-center gap-0.5 sm:gap-1 shrink-0">
+                              <ExpenseDialog
+                                vehicleId={vehicle.id}
+                                expense={expense}
+                                trigger={
+                                  <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    className="h-7 w-7 sm:h-8 sm:w-8 rounded-full text-slate-400 hover:text-slate-700 dark:hover:text-slate-200"
+                                    title="Редактировать"
+                                  >
+                                    <Pencil className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
+                                  </Button>
+                                }
+                              />
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-7 w-7 sm:h-8 sm:w-8 rounded-full text-slate-400 hover:text-rose-600 dark:hover:text-rose-400"
+                                title="Удалить"
+                                onClick={() => {
+                                  if (confirm("Удалить расход?")) {
+                                    deleteExpense.mutate(expense.id)
+                                  }
+                                }}
+                              >
+                                <Trash2 className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
+                              </Button>
                             </div>
-                          </ExpenseDetailDialog>
+                          </div>
                         ))}
                       </div>
                     )}
